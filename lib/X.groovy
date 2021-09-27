@@ -55,8 +55,9 @@ static LocalDate localDate(NodeRO node, String dateFormat = null) {
     }
 }
 
-static void setStyleAndTimestampInAttribute(String name, ZonedDateTime zonedDateTime = null) {
-    def node = ScriptUtils.node()
+static void setStyleAndTimestampInAttribute(String name, NodeRO node = null, ZonedDateTime zonedDateTime = null) {
+    if (!node)
+        node = ScriptUtils.node()
     if (!node[name]) {
         if (!zonedDateTime) {
             // Obtains the current date-time from the system clock in the default time-zone.
@@ -64,7 +65,7 @@ static void setStyleAndTimestampInAttribute(String name, ZonedDateTime zonedDate
         }
         node.style.name = name
         // The pattern must be different than any recognized by Freeplane.
-        // If recognized, FP stores the value as LocalDateTime, loosing the original time-zone info
+        // If it's recognized, FP'll store the value as LocalDateTime, loosing the original time-zone info
         node[name] = zonedDateTime.format(DateTimeFormatter.ofPattern(dfLong))
     } else {
         ScriptUtils.c().statusInfo = "${name} is already set to ${node[name]}"

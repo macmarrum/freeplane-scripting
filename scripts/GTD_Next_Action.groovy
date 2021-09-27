@@ -1,1 +1,2 @@
-X.setStyleAndTimestampInAttribute('!NextAcGTD_Next_Actiontion')
+// @ExecutionModes({ON_SINGLE_NODE})
+c.selecteds.each { X.setStyleAndTimestampInAttribute('!NextAction', it) }
