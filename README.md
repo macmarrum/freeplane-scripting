@@ -1,1 +1,1 @@
-# freeplane-scripts
+# freeplane-scripting
