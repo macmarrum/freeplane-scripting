@@ -145,5 +145,4 @@ def static reportCountOfDescendantsWithStyle(node = null, styleName = '!WaitingF
         return "$styleName: $countAll nodes in total"
     else
         return "$styleName: $countUnique unique nodes, $countAll nodes in total"
-
 }
