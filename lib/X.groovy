@@ -73,8 +73,77 @@ static void setStyleAndTimestampInAttribute(String name, NodeRO node = null, Zon
     }
 }
 
-static String countDescendantsWithStyle(node, String styleName, Boolean canCountAllClones = true, String messageFormatPattern = null) {
-    // TODO: count each clone only once
-    def cnt = node.findAll().findAll { it.style.name == styleName }.size()
-    return MessageFormat.format(messageFormatPattern ?: '{1} count: {0}', cnt, styleName, canCountAllClones)
+static String countDescendantsWithStyle(node, String styleName, Boolean isCountAllClones = true, String messageFormatPattern = null) {
+    Set<NodeRO> uniqueNodeIDs = new HashSet<>()
+    Boolean isCloneExist
+    Boolean isCountMeIn
+    def cnt = node.findAll().findAll {
+        if (isCountAllClones) {
+            isCountMeIn = true
+            if (!isCloneExist)
+                isCloneExist = it.countNodesSharingContent > 0
+        } else {  // don't count all clones
+            // check if self has already been counted
+            if (uniqueNodeIDs.contains(it)) {
+                isCloneExist = true
+                isCountMeIn = false
+            } else {
+                isCountMeIn = true
+                uniqueNodeIDs.add(it)
+            }
+            // add all clones of self
+            uniqueNodeIDs.addAll(it.nodesSharingContent)
+        }
+        isCountMeIn && it.style.name == styleName
+    }.size()
+    return MessageFormat.format(messageFormatPattern ?: '{1}: {0} {2}', cnt, styleName, isCountAllClones && isCloneExist ? 'nodes, when counting clones' : 'unique nodes')
+}
+
+class CountResult {
+    int count
+    Boolean hasClones
+
+    CountResult(int count, Boolean hasClones) {
+        this.count = count
+        this.hasClones = hasClones
+    }
+}
+
+static CountResult getCountOfDescendantsWithStyle(node, String styleName, Boolean isCountAllClones = true) {
+    Set<NodeRO> uniqueNodeIDs = new HashSet<>()
+    Boolean isCloneExist
+    Boolean isCountMeIn
+    def cnt = node.findAll().findAll {
+        if (isCountAllClones) {
+            isCountMeIn = true
+            if (!isCloneExist)
+                isCloneExist = it.countNodesSharingContent > 0
+        } else {  // don't count all clones
+            // check if self has already been counted
+            if (uniqueNodeIDs.contains(it)) {
+                isCloneExist = true
+                isCountMeIn = false
+            } else {
+                isCountMeIn = true
+                uniqueNodeIDs.add(it)
+            }
+            // add all clones of self
+            uniqueNodeIDs.addAll(it.nodesSharingContent)
+        }
+        isCountMeIn && it.style.name == styleName
+    }.size()
+    return new CountResult(cnt, isCloneExist)
+}
+
+def static reportCountOfDescendantsWithStyle(node = null, styleName = '!WaitingFor') {
+    node ?= ScriptUtils.node()
+    def uniqueResult = getCountOfDescendantsWithStyle(node, styleName, false)
+    def allResult = getCountOfDescendantsWithStyle(node, styleName, true)
+    int countAll = allResult.count
+    int countUnique = uniqueResult.count
+    if (countAll == countUnique)
+        return "$styleName: $countAll nodes in total"
+    else
+        return "$styleName: $countUnique unique nodes, $countAll nodes in total"
+
 }
