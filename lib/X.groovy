@@ -4,6 +4,7 @@ import org.freeplane.features.format.FormatController
 import org.freeplane.plugin.script.proxy.ConvertibleDate
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
+import java.text.MessageFormat
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -70,4 +71,10 @@ static void setStyleAndTimestampInAttribute(String name, NodeRO node = null, Zon
     } else {
         ScriptUtils.c().statusInfo = "${name} is already set to ${node[name]}"
     }
+}
+
+static String countDescendantsWithStyle(node, String styleName, Boolean canCountAllClones = true, String messageFormatPattern = null) {
+    // TODO: count each clone only once
+    def cnt = node.findAll().findAll { it.style.name == styleName }.size()
+    return MessageFormat.format(messageFormatPattern ?: '{1} count: {0}', cnt, styleName, canCountAllClones)
 }
