@@ -147,7 +147,7 @@ def static reportCountOfDescendantsWithStyle(node = null, styleName = '!WaitingF
         return "$styleName: $countUnique unique nodes, $countAll nodes in total"
 }
 
-def static tsvDescendatsWithStyle(NodeRO node = null, String styleName = '!WaitingFor', Boolean isConsiderClones = false) {
+def static getDescendantsWithStyle(NodeRO node = null, String styleName = '!WaitingFor', Boolean isConsiderClones = false) {
     node ?= ScriptUtils.node()
     Set<NodeRO> uniqueNodes = new HashSet<>()
     Boolean isCountMeIn
@@ -168,6 +168,13 @@ def static tsvDescendatsWithStyle(NodeRO node = null, String styleName = '!Waiti
                 uniqueNodes.addAll(it.nodesSharingContent)
             }
             isCountMeIn
-        }
-    }.collect { "${it.id}\t${it.transformedText.replaceAll(/\n/, '||')}" }.flatten().join('\n')
+        } else
+            false
+    }
+}
+
+def static tsvDescendantsWithStyle(NodeRO node = null, String styleName = '!WaitingFor', Boolean isConsiderClones = false) {
+    return getDescendantsWithStyle(node, styleName, isConsiderClones).collect {
+        "${it.id}\t${it.transformedText.replaceAll(/\n/, '||')}"
+    }.join('\n')
 }
