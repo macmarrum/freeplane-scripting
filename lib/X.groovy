@@ -110,7 +110,7 @@ class CountResult {
 }
 
 static CountResult getCountOfDescendantsWithStyle(node, String styleName, Boolean isCountAllClones = true) {
-    Set<NodeRO> uniqueNodeIDs = new HashSet<>()
+    Set<NodeRO> uniqueNodes = new HashSet<>()
     Boolean isCloneExist
     Boolean isCountMeIn
     def cnt = node.findAll().findAll {
@@ -120,15 +120,15 @@ static CountResult getCountOfDescendantsWithStyle(node, String styleName, Boolea
                 isCloneExist = it.countNodesSharingContent > 0
         } else {  // don't count all clones
             // check if self has already been counted
-            if (uniqueNodeIDs.contains(it)) {
+            if (uniqueNodes.contains(it)) {
                 isCloneExist = true
                 isCountMeIn = false
             } else {
                 isCountMeIn = true
-                uniqueNodeIDs.add(it)
+                uniqueNodes.add(it)
             }
             // add all clones of self
-            uniqueNodeIDs.addAll(it.nodesSharingContent)
+            uniqueNodes.addAll(it.nodesSharingContent)
         }
         isCountMeIn && it.style.name == styleName
     }.size()
@@ -145,4 +145,29 @@ def static reportCountOfDescendantsWithStyle(node = null, styleName = '!WaitingF
         return "$styleName: $countAll nodes in total"
     else
         return "$styleName: $countUnique unique nodes, $countAll nodes in total"
+}
+
+def static tsvDescendatsWithStyle(NodeRO node = null, String styleName = '!WaitingFor', Boolean isConsiderClones = false) {
+    node ?= ScriptUtils.node()
+    Set<NodeRO> uniqueNodes = new HashSet<>()
+    Boolean isCountMeIn
+    return node.findAll().findAll {
+        if (it.style.name == styleName) {
+            if (isConsiderClones)
+                isCountMeIn = true
+            else {
+                // check if self has already been counted
+                if (uniqueNodes.contains(it)) {
+                    // a clone exists
+                    isCountMeIn = false
+                } else {
+                    isCountMeIn = true
+                    uniqueNodes.add(it)
+                }
+                // add all clones of self
+                uniqueNodes.addAll(it.nodesSharingContent)
+            }
+            isCountMeIn
+        }
+    }.collect { "${it.id}\t${it.transformedText.replaceAll(/\n/, '||')}" }.flatten().join('\n')
 }
