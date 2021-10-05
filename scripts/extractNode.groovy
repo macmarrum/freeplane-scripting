@@ -1,7 +1,8 @@
-def kids = node.children
-if (kids.size() > 0) {
-	def pos = parent.getChildPosition(node)
-	Collections.reverse(kids)
-	kids.each{ it.moveTo(parent, pos) }
-	c.select(node)
+// @ExecutionModes({ON_SINGLE_NODE})
+def myPosition
+c.selecteds.each { self ->
+	if (self.children.size() > 0) {
+		myPosition = self.parent.getChildPosition(self)
+		self.children.reverse().each { it.moveTo(self.parent, myPosition) }
+	}
 }

@@ -57,15 +57,14 @@ static LocalDate localDate(NodeRO node, String dateFormat = null) {
 }
 
 static void setStyleAndTimestampInAttribute(String name, NodeRO node = null, ZonedDateTime zonedDateTime = null) {
-    if (!node)
-        node = ScriptUtils.node()
+    node ?= ScriptUtils.node()
     if (!node[name]) {
         if (!zonedDateTime) {
             // Obtains the current date-time from the system clock in the default time-zone.
             zonedDateTime = ZonedDateTime.now()
         }
         node.style.name = name
-        // The pattern must be different than any recognized by Freeplane.
+        // To store date/time as String, the pattern must be different than any recognized by Freeplane.
         // If it's recognized, FP'll store the value as LocalDateTime, loosing the original time-zone info
         node[name] = zonedDateTime.format(DateTimeFormatter.ofPattern(dfLong))
     } else {
@@ -168,12 +167,22 @@ def static getDescendantsWithStyle(NodeRO node = null, String styleName = '!Wait
                 uniqueNodes.addAll(it.nodesSharingContent)
             }
             isCountMeIn
-        } else
+        } else {
             false
+        }
     }
 }
 
+def static getTransformedTextWithNewlinesReplaced(NodeRO n, CharSequence replacement = '||') {
+    return n.transformedText.replaceAll(/\n/, replacement)
+}
+
+def makeTsv(CharSequence... args) {
+    return args.join(/\t/)
+}
+
 def static tsvDescendantsWithStyle(NodeRO node = null, String styleName = '!WaitingFor', Boolean isConsiderClones = false) {
+    def ttf = this.&getTransformedTextWithNewlinesReplaced
     return getDescendantsWithStyle(node, styleName, isConsiderClones).collect {
         "${it.id}\t${it.transformedText.replaceAll(/\n/, '||')}"
     }.join('\n')
