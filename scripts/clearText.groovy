@@ -1,2 +1,2 @@
 // @ExecutionModes({ON_SINGLE_NODE})
-c.slecteds.each { it.text = '' }
+c.selecteds.each { it.text = '' }

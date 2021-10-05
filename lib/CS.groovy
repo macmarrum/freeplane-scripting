@@ -1,16 +1,18 @@
-import groovy.transform.Field
 import org.freeplane.api.NodeRO
 
-@Field final static String ATTRIB_NAME = 'condiStyle'
+class CS {
+    final static String ATTRIB_NAME = 'condiStyle'
+    final static String attr = ATTRIB_NAME
 
-def static canApply(NodeRO node, String condiStyle, Boolean condition) {
-    if (condition.is(true)) {
-        node[ATTRIB_NAME] = condiStyle
-        return true
-    } else {
-        if (node[ATTRIB_NAME] == condiStyle) {
-            node[ATTRIB_NAME] = null
+    def static canApply(NodeRO node, String condiStyle, Boolean condition) {
+        if (condition.is(true)) {
+            node[ATTRIB_NAME] = condiStyle
+            return true
+        } else {
+            if (node[ATTRIB_NAME] == condiStyle) {
+                node[ATTRIB_NAME] = null
+            }
+            return false
         }
-        return false
     }
 }
