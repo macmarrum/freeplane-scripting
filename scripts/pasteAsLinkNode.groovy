@@ -44,7 +44,8 @@ if (copiedNodes.size() > 0) {
         copiedNodes.each {
             child = self.createChild()
             child.link.node = it
-            child.text = '=link.node.text'
+            child.text = '=link.node.transformedText'
+            child.detailsText = "<-${it.id}: ${it.transformedText}"
             toBeSelected.add(child)
         }
     }

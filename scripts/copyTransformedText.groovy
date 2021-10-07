@@ -1,0 +1,1 @@
+textUtils.copyToClipboard(node.transformedText)
