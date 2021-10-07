@@ -4,6 +4,7 @@ def self
 def par
 int myPos
 int parPos
+def toBeSelected = new ArrayList()
 def selecteds = c.selecteds.collect()  // a clone
 for (n in selecteds) {
 	// no swapping with root
@@ -16,6 +17,9 @@ for (n in selecteds) {
 	//		 3. SummaryNode's child, with the actual text
 	//  Freeplane displays an accolade symbol between 1 and 2, with 3 at its confluence point
 	if (!n.parent.visible) continue
+
+	// at the end, this will be selected
+	toBeSelected.add(n.parent)
 
 	// remember the objects, because they will move and their relative names won't work
 	self = n
@@ -46,5 +50,4 @@ for (n in selecteds) {
 	// remove temp
 	if (kids) temp.delete()
 }
-// re-select myselves
-c.select(selecteds)
+c.select(toBeSelected)
