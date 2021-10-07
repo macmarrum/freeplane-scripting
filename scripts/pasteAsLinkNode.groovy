@@ -40,12 +40,12 @@ def copiedNodes = getNodesFromClipboard(getXml(MapClipboardController.controller
 if (copiedNodes.size() > 0) {
     def toBeSelected = new ArrayList()
     def child
-    c.selecteds.each { self ->
-        copiedNodes.each {
-            child = self.createChild()
-            child.link.node = it
+    c.selecteds.each { target ->
+        copiedNodes.each { source ->
+            child = target.createChild()
+            child.link.node = source
             child.text = '=link.node.transformedText'
-            child.detailsText = "<-${it.id}: ${it.transformedText}"
+            child.detailsText = "<-${source.id}\n${source.transformedText}"
             toBeSelected.add(child)
         }
     }
