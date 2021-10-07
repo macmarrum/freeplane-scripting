@@ -1,1 +1,0 @@
-textUtils.copyToClipboard(node.details)
