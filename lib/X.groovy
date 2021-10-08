@@ -187,3 +187,50 @@ def static tsvDescendantsWithStyle(NodeRO node = null, String styleName = '!Wait
         "${it.id}\t${it.transformedText.replaceAll(/\n/, '||')}"
     }.join('\n')
 }
+
+static Boolean makeJsonIsMap(NodeRO node) {
+    return (node.children.size() > 1) && !makeJsonIsList(node)
+}
+
+static Boolean makeJsonIsNum(NodeRO node) {
+    return node.icons.icons.contains('emoji-1F522')
+}
+
+static Boolean makeJsonIsList(NodeRO node) {
+    return node.icons.icons.contains('list')
+}
+
+static Boolean makeJsonIsListNum(NodeRO node) {
+    return makeJsonIsList(node) && makeJsonIsNum(node)
+}
+
+static String makeJson(NodeRO node, int level = 1) {
+    /* key is always a string
+     * value can be
+     *  - a map
+     *  - a list of nums
+     *  - a list of strings/dates
+     *  - a num
+     *  - a string/date
+     */
+    final String indentSpaces = '  '
+    final String indent = "${indentSpaces * level}"
+    def valueJson
+    def body = node.children.collect { NodeRO key ->
+        if (makeJsonIsMap(key))
+            valueJson = makeJson(key, (level + 1))
+        else {
+            if (makeJsonIsList(key)) {
+                if (makeJsonIsNum(key))
+                    valueJson = "[${key.children.collect { it.text }.join(', ')}]"
+                else
+                    valueJson = "[${key.children.collect { "\"${it.text}\"" }.join(', ')}]"
+            } else if (makeJsonIsNum(key))
+                valueJson = "${key.children[0].text}"
+            else
+                valueJson = "\"${key.children[0].text}\""
+        }
+        "\"${key.text}\": ${valueJson}"
+    }.join(",\n${indent}")
+    return "{\n${indent}${body}\n${indentSpaces * (level - 1)}}"
+}

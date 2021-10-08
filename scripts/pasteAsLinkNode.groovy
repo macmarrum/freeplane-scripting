@@ -45,7 +45,7 @@ if (copiedNodes.size() > 0) {
             child = target.createChild()
             child.link.node = source
             child.text = '=link.node.transformedText'
-            child.detailsText = "<-${source.id}\n${source.transformedText}"
+            child.detailsText = "#${source.id}\n${source.transformedText}"
             toBeSelected.add(child)
         }
     }
