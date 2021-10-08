@@ -188,20 +188,24 @@ def static tsvDescendantsWithStyle(NodeRO node = null, String styleName = '!Wait
     }.join('\n')
 }
 
-static Boolean makeJsonIsMap(NodeRO node) {
-    return !makeJsonIsList(node) && node.children.any{ it.children.size() > 0 }
+static Boolean makeJson_isMap(NodeRO node) {
+    return !makeJson_isList(node) && node.children.any { it.children.size() > 0 }
 }
 
-static Boolean makeJsonIsNum(NodeRO node) {
+static Boolean makeJson_isNum(NodeRO node) {
     return node.icons.icons.contains('emoji-1F522')
 }
 
-static Boolean makeJsonIsList(NodeRO node) {
+static Boolean makeJson_isList(NodeRO node) {
     return node.icons.icons.contains('list')
 }
 
-static Boolean makeJsonIsListNum(NodeRO node) {
-    return makeJsonIsList(node) && makeJsonIsNum(node)
+static Boolean makeJson_isListNum(NodeRO node) {
+    return makeJson_isList(node) && makeJson_isNum(node)
+}
+
+static Boolean makeJson_isIgnored(NodeRO node) {
+    return node.icons.icons.contains('closed')
 }
 
 static String makeJson(NodeRO node, int level = 1) {
@@ -216,21 +220,23 @@ static String makeJson(NodeRO node, int level = 1) {
     final String indentSpaces = '  '
     final String indent = "${indentSpaces * level}"
     def valueJson
-    def body = node.children.collect { NodeRO key ->
-        if (makeJsonIsMap(key))
+    def body = node.children.findAll { !makeJson_isIgnored(it) }.collect { NodeRO key ->
+        if (key.children.findAll { !makeJson_isIgnored(it) }.size() == 0)
+            return null
+        if (makeJson_isMap(key))
             valueJson = makeJson(key, (level + 1))
         else {
-            if (makeJsonIsList(key)) {
-                if (makeJsonIsNum(key))
-                    valueJson = "[${key.children.collect { it.transformedText }.join(', ')}]"
+            if (makeJson_isList(key)) {
+                if (makeJson_isNum(key))
+                    valueJson = "[${key.children.findAll { !makeJson_isIgnored(it) }.collect { it.transformedText }.join(', ')}]"
                 else
-                    valueJson = "[${key.children.collect { "\"${it.transformedText}\"" }.join(', ')}]"
-            } else if (makeJsonIsNum(key))
-                valueJson = "${key.children[0].transformedText}"
+                    valueJson = "[${key.children.findAll { !makeJson_isIgnored(it) }.collect { "\"${it.transformedText}\"" }.join(', ')}]"
+            } else if (makeJson_isNum(key))
+                valueJson = "${key.children.find { !makeJson_isIgnored(it) }.transformedText}"
             else
-                valueJson = "\"${key.children[0].transformedText}\""
+                valueJson = "\"${key.children.find { !makeJson_isIgnored(it) }.transformedText}\""
         }
         "\"${key.transformedText}\": ${valueJson}"
-    }.join(",\n${indent}")
+    }.findAll { it }.join(",\n${indent}")
     return "{\n${indent}${body}\n${indentSpaces * (level - 1)}}"
 }
