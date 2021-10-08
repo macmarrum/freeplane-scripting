@@ -189,7 +189,7 @@ def static tsvDescendantsWithStyle(NodeRO node = null, String styleName = '!Wait
 }
 
 static Boolean makeJsonIsMap(NodeRO node) {
-    return (node.children.size() > 1) && !makeJsonIsList(node)
+    return !makeJsonIsList(node) && node.children.any{ it.children.size() > 0 }
 }
 
 static Boolean makeJsonIsNum(NodeRO node) {
