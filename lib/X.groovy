@@ -222,15 +222,15 @@ static String makeJson(NodeRO node, int level = 1) {
         else {
             if (makeJsonIsList(key)) {
                 if (makeJsonIsNum(key))
-                    valueJson = "[${key.children.collect { it.text }.join(', ')}]"
+                    valueJson = "[${key.children.collect { it.transformedText }.join(', ')}]"
                 else
-                    valueJson = "[${key.children.collect { "\"${it.text}\"" }.join(', ')}]"
+                    valueJson = "[${key.children.collect { "\"${it.transformedText}\"" }.join(', ')}]"
             } else if (makeJsonIsNum(key))
-                valueJson = "${key.children[0].text}"
+                valueJson = "${key.children[0].transformedText}"
             else
-                valueJson = "\"${key.children[0].text}\""
+                valueJson = "\"${key.children[0].transformedText}\""
         }
-        "\"${key.text}\": ${valueJson}"
+        "\"${key.transformedText}\": ${valueJson}"
     }.join(",\n${indent}")
     return "{\n${indent}${body}\n${indentSpaces * (level - 1)}}"
 }
