@@ -17,7 +17,7 @@ private String getXml(Transferable t) {
         try {
             return t.getTransferData(MindMapNodesSelection.mindMapNodesFlavor).toString()
         }
-        catch (final Exception e) {
+        catch (ignored) {
         }
     }
     return null
@@ -26,26 +26,42 @@ private String getXml(Transferable t) {
 private List getNodesFromClipboard(String xml) {
     try {
         def parser = new XmlParser()
-        return xml.split(MapClipboardController.NODESEPARATOR).collect {
+        return xml.split(MapClipboardController.NODESEPARATOR).collect { String it ->
             def xmlRootNode = parser.parseText(it)
             node.mindMap.node(xmlRootNode.@ID)
         }
     }
-    catch (final Exception e) {
+    catch (ignored) {
     }
-    return [];
+    return []
 }
 
 def copiedNodes = getNodesFromClipboard(getXml(MapClipboardController.controller.clipboardContents))
 if (copiedNodes.size() > 0) {
     def toBeSelected = new ArrayList()
     def child
+    def textAttrib = node.map.root['pasteAsLinkNodeText']
+    def detailsAttrib = node.map.root['pasteAsListNodeDetails']
+    c.statusInfo = "${textAttrib} | ${detailsAttrib}"
     c.selecteds.each { target ->
         copiedNodes.each { source ->
             child = target.createChild()
             child.link.node = source
-            child.text = '=link.node.transformedText'
-            child.detailsText = "#${source.id}\n${source.transformedText}"
+            child.text = !textAttrib ? '=link.node.transformedText' : textAttrib.text.replaceAll(/^'=/, '=')
+            if (!detailsAttrib) {
+                child.detailsText = "#${source.id}"
+            } else if (detailsAttrib.startsWith(/'=/)) {
+                child.detailsText = detailsAttrib.text.drop(0)
+            } else {
+                switch (detailsAttrib.num0) {
+                    case 1: child.detailsText = "#${source.id}"
+                        break
+                    case 2: child.detailsText = "${source.transformedText}"
+                        break
+                    case 3: child.detailsText = "#${source.id}\n${source.transformedText}"
+                        break
+                }
+            }
             toBeSelected.add(child)
         }
     }
