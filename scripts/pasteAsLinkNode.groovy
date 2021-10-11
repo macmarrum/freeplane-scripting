@@ -41,7 +41,7 @@ if (copiedNodes.size() > 0) {
     def toBeSelected = new ArrayList()
     def child
     def textAttrib = node.map.root['pasteAsLinkNodeText']
-    def detailsAttrib = node.map.root['pasteAsListNodeDetails']
+    def detailsAttrib = node.map.root['pasteAsLinkNodeDetails']
     c.statusInfo = "${textAttrib} | ${detailsAttrib}"
     c.selecteds.each { target ->
         copiedNodes.each { source ->
