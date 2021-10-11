@@ -205,7 +205,7 @@ static Boolean makeJson_isListNum(NodeRO node) {
 }
 
 static Boolean makeJson_isIgnored(NodeRO node) {
-    return node.icons.icons.contains('closed')
+    return node.icons.icons.contains('emoji-26D4')
 }
 
 static String makeJson(NodeRO node, int level = 1) {
