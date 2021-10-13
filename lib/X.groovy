@@ -240,3 +240,51 @@ static String makeJson(NodeRO node, int level = 1) {
     }.findAll { it }.join(",\n${indent}")
     return "{\n${indent}${body}\n${indentSpaces * (level - 1)}}"
 }
+
+
+static String zipJson(NodeRO node) {
+    if (node.children.size() != 2) return '----\n-- Assert "2 branches" failed\n----\n'
+    // simplified -- no map
+    // field name from branchNum 1
+    // value (can be a list) from branchNum 2
+    final int level = 1
+    final String indentSpaces = '  '
+    final String indent = "${indentSpaces * level}"
+    int smallerBranchChildrenSize = node.children.collect { branch -> branch.children.size() }.min()
+    def keys = new HashMap<Integer, NodeRO>()
+    def values = []
+    NodeRO key
+    node.children.eachWithIndex { branch, branchNum ->
+        branch.children.eachWithIndex { levelOneChild, int idx ->
+            if (idx < smallerBranchChildrenSize) {
+                if (branchNum == 0) {
+                    keys[idx] = levelOneChild.children[0]
+                } else {  // branchNum == 1
+                    if (levelOneChild.children.findAll { !makeJson_isIgnored(it) }.size() == 0)
+                        values << 'null'
+                    else {
+                        key = keys[idx]
+                        if (makeJson_isList(key)) {
+                            if (makeJson_isNum(key))
+                                values << "[${levelOneChild.children.findAll { !makeJson_isIgnored(it) }.collect { it.transformedText }.join(', ')}]"
+                            else
+                                values << "[${levelOneChild.children.findAll { !makeJson_isIgnored(it) }.collect { "\"${it.transformedText}\"" }.join(', ')}]"
+                        } else if (makeJson_isNum(key))
+                            values << "${levelOneChild.children.find { !makeJson_isIgnored(it) }.transformedText}"
+                        else
+                            values << "\"${levelOneChild.children.find { !makeJson_isIgnored(it) }.transformedText}\""
+                    }
+                }
+            }
+        }
+    }
+    def jsonList = []
+    def valueJson
+    keys.eachWithIndex { Map.Entry<Integer, NodeRO> entry, int idx ->
+        key = entry.value
+        valueJson = values[idx]
+        jsonList << "\"${key.transformedText}\": ${valueJson}"
+    }
+    def body = jsonList.join(",\n${indent}")
+    return "{\n${indent}${body}\n${indentSpaces * (level - 1)}}"
+}
