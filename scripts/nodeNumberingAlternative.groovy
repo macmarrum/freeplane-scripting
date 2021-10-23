@@ -2,20 +2,20 @@ import org.freeplane.api.NodeRO
 
 import java.util.regex.Pattern
 
-final Boolean canUseDotAfterNumber = false
-final String attrib = 'numbering'
+final Boolean canUseDotAfterNumber = node['#dot'] ? node['#dot'].num0 : false
+final String attrib = '#'
 
 // clean up
 def pat
 node.findAll().drop(1).each {
     if (it[attrib]) {
-        if (canUseDotAfterNumber) {
+//        if (canUseDotAfterNumber) {
             // FP replaces '1.' with '1' (number recognition) when editing a node,
             // therefore looking for a number _optionally_ followed by a dot
             pat = Pattern.compile("^${it[attrib]}\\.? ?")
-        } else {
-            pat = Pattern.compile("^${it[attrib]} ?")
-        }
+//        } else {
+//            pat = Pattern.compile("^${it[attrib]} ?")
+//        }
         it.text = "${it.text.replaceAll(pat, '')}"
         it[attrib] = null
     }

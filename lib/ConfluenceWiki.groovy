@@ -1,7 +1,7 @@
 /*
  * Inspired by https://github.com/EdoFro/Freeplane_MarkdownHelper
  */
-import org.freeplane.plugin.script.proxy.Proxy.Node as FPN
+import org.freeplane.api.Node as FPN
 
 class ConfluenceWiki {
 
@@ -17,34 +17,53 @@ class ConfluenceWiki {
             noSep_cancer            : 'emoji-264B',
             pButton                 : 'emoji-1F17F',
 //            noP_prohibited          : 'emoji-1F6AB',
-            nl_rightArrowCurvingLeft: 'emoji-21A9',
+//            nl_rightArrowCurvingLeft: 'emoji-21A9',
+            nl_rightArrowCurvingDown: 'emoji-2935',
             ol_keycapHash           : 'emoji-0023-20E3',
+            border_unchecked        : 'unchecked',
     ]
 
-    def static hasIcon(FPN n, String icon) {
+    static Boolean hasIcon(FPN n, String icon) {
         return n.icons.icons.contains(icon)
     }
 
-    def static getContent(FPN n) {
+    static String getContent(FPN n) {
         return n.note ?: n.transformedText
     }
 
-    def static getSep(FPN n) {
+    static String getSep(FPN n) {
         return hasIcon(n, icon.noSep_cancer) ? '' : ' '
     }
 
-    def static getNewLine(FPN n) {
-        return hasIcon(n, icon.nl_rightArrowCurvingLeft) ? '\n' : ''
+    static String getNewLine(FPN n) {
+        return hasIcon(n, icon.nl_rightArrowCurvingDown) ? '\n' : ''
     }
 
-    def static getEol(FPN n) {
+    static String getEol(FPN n) {
         return hasIcon(n, icon.eol_chequeredFlag) ? '\n' : ''
     }
 
-    def static mkNode(FPN n) {
+    static String mkParent(FPN n) {
+        return _execIfChildren(n, { _mkParent(n) })
+    }
+
+    static String _execIfChildren(FPN n, Closure closure) {
+        if (n.children.size() > 0)
+            return closure()
+        else
+            return '<!-- children are missing -->'
+    }
+
+    static String _mkParent(FPN n) {
+        return n.children.collect { mkNode(it) }.join('')
+    }
+
+    static String mkNode(FPN n) {
         def eol = getEol(n)
         def nl = getNewLine(n)
-        if (!hasIcon(n, icon.noEntry)) {
+        if (hasIcon(n, icon.noEntry)) {
+            return ''
+        } else {
             if (n.hasStyle(style.leaf)) {
                 return "${n.note}${eol}"
             } else {
@@ -52,37 +71,36 @@ class ConfluenceWiki {
                 if (_isHeading(n)) {
                     return _mkHeading(n, body, nl, eol)
                 } else if (hasIcon(n, icon.pButton)) {
-                    return "<p>${nl}${body}${nl}</p>${eol}"
+                    return "<p>${nl}${body}${nl}</p>${eol}".toString()
                 } else {
-                    return "${body}${eol}"
+                    return "${body}${eol}".toString()
                 }
             }
         }
     }
 
-    def static _isHeading(FPN n) {
+    static Boolean _isHeading(FPN n) {
         return (n.icons.size() > 0 && n.icons.icons.any { it.startsWith('full-') })
     }
 
-    def static _mkHeading(FPN n, String body, String nl, String eol) {
+    static String _mkHeading(FPN n, String body, String nl, String eol) {
         def hIcon = n.icons.icons.find { it.startsWith('full-') }
         def hLevel = hIcon[5..-1]
         return "<h${hLevel}>${nl}${body}${nl}</h${hLevel}>${eol}".toString()
     }
 
 
-    def static getFirstChildIfNotIgnoreNode(n) {
-        if (n.hasStyle(style.leaf))  // when a leaf node, children are ignored
+    static FPN getFirstChildIfNotIgnoreNode(FPN n) {
+        if (n.hasStyle(style.leaf) || n.children.size() == 0 || hasIcon(n.children[0], icon.noEntry))
             return null
-        if (n.children.size() > 0)
-            if (!hasIcon(n, icon.noEntry))  // not ignoreNode
-                return n.children[0]
+        else
+            return n.children[0]
     }
 
-    def static countFirstChildChain(n, cnt = 0) {
+    static int countFirstChildChain(FPN n, int cnt = 0) {
         def child = getFirstChildIfNotIgnoreNode(n)
         if (child)
-            countFirstChildChain(child, ++cnt)
+            return countFirstChildChain(child, ++cnt)
         else
             return cnt
     }
@@ -91,7 +109,7 @@ class ConfluenceWiki {
         ROW, COLUMN, NONE
     }
 
-    def static mkTable(FPN n) {
+    static String mkTable(FPN n) {
         def nl = getNewLine(n)
         HiLite1st hiLite1st
         if (n['hiLite1st']) {
@@ -102,7 +120,7 @@ class ConfluenceWiki {
         def tableWiki = new StringBuilder()
         def colNum = 1
         def rowNum = 1
-        tableWiki << "<table>${nl}<colgroup><col/><col/></colgroup>${nl}<tbody>${nl}"
+        tableWiki << "<table>${nl}<colgroup><col /><col /></colgroup>${nl}<tbody>${nl}"
         // the first column in each row is technical, therefore it's skipped
         n.children.each { FPN row ->
             if (!hasIcon(row, icon.noEntry)) {  // not ignoreNode
@@ -121,7 +139,7 @@ class ConfluenceWiki {
         return result
     }
 
-    def static mkTableCell(n, int rowNum, int colNum, HiLite1st hiLite1st, String nl) {
+    static String mkTableCell(FPN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl) {
         n.details = "№$colNum"
         def result = new StringBuilder()
         def tag
@@ -138,14 +156,14 @@ class ConfluenceWiki {
         result << tag
         result << getContent(n)
         result << "</${tag[1..-1]}${nl}"
-        def firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n)
+        FPN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n)
         if (firstChildIfNotIgnoreNode) {
             result << mkTableCell(firstChildIfNotIgnoreNode, rowNum, ++colNum, hiLite1st, nl)
         }
         return result.toString()
     }
 
-    def static mkList(FPN n) {
+    static String mkList(FPN n) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
         def tag = hasIcon(n, icon.ol_keycapHash) ? '<ol>' : '<ul>'
@@ -157,7 +175,44 @@ class ConfluenceWiki {
         return result.toString()
     }
 
-    def static mkQuote(FPN n) {
+    static String mkZipList(FPN n) {
+        def nl = getNewLine(n)
+//        def result = new StringBuilder()
+//        def tag = hasIcon(n, icon.ol_keycapHash) ? '<ol>' : '<ul>'
+//        result << "${tag}${nl}"
+//        n.children.each {
+//            result << "<li>${nl}${mkNode(it)}${nl}</li>${nl}"
+//        }
+//        result << "</${tag[1..-1]}"
+//        return result.toString()
+        def bullet = n['simBullet'] ?: '●'
+        int smallerBranchChildrenSize = n.children.collect { branch -> branch.children.size() }.min()
+        def items = new HashMap<Integer, StringBuilder>()
+        n.children.each { branch ->
+            branch.children.eachWithIndex { levelOneChild, int idx ->
+                if (idx < smallerBranchChildrenSize) {
+                    if (!items[idx]) {
+                        items[idx] = new StringBuilder()
+                        items[idx] << bullet
+                        items[idx] << ' '
+                    }
+                    items[idx] << getEachFirstChildsContent(levelOneChild)  // skip levelOneChild, which is a numbering
+                }
+            }
+        }
+        if (items.size() == 0) return '<!-- grandchildren are missing -->'
+        def result = items.values().join("<br />${nl}")
+        return "<p>${nl}${result}${nl}</p>".toString()
+    }
+
+    static String getEachFirstChildsContent(n) {
+        def child = getFirstChildIfNotIgnoreNode(n)
+        if (child)
+            return "${child.note ?: child.transformedText} ${getEachFirstChildsContent(child)}".toString()
+        else
+            return ''
+    }
+    static String mkQuote(FPN n) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
         result << "<blockquote>${nl}"
@@ -165,7 +220,128 @@ class ConfluenceWiki {
             if (!hasIcon(child, icon.noEntry))
                 result << "${mkNode(child)}${nl}"
         }
-        result << "</blockquote>${getEol(n)}"
+        result << "</blockquote>"
         return result.toString()
+    }
+
+    static String mkLink(FPN n) {
+        def nl = getNewLine(n)
+        for (child in n.children.find { it.link }) {
+            return """<a href="${child.link.text}">${nl}${child.text}${nl}</a>""".toString()
+        }
+        return '<!-- a child with a link is missing -->'
+    }
+
+    static String getUuid(FPN n) {
+        // e.g. '649ac91e-33a1-476c-93d2-a30170e197a3'
+        def uuid = 'UUID'
+        def canGenerate = false
+        if (!n[uuid])
+            canGenerate = true
+        else if (!n[uuid].text.endsWith(n.id))
+            canGenerate = true
+        if (canGenerate)
+            n[uuid] = "${UUID.randomUUID().toString()}-${n.id}"
+        return n[uuid].text[0..35]
+    }
+
+    static String mkExpand(FPN n) {
+        return _mkMacroRich(n, 'expand', [title: n.details ? n.details.text : 'Click here to expand...'])
+    }
+
+    static String mkDiv(FPN n) {
+        Map<String, String> params = n.details ? [class: n.details.text] : null
+        return _mkMacroRich(n, 'div', params)
+    }
+
+    static String mkCode_(FPN n) {
+        def nl = getNewLine(n)
+        for (child in n.children.find { FPN it -> it.note }) {
+            def lang = child.text ?: 'none'
+            def result = new StringBuilder()
+            result << """<ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="${getUuid(n)}">${nl}"""
+            result << """<ac:parameter ac:name="language">${lang}</ac:parameter>${nl}"""
+            result << """<ac:plain-text-body>${nl}<![CDATA[${child.note}]]${nl}</ac:plain-text-body>${nl}"""
+            result << """</ac:structured-macro>"""
+            return result.toString()
+        }
+        return '<!-- a child with a note is missing -->'
+    }
+
+    static String mkCode(FPN n) {
+        for (child in n.children.find { FPN it -> it.note }) {
+            String lang = child.details ?: 'none'
+            String cdata = child.note
+            return _mkMacroPlain(n, 'code', cdata, [language: lang])
+        }
+        return '<!-- a child with a note is missing -->'
+    }
+
+    static String _mkMacroPlain(FPN n, String macro, String cdata, Map<String, String> parameters = null) {
+        def nl = getNewLine(n)
+        def result = new StringBuilder()
+        result << """<ac:structured-macro ac:name="${macro}" ac:schema-version="1" ac:macro-id="${getUuid(n)}">${nl}"""
+        if (parameters)
+            parameters.each {
+                result << """<ac:parameter ac:name="${it.key}">${it.value}</ac:parameter>${nl}"""
+            }
+        if (cdata)
+            result << """<ac:plain-text-body>${nl}<![CDATA[${cdata}]]${nl}</ac:plain-text-body>${nl}"""
+        result << """</ac:structured-macro>"""
+        return result.toString()
+    }
+
+    static String _mkMacroRich(FPN n, String macro, Map<String, String> parameters = null, String body = null) {
+        Closure closure = {
+            def nl = getNewLine(n)
+            def result = new StringBuilder()
+            def _body = body ?: _mkParent(n)
+            result << """<ac:structured-macro ac:name="${macro}" ac:schema-version="1" ac:macro-id="${getUuid(n)}">${nl}"""
+            if (parameters)
+                parameters.each {
+                    result << """<ac:parameter ac:name="${it.key}">${it.value}</ac:parameter>${nl}"""
+                }
+            result << """<ac:rich-text-body>${nl}${_body}${nl}</ac:rich-text-body>${nl}"""
+            result << """</ac:structured-macro>"""
+            return result.toString()
+        }
+        return _execIfChildren(n, closure)
+    }
+
+    static String mkDivExpand(FPN n) {
+        def title = n.details ? n.details.text : 'Click here to expand...'
+        return _mkMacroRich(n, 'div', [class: n.link.text ?: 'expand-in-a-box'], _mkMacroRich(n, 'expand', [title: title]))
+    }
+
+    static String mkAttachments(FPN n) {
+        return """<ac:structured-macro ac:name="attachments" ac:schema-version="1" ac:macro-id="${getUuid(n)}" />"""
+    }
+
+    static String mkStyleImport(FPN n) {
+        for (child in n.children.find { FPN it -> it.text }) {
+            return _mkMacroPlain(n, 'style', null, [import: child.text])
+        }
+        return '<!-- a child with text is missing -->'
+    }
+
+    static String mkStyle(FPN n) {
+        return _mkMacroPlain(n, 'style', mkParent(n))
+    }
+
+    static String mkHtml(FPN n) {
+        return _mkMacroPlain(n, 'html', mkParent(n))
+    }
+
+    static String mkImage(FPN n) {
+        for (child in n.children.find { FPN it -> it.text }) {
+            def result = new StringBuilder()
+            def height = child.details ? /ac:height="${child.details}" / : ''
+            def border = hasIcon(child, icon.border_unchecked) ? /ac:border="true" / : ''
+            result << """<ac:image ${height}${border}>"""
+            result << """<ri:attachment ri:filename="${child.text}" />"""
+            result << """</ac:image>"""
+            return result.toString()
+        }
+        return '<!-- a child with text is missing -->'
     }
 }
