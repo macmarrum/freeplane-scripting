@@ -337,10 +337,10 @@ class ConfluenceWiki {
         return '<!-- a child with text is missing -->'
     }
 
-    static String mkCollector(FPN n) {
+    static String mkCsv(FPN n) {
         if (n.children.size() > 0) {
-            def collectorSep = 'collectorSep'
-            def sep = n[collectorSep] ? n[collectorSep].text : ', '
+            def csvSep = 'csvSep'
+            def sep = n[csvSep] ? n[csvSep].text : ', '
             return n.children.findAll { !hasIcon(it, icon.noEntry) }.collect { child ->
                 def grandchildrensContent = getEachFirstChildsContent(child, sep)
                 def sepGrandchildsContent = grandchildrensContent != '' ? "${sep}${grandchildrensContent}" : ''
