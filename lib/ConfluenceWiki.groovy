@@ -16,8 +16,6 @@ class ConfluenceWiki {
             eol_chequeredFlag       : 'emoji-1F3C1',
             noSep_cancer            : 'emoji-264B',
             pButton                 : 'emoji-1F17F',
-//            noP_prohibited          : 'emoji-1F6AB',
-//            nl_rightArrowCurvingLeft: 'emoji-21A9',
             nl_rightArrowCurvingDown: 'emoji-2935',
             ol_keycapHash           : 'emoji-0023-20E3',
             border_unchecked        : 'unchecked',
@@ -177,14 +175,6 @@ class ConfluenceWiki {
 
     static String mkZipList(FPN n) {
         def nl = getNewLine(n)
-//        def result = new StringBuilder()
-//        def tag = hasIcon(n, icon.ol_keycapHash) ? '<ol>' : '<ul>'
-//        result << "${tag}${nl}"
-//        n.children.each {
-//            result << "<li>${nl}${mkNode(it)}${nl}</li>${nl}"
-//        }
-//        result << "</${tag[1..-1]}"
-//        return result.toString()
         def bullet = n['simBullet'] ?: '●'
         int smallerBranchChildrenSize = n.children.collect { branch -> branch.children.size() }.min()
         def items = new HashMap<Integer, StringBuilder>()
@@ -212,6 +202,7 @@ class ConfluenceWiki {
         else
             return ''
     }
+
     static String mkQuote(FPN n) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
@@ -246,26 +237,16 @@ class ConfluenceWiki {
     }
 
     static String mkExpand(FPN n) {
-        return _mkMacroRich(n, 'expand', [title: n.details ? n.details.text : 'Click here to expand...'])
+        return _execIfChildren(n, {
+            _mkMacroRich(n, 'expand', [title: n.details ? n.details.text : 'Click here to expand...'])
+        })
     }
 
     static String mkDiv(FPN n) {
-        Map<String, String> params = n.details ? [class: n.details.text] : null
-        return _mkMacroRich(n, 'div', params)
-    }
-
-    static String mkCode_(FPN n) {
-        def nl = getNewLine(n)
-        for (child in n.children.find { FPN it -> it.note }) {
-            def lang = child.text ?: 'none'
-            def result = new StringBuilder()
-            result << """<ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="${getUuid(n)}">${nl}"""
-            result << """<ac:parameter ac:name="language">${lang}</ac:parameter>${nl}"""
-            result << """<ac:plain-text-body>${nl}<![CDATA[${child.note}]]${nl}</ac:plain-text-body>${nl}"""
-            result << """</ac:structured-macro>"""
-            return result.toString()
-        }
-        return '<!-- a child with a note is missing -->'
+        return _execIfChildren(n, {
+            Map<String, String> params = n.details ? [class: n.details.text] : null
+            return _mkMacroRich(n, 'div', params)
+        })
     }
 
     static String mkCode(FPN n) {
@@ -292,25 +273,24 @@ class ConfluenceWiki {
     }
 
     static String _mkMacroRich(FPN n, String macro, Map<String, String> parameters = null, String body = null) {
-        Closure closure = {
-            def nl = getNewLine(n)
-            def result = new StringBuilder()
-            def _body = body ?: _mkParent(n)
-            result << """<ac:structured-macro ac:name="${macro}" ac:schema-version="1" ac:macro-id="${getUuid(n)}">${nl}"""
-            if (parameters)
-                parameters.each {
-                    result << """<ac:parameter ac:name="${it.key}">${it.value}</ac:parameter>${nl}"""
-                }
-            result << """<ac:rich-text-body>${nl}${_body}${nl}</ac:rich-text-body>${nl}"""
-            result << """</ac:structured-macro>"""
-            return result.toString()
-        }
-        return _execIfChildren(n, closure)
+        def nl = getNewLine(n)
+        def result = new StringBuilder()
+        def _body = body ?: _mkParent(n)
+        result << """<ac:structured-macro ac:name="${macro}" ac:schema-version="1" ac:macro-id="${getUuid(n)}">${nl}"""
+        if (parameters)
+            parameters.each {
+                result << """<ac:parameter ac:name="${it.key}">${it.value}</ac:parameter>${nl}"""
+            }
+        result << """<ac:rich-text-body>${nl}${_body}${nl}</ac:rich-text-body>${nl}"""
+        result << """</ac:structured-macro>"""
+        return result.toString()
     }
 
     static String mkDivExpand(FPN n) {
-        def title = n.details ? n.details.text : 'Click here to expand...'
-        return _mkMacroRich(n, 'div', [class: n.link.text ?: 'expand-in-a-box'], _mkMacroRich(n, 'expand', [title: title]))
+        return _execIfChildren(n, {
+            def title = n.details ? n.details.text : 'Click here to expand...'
+            return _mkMacroRich(n, 'div', [class: n.link.text ?: 'expand-in-a-box'], _mkMacroRich(n, 'expand', [title: title]))
+        })
     }
 
     static String mkAttachments(FPN n) {
@@ -325,11 +305,15 @@ class ConfluenceWiki {
     }
 
     static String mkStyle(FPN n) {
-        return _mkMacroPlain(n, 'style', mkParent(n))
+        return _execIfChildren(n, {
+            return _mkMacroPlain(n, 'style', _mkParent(n))
+        })
     }
 
     static String mkHtml(FPN n) {
-        return _mkMacroPlain(n, 'html', mkParent(n))
+        return _execIfChildren(n, {
+            return _mkMacroPlain(n, 'html', _mkParent(n))
+        })
     }
 
     static String mkImage(FPN n) {
