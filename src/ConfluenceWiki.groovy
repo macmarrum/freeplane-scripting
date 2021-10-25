@@ -201,7 +201,7 @@ class ConfluenceWiki {
     }
 
     static String getEachFirstChildsContent(n, String sep = ' ', Boolean canSkipLeafCheck = false) {
-        /* canSkipLeafCheck for top-level nodes, e.g. mkCsv */
+        /* canSkipLeafCheck for top-level nodes of mkSomething */
         def child = getFirstChildIfNotIgnoreNode(n, canSkipLeafCheck)
         if (child) {
             def grandchildsContent = getEachFirstChildsContent(child, sep)
@@ -337,11 +337,18 @@ class ConfluenceWiki {
         return '<!-- a child with text is missing -->'
     }
 
-    static String mkCsv(FPN n) {
+    static String mkCollector(FPN n) {
         if (n.children.size() > 0) {
-            def csvSep = 'csvSep'
-            def sep = n[csvSep] ? n[csvSep].text : ', '
-            return getEachFirstChildsContent(n, sep, true)
+            def collectorSep = 'collectorSep'
+            def sep = n[collectorSep] ? n[collectorSep].text : ', '
+            return n.children.findAll { !hasIcon(it, icon.noEntry) }.collect { child ->
+                def grandchildrensContent = getEachFirstChildsContent(child, sep)
+                def sepGrandchildsContent = grandchildrensContent != '' ? "${sep}${grandchildrensContent}" : ''
+                if (grandchildrensContent)
+                    return "${child.note ?: child.transformedText}${sepGrandchildsContent}"
+                else
+                    return child.note ?: child.transformedText
+            }.join(sep)
         } else
             return '<!-- a child is missing -->'
     }
