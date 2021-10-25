@@ -21,6 +21,10 @@ class ConfluenceWiki {
             border_unchecked        : 'unchecked',
     ]
 
+    static Boolean isLeaf(FPN n) {
+        return n.style.name == style.leaf
+    }
+
     static Boolean hasIcon(FPN n, String icon) {
         return n.icons.icons.contains(icon)
     }
@@ -62,7 +66,7 @@ class ConfluenceWiki {
         if (hasIcon(n, icon.noEntry)) {
             return ''
         } else {
-            if (n.hasStyle(style.leaf)) {
+            if (isLeaf(n)) {
                 return "${n.note}${eol}"
             } else {
                 def body = "${getContent(n)}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}"
@@ -88,8 +92,9 @@ class ConfluenceWiki {
     }
 
 
-    static FPN getFirstChildIfNotIgnoreNode(FPN n) {
-        if (n.hasStyle(style.leaf) || n.children.size() == 0 || hasIcon(n.children[0], icon.noEntry))
+    static FPN getFirstChildIfNotIgnoreNode(FPN n, Boolean canSkipLeafCheck = false) {
+        def isLeafAndNotSkipped = isLeaf(n) && !canSkipLeafCheck
+        if (isLeafAndNotSkipped || n.children.size() == 0 || hasIcon(n.children[0], icon.noEntry))
             return null
         else
             return n.children[0]
@@ -195,11 +200,14 @@ class ConfluenceWiki {
         return "<p>${nl}${result}${nl}</p>".toString()
     }
 
-    static String getEachFirstChildsContent(n) {
-        def child = getFirstChildIfNotIgnoreNode(n)
-        if (child)
-            return "${child.note ?: child.transformedText} ${getEachFirstChildsContent(child)}".toString()
-        else
+    static String getEachFirstChildsContent(n, String sep = ' ', Boolean canSkipLeafCheck = false) {
+        /* canSkipLeafCheck for top-level nodes, e.g. mkCsv */
+        def child = getFirstChildIfNotIgnoreNode(n, canSkipLeafCheck)
+        if (child) {
+            def grandchildsContent = getEachFirstChildsContent(child, sep)
+            def sepGrandchildsContent = grandchildsContent != '' ? "${sep}${grandchildsContent}" : ''
+            return "${child.note ?: child.transformedText}${sepGrandchildsContent}".toString()
+        } else
             return ''
     }
 
@@ -327,5 +335,14 @@ class ConfluenceWiki {
             return result.toString()
         }
         return '<!-- a child with text is missing -->'
+    }
+
+    static String mkCsv(FPN n) {
+        if (n.children.size() > 0) {
+            def csvSep = 'csvSep'
+            def sep = n[csvSep] ? n[csvSep].text : ', '
+            return getEachFirstChildsContent(n, sep, true)
+        } else
+            return '<!-- a child is missing -->'
     }
 }
