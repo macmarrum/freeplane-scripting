@@ -309,7 +309,7 @@ class ConfluenceWiki {
                 result << """<ac:parameter ac:name="${it.key}">${it.value}</ac:parameter>${nl}"""
             }
         if (cdata)
-            result << """<ac:plain-text-body>${nl}<![CDATA[${cdata}]]${nl}</ac:plain-text-body>${nl}"""
+            result << """<ac:plain-text-body>${nl}<![CDATA[${cdata}]]>${nl}</ac:plain-text-body>${nl}"""
         result << """</ac:structured-macro>"""
         return result.toString()
     }
