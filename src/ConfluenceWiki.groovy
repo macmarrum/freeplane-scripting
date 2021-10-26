@@ -74,13 +74,15 @@ class ConfluenceWiki {
             if (isLeaf(n)) {
                 return "${n.note}${eol}"
             } else {
-                def body = "${getContent(n)}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}"
                 if (_isHeading(n)) {
-                    return _mkHeading(n, body, nl, eol)
-                } else if (hasIcon(n, icon.pButton)) {
-                    return "<p>${nl}${body}${nl}</p>${eol}".toString()
+                    return _mkHeading(n, nl, eol)
                 } else {
-                    return "${body}${eol}".toString()
+                    def body = "${getContent(n)}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}"
+                    if (hasIcon(n, icon.pButton)) {
+                        return "<p>${nl}${body}${nl}</p>${eol}".toString()
+                    } else {
+                        return "${body}${eol}".toString()
+                    }
                 }
             }
         }
@@ -90,10 +92,11 @@ class ConfluenceWiki {
         return (n.icons.size() > 0 && n.icons.icons.any { it.startsWith('full-') })
     }
 
-    static String _mkHeading(FPN n, String body, String nl, String eol) {
+    static String _mkHeading(FPN n, String nl, String eol) {
         def hIcon = n.icons.icons.find { it.startsWith('full-') }
         def hLevel = hIcon[5..-1]
-        return "<h${hLevel}>${nl}${body}${nl}</h${hLevel}>${eol}".toString()
+        def childrenBody = n.children.size() > 0 ? n.children.collect {mkNode(it)}.join('') : ''
+        return "<h${hLevel}>${nl}${getContent(n)}${nl}</h${hLevel}>${childrenBody}${eol}".toString()
     }
 
 
@@ -279,9 +282,15 @@ class ConfluenceWiki {
 
     static String mkCode(FPN n) {
         for (child in n.children.find { FPN it -> it.note }) {
-            String lang = child.details ?: 'none'
+            String lang = child.text ?: 'none'
             String cdata = child.note
-            return _mkMacroPlain(n, 'code', cdata, [language: lang])
+            def params = [language: lang]
+            String title = n.details
+            if (title) {
+                params.title = title
+                params.collapse = 'true'
+            }
+            return _mkMacroPlain(n, 'code', cdata, params)
         }
         return '<!-- a child with a note is missing -->'
     }
@@ -371,22 +380,6 @@ class ConfluenceWiki {
             def cellsSize = cells.size()
             int i
             return cells.collect {"${it.note ?: it.transformedText}${++i == cellsSize || hasIcon(it, icon.noSep_cancer) ? '' : sep}" }.join('')
-        } else
-            return '<!-- a child is missing -->'
-    }
-
-    static String mkCsv_(FPN n) {
-        if (n.children.size() > 0) {
-            def csvSep = 'csvSep'
-            def sep = n[csvSep] ? n[csvSep].text : ', '
-            return n.children.findAll { !hasIcon(it, icon.noEntry) }.collect { child ->
-                def grandchildrensContent = getEachFirstChildsContent(child, sep)
-                def sepGrandchildsContent = grandchildrensContent == '' || hasIcon(child, icon.noSep_cancer) ? '' : "${sep}${grandchildrensContent}"
-                if (grandchildrensContent)
-                    return "${child.note ?: child.transformedText}${sepGrandchildsContent}"
-                else
-                    return child.note ?: child.transformedText
-            }.join('')
         } else
             return '<!-- a child is missing -->'
     }
