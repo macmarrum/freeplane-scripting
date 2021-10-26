@@ -21,6 +21,11 @@ class ConfluenceWiki {
             border_unchecked        : 'unchecked',
     ]
 
+    static HashMap<String, String> tbl = [
+            rowCnt: '₵',
+            rowNum: '№',
+    ]
+
     static Boolean isLeaf(FPN n) {
         return n.style.name == style.leaf
     }
@@ -100,10 +105,10 @@ class ConfluenceWiki {
             return n.children[0]
     }
 
-    static int countFirstChildChain(FPN n, int cnt = 0) {
-        def child = getFirstChildIfNotIgnoreNode(n)
+    static int _tbl_countFirstChildChain(FPN n, int cnt = 0) {
+        def child = getFirstChildIfNotIgnoreNode(n, true)
         if (child)
-            return countFirstChildChain(child, ++cnt)
+            return _tbl_countFirstChildChain(child, ++cnt)
         else
             return cnt
     }
@@ -124,10 +129,12 @@ class ConfluenceWiki {
         def colNum = 1
         def rowNum = 1
         tableWiki << "<table>${nl}<colgroup><col /><col /></colgroup>${nl}<tbody>${nl}"
+        // clean up details containing old tbl.rowNum
+        n.findAll().drop(1).each {if (it.details && it.details.text.startsWith(tbl.rowNum)) it.details = null}
         // the first column in each row is technical, therefore it's skipped
         n.children.each { FPN row ->
             if (!hasIcon(row, icon.noEntry)) {  // not ignoreNode
-                row.details = "₵${countFirstChildChain(row)}".toString()
+                row.details = "${tbl.rowCnt}${_tbl_countFirstChildChain(row)}".toString()
 
                 if (row.children.size() > 0) {
                     tableWiki << "<tr>${nl}"
@@ -143,7 +150,7 @@ class ConfluenceWiki {
     }
 
     static String mkTableCell(FPN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl) {
-        n.details = "№$colNum"
+        n.details = "${tbl.rowNum}${colNum}"
         def result = new StringBuilder()
         def tag
         switch (hiLite1st) {
@@ -159,7 +166,8 @@ class ConfluenceWiki {
         result << tag
         result << getContent(n)
         result << "</${tag[1..-1]}${nl}"
-        FPN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n)
+        // canSkipLeafCheck=true because each cell is basically a top-level node, i.e. can be a leaf
+        FPN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, true)
         if (firstChildIfNotIgnoreNode) {
             result << mkTableCell(firstChildIfNotIgnoreNode, rowNum, ++colNum, hiLite1st, nl)
         }
@@ -224,6 +232,7 @@ class ConfluenceWiki {
     }
 
     static String mkLink(FPN n) {
+        /* make link of the first child with a link */
         def nl = getNewLine(n)
         for (child in n.children.find { it.link }) {
             return """<a href="${child.link.text}">${nl}${child.text}${nl}</a>""".toString()
