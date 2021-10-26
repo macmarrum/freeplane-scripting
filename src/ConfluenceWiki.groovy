@@ -219,6 +219,17 @@ class ConfluenceWiki {
             return ''
     }
 
+    static List<FPN> getFirstChildChain(FPN n, List<FPN> firstChildChain = null) {
+        if (firstChildChain.is(null))
+            firstChildChain = new ArrayList<>()
+        firstChildChain.add(n)
+        def child = getFirstChildIfNotIgnoreNode(n)
+        if (child)
+            return getFirstChildChain(child, firstChildChain)
+        else
+            return firstChildChain
+    }
+
     static String mkQuote(FPN n) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
@@ -355,14 +366,27 @@ class ConfluenceWiki {
         if (n.children.size() > 0) {
             def csvSep = 'csvSep'
             def sep = n[csvSep] ? n[csvSep].text : ', '
+            def cells = new ArrayList<FPN>()
+            n.children.findAll { !hasIcon(it, icon.noEntry) }.each { cells.addAll(getFirstChildChain(it)) }
+            def cellsSize = cells.size()
+            int i
+            return cells.collect {"${it.note ?: it.transformedText}${++i == cellsSize || hasIcon(it, icon.noSep_cancer) ? '' : sep}" }.join('')
+        } else
+            return '<!-- a child is missing -->'
+    }
+
+    static String mkCsv_(FPN n) {
+        if (n.children.size() > 0) {
+            def csvSep = 'csvSep'
+            def sep = n[csvSep] ? n[csvSep].text : ', '
             return n.children.findAll { !hasIcon(it, icon.noEntry) }.collect { child ->
                 def grandchildrensContent = getEachFirstChildsContent(child, sep)
-                def sepGrandchildsContent = grandchildrensContent != '' ? "${sep}${grandchildrensContent}" : ''
+                def sepGrandchildsContent = grandchildrensContent == '' || hasIcon(child, icon.noSep_cancer) ? '' : "${sep}${grandchildrensContent}"
                 if (grandchildrensContent)
                     return "${child.note ?: child.transformedText}${sepGrandchildsContent}"
                 else
                     return child.note ?: child.transformedText
-            }.join(sep)
+            }.join('')
         } else
             return '<!-- a child is missing -->'
     }
