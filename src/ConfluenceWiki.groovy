@@ -130,7 +130,7 @@ class ConfluenceWiki {
         def rowNum = 1
         tableWiki << "<table>${nl}<colgroup><col /><col /></colgroup>${nl}<tbody>${nl}"
         // clean up details containing old tbl.rowNum
-        n.findAll().drop(1).each {if (it.details && it.details.text.startsWith(tbl.rowNum)) it.details = null}
+        n.findAll().drop(1).each { if (it.details && it.details.text.startsWith(tbl.rowNum)) it.details = null }
         // the first column in each row is technical, therefore it's skipped
         n.children.each { FPN row ->
             if (!hasIcon(row, icon.noEntry)) {  // not ignoreNode
@@ -273,6 +273,11 @@ class ConfluenceWiki {
             return _mkMacroPlain(n, 'code', cdata, [language: lang])
         }
         return '<!-- a child with a note is missing -->'
+    }
+
+    static String mkPageInfo(FPN n, String infoType, String type = 'Flat') {
+        /* Page id, Current version, Tiny url, Title, ...  */
+        return _mkMacroPlain(n, 'page-info', null, [infoType: infoType, type: type])
     }
 
     static String _mkMacroPlain(FPN n, String macro, String cdata, Map<String, String> parameters = null) {
