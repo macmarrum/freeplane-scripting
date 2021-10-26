@@ -283,7 +283,7 @@ class ConfluenceWiki {
     static String mkCode(FPN n) {
         for (child in n.children.find { FPN it -> it.note }) {
             String lang = child.text ?: 'none'
-            String cdata = child.note.text.replaceAll(/\n/, /\\n/)  // flatten to a single line
+            String cdata = child.note.text
             def params = [language: lang]
             String title = n.details
             if (title) {
