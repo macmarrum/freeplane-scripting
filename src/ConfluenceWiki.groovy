@@ -79,7 +79,7 @@ class ConfluenceWiki {
                 } else {
                     def body = "${getContent(n)}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}"
                     if (hasIcon(n, icon.pButton)) {
-                        return "<p>${nl}${body}${nl}</p>${eol}".toString()
+                        return "<p>${nl}${body.replaceAll(/\n/, "<br />${nl}")}${nl}</p>${eol}".toString()
                     } else {
                         return "${body}${eol}".toString()
                     }
@@ -283,7 +283,7 @@ class ConfluenceWiki {
     static String mkCode(FPN n) {
         for (child in n.children.find { FPN it -> it.note }) {
             String lang = child.text ?: 'none'
-            String cdata = child.note
+            String cdata = child.note.text.replaceAll(/\n/, /\\n/)  // flatten to a single line
             def params = [language: lang]
             String title = n.details
             if (title) {
