@@ -3,7 +3,7 @@
  */
 import org.freeplane.api.Node as FPN
 
-class ConfluenceWiki {
+class ConfluenceStorage {
 
     static HashMap<String, String> style = [
             root: 'cWikiRoot',
@@ -19,6 +19,7 @@ class ConfluenceWiki {
             nl_rightArrowCurvingDown: 'emoji-2935',
             ol_keycapHash           : 'emoji-0023-20E3',
             border_unchecked        : 'unchecked',
+            nbsp_gemini             : 'emoji-264A',
     ]
 
     static HashMap<String, String> tbl = [
@@ -35,7 +36,8 @@ class ConfluenceWiki {
     }
 
     static String getContent(FPN n) {
-        return n.note ?: n.transformedText
+        def content = n.note ? n.note.text : n.transformedText
+        return hasIcon(n, icon.nbsp_gemini) ? content.replaceAll(/ /, '&nbsp;') : content
     }
 
     static String getSep(FPN n) {
@@ -95,7 +97,7 @@ class ConfluenceWiki {
     static String _mkHeading(FPN n, String nl, String eol) {
         def hIcon = n.icons.icons.find { it.startsWith('full-') }
         def hLevel = hIcon[5..-1]
-        def childrenBody = n.children.size() > 0 ? n.children.collect {mkNode(it)}.join('') : ''
+        def childrenBody = n.children.size() > 0 ? n.children.collect { mkNode(it) }.join('') : ''
         return "<h${hLevel}>${nl}${getContent(n)}${nl}</h${hLevel}>${childrenBody}${eol}".toString()
     }
 
@@ -379,7 +381,7 @@ class ConfluenceWiki {
             n.children.findAll { !hasIcon(it, icon.noEntry) }.each { cells.addAll(getFirstChildChain(it)) }
             def cellsSize = cells.size()
             int i
-            return cells.collect {"${it.note ?: it.transformedText}${++i == cellsSize || hasIcon(it, icon.noSep_cancer) ? '' : sep}" }.join('')
+            return cells.collect { "${it.note ?: it.transformedText}${++i == cellsSize || hasIcon(it, icon.noSep_cancer) ? '' : sep}" }.join('')
         } else
             return '<!-- a child is missing -->'
     }
