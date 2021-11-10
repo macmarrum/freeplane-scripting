@@ -76,17 +76,19 @@ class ConfluenceStorage {
             return ''
         } else {
             if (isLeaf(n)) {
-                return "${n.note}${eol}"
+                if (hasIcon(n, icon.pButton))
+                    return "<p>${nl}${n.note}</p>${eol}".toString()
+                else
+                    return "${n.note}${eol}".toString()
             } else {
                 if (_isHeading(n)) {
                     return _mkHeading(n, nl, eol)
                 } else {
                     def body = "${getContent(n)}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}"
-                    if (hasIcon(n, icon.pButton)) {
+                    if (hasIcon(n, icon.pButton))
                         return "<p>${nl}${body.replaceAll(/\n/, "<br />${nl}")}${nl}</p>${eol}".toString()
-                    } else {
+                    else
                         return "${body}${eol}".toString()
-                    }
                 }
             }
         }
@@ -378,8 +380,18 @@ class ConfluenceStorage {
     }
 
     static String mkCsv(FPN n) {
+        // sep can be defined as the attribute csvSep
+        // sep can be defined in details
+        // for table cells (details start with №), the default sep is used
         if (n.children.size() > 0) {
-            def sep = n.details ? (n.details.plain == 'none' ? '' : n.details.plain) : ', '
+            String sep
+            final String csvSep = 'csvSep'
+            if (n[csvSep].text !== null)
+                sep = n[csvSep].text
+            else if (n.details !== null)
+                sep = n.details.plain.startsWith(tbl.rowNum) ? ', ' : n.details.plain
+            else
+                sep = ', '
             def cells = new ArrayList<FPN>()
             n.children.findAll { !hasIcon(it, icon.noEntry) }.each { cells.addAll(getFirstChildChain(it)) }
             def cellsSize = cells.size()
