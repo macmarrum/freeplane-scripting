@@ -338,7 +338,10 @@ class ConfluenceStorage {
     }
 
     static String mkAttachments(FPN n) {
-        return """<ac:structured-macro ac:name="attachments" ac:schema-version="1" ac:macro-id="${getUuid(n)}" />"""
+        def nl = getNewLine(n)
+        def canUpload = n['attachmentsUpload'].num0 == 1 ? 'true' : 'false'
+        def canOld = n['attachmentsOld'].num0 == 1 ? 'true' : 'false'
+        return """<ac:structured-macro ac:name="attachments" ac:schema-version="1" ac:macro-id="${getUuid(n)}">${nl}<ac:parameter ac:name="upload">${canUpload}</ac:parameter>${nl}<ac:parameter ac:name="old">${canOld}</ac:parameter>${nl}</ac:structured-macro>"""
     }
 
     static String mkStyleImport(FPN n) {

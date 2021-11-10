@@ -8,6 +8,7 @@ def positions = selecteds.collect { it.parent.getChildPosition(it) }
 selecteds.eachWithIndex { self, idx ->
     myPosition = positions[idx]
     myNewParent = self.parent.createChild(myPosition)
+    myNewParent.setLeft(self.isLeft())
     self.moveTo(myNewParent)
     toBeSelected.add(myNewParent)
 }
