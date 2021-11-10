@@ -379,8 +379,7 @@ class ConfluenceStorage {
 
     static String mkCsv(FPN n) {
         if (n.children.size() > 0) {
-            def csvSep = 'csvSep'
-            def sep = n[csvSep] ? n[csvSep].text : ', '
+            def sep = n.details ? (n.details.plain == 'none' ? '' : n.details.plain) : ', '
             def cells = new ArrayList<FPN>()
             n.children.findAll { !hasIcon(it, icon.noEntry) }.each { cells.addAll(getFirstChildChain(it)) }
             def cellsSize = cells.size()
@@ -388,5 +387,11 @@ class ConfluenceStorage {
             return cells.collect { "${it.note ?: it.transformedText}${++i == cellsSize || hasIcon(it, icon.noSep_cancer) ? '' : sep}" }.join('')
         } else
             return '<!-- a child is missing -->'
+    }
+
+    static String mkWiki(FPN n) {
+        return _execIfChildren(n, {
+            return _mkMacroPlain(n, 'unmigrated-wiki-markup', _mkParent(n))
+        })
     }
 }
