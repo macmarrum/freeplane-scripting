@@ -20,6 +20,8 @@ class ConfluenceStorage {
             ol_keycapHash           : 'emoji-0023-20E3',
             border_unchecked        : 'unchecked',
             nbsp_gemini             : 'emoji-264A',
+            numbers_inputNumbers    : 'emoji-1F522',
+            collapse_fastUpButton   : 'emoji-23EB',
     ]
 
     static HashMap<String, String> tbl = [
@@ -285,13 +287,12 @@ class ConfluenceStorage {
     static String mkCode(FPN n) {
         for (child in n.children.find { FPN it -> it.note }) {
             String lang = child.text ?: 'none'
-            String cdata = child.note.text
             def params = [language: lang]
-            String title = n.details
-            if (title) {
-                params.title = title
-                params.collapse = 'true'
-            }
+            if (child.details) params.title = child.details.text
+            if (hasIcon(child, icon.collapse_fastUpButton)) params.collapse = 'true'
+            if (hasIcon(child, icon.numbers_inputNumbers)) params.linenumbers = 'true'
+            if (child.link.text) params.theme = child.link.text
+            String cdata = child.note.text
             return _mkMacroPlain(n, 'code', cdata, params)
         }
         return '<!-- a child with a note is missing -->'
