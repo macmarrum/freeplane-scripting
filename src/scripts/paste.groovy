@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
 /*
  * Alternative "paste" functionality
  *

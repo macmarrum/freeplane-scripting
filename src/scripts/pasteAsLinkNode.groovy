@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
 /*
  * Paste each copied node as a node with a link to the original and formula =link.node.text
  *
