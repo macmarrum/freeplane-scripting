@@ -12,7 +12,7 @@ import org.freeplane.features.map.clipboard.MindMapNodesSelection
 
 import java.awt.datatransfer.Transferable
 
-private String getXml(Transferable t) {
+private static String getXml(Transferable t) {
     if (t.isDataFlavorSupported(MindMapNodesSelection.mindMapNodesFlavor)) {
         try {
             return t.getTransferData(MindMapNodesSelection.mindMapNodesFlavor).toString()
@@ -49,7 +49,8 @@ if (copiedNodes.size() > 0) {
             child.link.node = source
             child.text = !textAttrib ? '=link.node.transformedText' : textAttrib.text.replaceAll(/^'=/, '=')
             if (!detailsAttrib) {
-                child.detailsText = "#${source.id}"
+                if (source.details)
+                    child.detailsText = '=link.node.details'
             } else if (detailsAttrib.startsWith(/'=/)) {
                 child.detailsText = detailsAttrib.text.drop(0)
             } else {
