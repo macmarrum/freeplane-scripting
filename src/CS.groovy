@@ -5,13 +5,12 @@ class CS {
     final static String attr = ATTRIB_NAME
 
     def static canApply(NodeRO node, String condiStyle, Boolean condition) {
-        if (condition.is(true)) {
+        if (condition) {
             node[ATTRIB_NAME] = condiStyle
             return true
         } else {
-            if (node[ATTRIB_NAME] == condiStyle) {
+            if (node[ATTRIB_NAME].text == condiStyle)
                 node[ATTRIB_NAME] = null
-            }
             return false
         }
     }
