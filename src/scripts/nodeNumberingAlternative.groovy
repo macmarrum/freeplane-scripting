@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SELECTED_NODE="/menu_bar/Mac2"})
+// @ExecutionModes({ON_SELECTED_NODE="/menu_bar/Mac1"})
 import org.freeplane.api.NodeRO
 
 import java.util.regex.Pattern

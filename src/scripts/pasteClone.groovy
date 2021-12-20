@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
 def toBeSelected = new ArrayList()
 def initialChildren
 c.selecteds.each{ self ->

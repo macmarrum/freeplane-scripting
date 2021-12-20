@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 import org.freeplane.features.format.FormatController
 
 def customDateFormatForThisScriptOnly = 'yyyy-mm-dd,E'

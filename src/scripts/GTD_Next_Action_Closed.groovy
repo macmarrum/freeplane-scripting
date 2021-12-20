@@ -1,2 +1,2 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
 c.selecteds.each { X.setStyleAndTimestampInAttribute('!NextAction.Closed', it) }

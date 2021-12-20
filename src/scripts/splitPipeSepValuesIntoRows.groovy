@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 import org.freeplane.api.NodeRO
 import org.freeplane.api.Node as FPN
 c.selecteds.each { NodeRO nodeToBeSplit ->

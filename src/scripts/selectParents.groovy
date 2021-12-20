@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
 final boolean countHidden = false  // FP cannot select hidden nodes, incl SummaryNode
 final boolean mutateCollectionInPlace = true
 def selecteds = c.selecteds.collect()  // a copy

@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 // alternative location: "//main_menu/format//menu_manageStyles"})
 // based on CopyMapStylesAction.java
 

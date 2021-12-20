@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
 import org.freeplane.features.attribute.AttributeTableLayoutModel
 import org.freeplane.features.attribute.ModelessAttributeController
 import org.freeplane.features.map.MapModel

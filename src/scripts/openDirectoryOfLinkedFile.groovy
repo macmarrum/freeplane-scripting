@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SELECTED_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SELECTED_NODE="/menu_bar/Mac2"})
 // based on OpenCurrentMapDirAction.java
 import org.freeplane.core.util.Hyperlink
 import org.freeplane.features.link.LinkController
