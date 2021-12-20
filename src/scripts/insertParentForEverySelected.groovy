@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 def myPosition
 def myNewParent
 def toBeSelected = new HashSet()

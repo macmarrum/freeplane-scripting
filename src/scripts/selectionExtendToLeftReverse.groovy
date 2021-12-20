@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 // remove top parents from selection
 def toBeSelected = c.selecteds.minus(map.root)
 toBeSelected.removeAll { it.parent !in c.selecteds }

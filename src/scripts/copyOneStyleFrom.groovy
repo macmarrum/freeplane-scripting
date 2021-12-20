@@ -1,4 +1,5 @@
-// @ExecutionModes({ON_SINGLE_NODE="//main_menu/format//menu_manageStyles"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// alternative location: "//main_menu/format//menu_manageStyles"})
 // based on CopyMapStylesAction.java
 
 import org.freeplane.api.MindMap

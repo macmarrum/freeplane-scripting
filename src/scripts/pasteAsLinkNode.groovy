@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 /*
  * Paste each copied node as a node with a link to the original and formula =link.node.text
  *
@@ -50,7 +50,7 @@ if (copiedNodes.size() > 0) {
             child.text = !textAttrib ? '=link.node.transformedText' : textAttrib.text.replaceAll(/^'=/, '=')
             if (!detailsAttrib) {
                 if (source.details)
-                    child.detailsText = '=link.node.details'
+                    child.detailsText = '=link.node.details ?: \'(none)\''
             } else if (detailsAttrib.startsWith(/'=/)) {
                 child.detailsText = detailsAttrib.text.drop(0)
             } else {

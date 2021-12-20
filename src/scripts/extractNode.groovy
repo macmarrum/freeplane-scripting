@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 def myPosition
 c.selecteds.each { self ->
 	if (self.children.size() > 0) {
