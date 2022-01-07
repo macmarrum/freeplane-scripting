@@ -1,6 +1,7 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
-def toBeSelected = new HashSet()
+def toBeSelected = new HashSet<org.freeplane.api.NodeRO>()
+boolean isLeft = c.selected.isLeft()
 c.selecteds.each { self ->
-    toBeSelected.addAll(self.parent.children.findAll { it.visible })
+    toBeSelected.addAll(self.parent.children.findAll { it.visible && it.left == isLeft })
 }
 c.select(toBeSelected)
