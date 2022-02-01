@@ -6,9 +6,9 @@ import org.freeplane.api.Node as FPN
 class ConfluenceStorage {
 
     static HashMap<String, String> style = [
-            root: 'cWikiRoot',
-            leaf: 'cWikiLeaf',
-            node: 'cWikiNode'
+            wikiRoot: 'cWikiRoot',
+            wikiLeaf: 'cWikiLeaf',
+            wikiNode: 'cWikiNode'
     ]
 
     static HashMap<String, String> icon = [
@@ -29,8 +29,8 @@ class ConfluenceStorage {
             rowNum: '№',
     ]
 
-    static Boolean isLeaf(FPN n) {
-        return n.style.name == style.leaf
+    static Boolean isWikiLeaf(FPN n) {
+        return n.style.name == style.wikiLeaf
     }
 
     static Boolean hasIcon(FPN n, String icon) {
@@ -75,7 +75,7 @@ class ConfluenceStorage {
         if (hasIcon(n, icon.noEntry)) {
             return ''
         } else {
-            if (isLeaf(n)) {
+            if (isWikiLeaf(n)) {
                 if (hasIcon(n, icon.pButton))
                     return "<p>${nl}${n.note}</p>${eol}".toString()
                 else
@@ -86,7 +86,7 @@ class ConfluenceStorage {
                 } else {
                     def body = "${getContent(n)}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}"
                     if (hasIcon(n, icon.pButton))
-                        return "<p>${nl}${body.replaceAll(/\n/, "<br />${nl}")}${nl}</p>${eol}".toString()
+                        return "<p>${nl}${_mkNonWikiLeafParagraph(body, nl)}${nl}</p>${eol}".toString()
                     else
                         return "${body}${eol}".toString()
                 }
@@ -105,9 +105,15 @@ class ConfluenceStorage {
         return "<h${hLevel}>${nl}${getContent(n)}${nl}</h${hLevel}>${childrenBody}${eol}".toString()
     }
 
+    String _mkNonWikiLeafParagraph(String body, String nl) {
+        def map = ['--': '&ndash;', '>': '&gt;', '<': '&lt;']
+        map.each { body = body.replaceAll(it.key, it.value) }
+        return body.replaceAll(/\n/, "<br />${nl}")
+    }
+
 
     static FPN getFirstChildIfNotIgnoreNode(FPN n, Boolean canSkipLeafCheck = false) {
-        def isLeafAndNotSkipped = isLeaf(n) && !canSkipLeafCheck
+        def isLeafAndNotSkipped = isWikiLeaf(n) && !canSkipLeafCheck
         if (isLeafAndNotSkipped || n.children.size() == 0 || hasIcon(n.children[0], icon.noEntry))
             return null
         else
@@ -175,7 +181,7 @@ class ConfluenceStorage {
         result << tag
         result << getContent(n)
         result << "</${tag[1..-1]}${nl}"
-        // canSkipLeafCheck=true because each cell is basically a top-level node, i.e. can be a leaf
+        // canSkipLeafCheck=true because each cell is basically a top-level node, i.e. can be a wikiLeaf
         FPN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, true)
         if (firstChildIfNotIgnoreNode) {
             result << mkTableCell(firstChildIfNotIgnoreNode, rowNum, ++colNum, hiLite1st, nl)
