@@ -84,7 +84,7 @@ class ConfluenceStorage {
                 if (_isHeading(n)) {
                     return _mkHeading(n, nl, eol)
                 } else {
-                    def body = "${getContent(n)}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}"
+                    def body = "${getContent(n)}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}".toString()
                     if (hasIcon(n, icon.pButton))
                         return "<p>${nl}${_mkNonWikiLeafParagraph(body, nl)}${nl}</p>${eol}".toString()
                     else
@@ -105,7 +105,7 @@ class ConfluenceStorage {
         return "<h${hLevel}>${nl}${getContent(n)}${nl}</h${hLevel}>${childrenBody}${eol}".toString()
     }
 
-    String _mkNonWikiLeafParagraph(String body, String nl) {
+    static String _mkNonWikiLeafParagraph(String body, String nl) {
         def map = ['--': '&ndash;', '>': '&gt;', '<': '&lt;']
         map.each { body = body.replaceAll(it.key, it.value) }
         return body.replaceAll(/\n/, "<br />${nl}")
