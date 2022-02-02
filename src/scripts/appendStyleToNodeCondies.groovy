@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
 /*
  * Appends the current style to Node Conditional Styles
  */
