@@ -2,7 +2,9 @@
  * Inspired by https://github.com/EdoFro/Freeplane_MarkdownHelper
  */
 
+
 import groovy.xml.XmlUtil
+import org.freeplane.api.Node
 import org.freeplane.api.Node as FPN
 
 class ConfluenceStorage {
@@ -77,6 +79,15 @@ class ConfluenceStorage {
         return n.children.collect { mkNode(it) }.join('')
     }
 
+    static LinkedHashMap<String, String> bodyReplacements = [
+            /\n-\+ /         : '\n&rarr; ',
+            /\n--\+ /        : '\n&rarrtl; ',
+            /\n-- /          : '\n&ndash; ',
+            /\n--- /         : '\n&mdash; ',
+            /([^-])--([^-])/ : '$1&ndash;$2',
+            /([^-])---([^-])/: '$1&mdash;$2',
+    ]
+
     static String mkNode(FPN n) {
         def eol = getEol(n)
         def nl = getNewLine(n)
@@ -93,9 +104,12 @@ class ConfluenceStorage {
                     return _mkHeading(n, nl, eol)
                 } else {
                     def body = "${getContent(n)}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}".toString()
-                    if (hasIcon(n, icon.pButton))
-                        return "<p>${nl}${body.replaceAll(/\n/, "<br />${nl}")}${nl}</p>${eol}".toString()
-                    else
+                    if (hasIcon(n, icon.pButton)) {
+                        body = body.replaceAll(/\n\+ /, "\n${getSimBullet(n)} ")
+                        bodyReplacements.each { body = body.replaceAll(it.key, it.value) }
+                        body = body.replaceAll(/\n/, "<br />${nl}")
+                        return "<p>${nl}${body}${nl}</p>${eol}".toString()
+                    } else
                         return "${body}${eol}".toString()
                 }
             }
@@ -205,7 +219,7 @@ class ConfluenceStorage {
 
     static String mkZipList(FPN n) {
         def nl = getNewLine(n)
-        def bullet = n['simBullet'] ?: '●'
+        def bullet = getSimBullet(n)
         int smallerBranchChildrenSize = n.children.collect { branch -> branch.children.size() }.min()
         def items = new HashMap<Integer, StringBuilder>()
         n.children.each { branch ->
@@ -223,6 +237,10 @@ class ConfluenceStorage {
         if (items.size() == 0) return '<!-- grandchildren are missing -->'
         def result = items.values().join("<br />${nl}")
         return "<p>${nl}${result}${nl}</p>".toString()
+    }
+
+    static String getSimBullet(Node n) {
+        return n['simBullet'] ?: '●'
     }
 
     static String getEachFirstChildsContent(n, String sep = ' ', Boolean canSkipLeafCheck = false) {
