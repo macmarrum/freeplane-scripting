@@ -79,7 +79,7 @@ class ConfluenceStorage {
         return n.children.collect { mkNode(it) }.join('')
     }
 
-    static LinkedHashMap<String, String> bodyReplacements = [
+    static LinkedHashMap<String, String> pReplacements = [
             /\n=- /           : '\n&rarr; ',
             /\n== /           : '\n&rarrtl; ',
             /\n-- /           : '\n&ndash; ',
@@ -92,11 +92,12 @@ class ConfluenceStorage {
     static String mkNode(FPN n) {
         def eol = getEol(n)
         def nl = getNewLine(n)
+        def isP = hasIcon(n, icon.pButton)
         if (hasIcon(n, icon.noEntry)) {
             return ''
         } else {
             if (isWikiLeaf(n)) {
-                if (hasIcon(n, icon.pButton))
+                if (isP)
                     return "<p>${nl}${n.note}</p>${eol}".toString()
                 else
                     return "${n.note}${eol}".toString()
@@ -104,13 +105,16 @@ class ConfluenceStorage {
                 if (_isHeading(n)) {
                     return _mkHeading(n, nl, eol)
                 } else {
-                    def body = "${getContent(n)}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}".toString()
-                    if (hasIcon(n, icon.pButton)) {
-                        body = body.replaceAll(/\n\+ /, "\n${getSimBullet(n)} ")
-                        bodyReplacements.each { body = body.replaceAll(it.key, it.value) }
-                        body = body.replaceAll(/\n/, "<br />${nl}")
+                    def pContent = getContent(n)
+                    if (isP) {
+                        pContent = pContent.replaceAll(/\n\+ /, "\n${getSimBullet(n)} ")
+                        pReplacements.each { pContent = pContent.replaceAll(it.key, it.value) }
+                        pContent = pContent.replaceAll(/\n/, "<br />${nl}")
+                    }
+                    def body = "${pContent}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}".toString()
+                    if (isP)
                         return "<p>${nl}${body}${nl}</p>${eol}".toString()
-                    } else
+                    else
                         return "${body}${eol}".toString()
                 }
             }
