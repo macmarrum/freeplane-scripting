@@ -3,7 +3,7 @@
  * Appends the current style to Node Conditional Styles
  */
 
-
+import org.freeplane.api.Node as FPN
 import org.freeplane.features.map.MapModel
 import org.freeplane.features.map.NodeModel
 import org.freeplane.features.styles.ConditionalStyleModel
@@ -23,7 +23,8 @@ static ConditionalStyleModel getConditionalStyleModel(NodeModel node) {
     return conditionalStyleModel
 }
 
-for (node in c.selecteds) {
+//ArrayList<FPN> toBeSelected_nodesWithStyleAddedToCondies = new ArrayList<>()
+for (FPN node in c.selecteds) {
     IStyle iStyle = node.style.style
     if (iStyle === null)
         continue
@@ -31,5 +32,8 @@ for (node in c.selecteds) {
     MapModel map = node.mindMap.delegate
     ConditionalStyleModel condiStyleModel = getConditionalStyleModel(nodeModel)
     ((MLogicalStyleController) LogicalStyleController.getController()).addConditionalStyle(map, condiStyleModel, true, null, iStyle, false)
+//    toBeSelected_nodesWithStyleAddedToCondies.add(node)
 }
+//c.select(toBeSelected_nodesWithStyleAddedToCondies)
+// No need to use toBeSelected: if node has an explicitly assigned style, it is covered by the above loop; if not, ResetStyleAction has no effect on the node
 menuUtils.executeMenuItems(['ResetStyleAction',])
