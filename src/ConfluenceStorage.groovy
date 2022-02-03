@@ -80,12 +80,12 @@ class ConfluenceStorage {
     }
 
     static LinkedHashMap<String, String> bodyReplacements = [
-            /\n-\+ /         : '\n&rarr; ',
-            /\n--\+ /        : '\n&rarrtl; ',
-            /\n-- /          : '\n&ndash; ',
-            /\n--- /         : '\n&mdash; ',
-            /([^-])--([^-])/ : '$1&ndash;$2',
-            /([^-])---([^-])/: '$1&mdash;$2',
+            /\n=- /           : '\n&rarr; ',
+            /\n== /           : '\n&rarrtl; ',
+            /\n-- /           : '\n&ndash; ',
+            /\n--- /          : '\n&mdash; ',
+            /([^-])--([^-])/  : '$1&ndash;$2',
+            /([^-])---([^-])/ : '$1&mdash;$2',
             /\{\{([^{]+)\}\)}/: '<code>$1</code>',
     ]
 
