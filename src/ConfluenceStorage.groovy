@@ -1,6 +1,8 @@
 /*
  * Inspired by https://github.com/EdoFro/Freeplane_MarkdownHelper
  */
+
+import groovy.xml.XmlUtil
 import org.freeplane.api.Node as FPN
 
 class ConfluenceStorage {
@@ -22,6 +24,7 @@ class ConfluenceStorage {
             nbsp_gemini             : 'emoji-264A',
             numbers_inputNumbers    : 'emoji-1F522',
             collapse_fastUpButton   : 'emoji-23EB',
+            xmlEscape_broom         : 'emoji-1F9F9',
     ]
 
     static HashMap<String, String> tbl = [
@@ -37,8 +40,13 @@ class ConfluenceStorage {
         return n.icons.icons.contains(icon)
     }
 
+    /**
+     * First escape xml, if broom present
+     * Only then replace each space with nbsp, if gemini present
+     */
     static String getContent(FPN n) {
         def content = n.note ? n.note.text : n.transformedText
+        if (hasIcon(n, icon.xmlEscape_broom)) content = XmlUtil.escapeXml(content)
         return hasIcon(n, icon.nbsp_gemini) ? content.replaceAll(/ /, '&nbsp;') : content
     }
 
@@ -86,7 +94,7 @@ class ConfluenceStorage {
                 } else {
                     def body = "${getContent(n)}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}".toString()
                     if (hasIcon(n, icon.pButton))
-                        return "<p>${nl}${_mkNonWikiLeafParagraph(body, nl)}${nl}</p>${eol}".toString()
+                        return "<p>${nl}${body.replaceAll(/\n/, "<br />${nl}")}${nl}</p>${eol}".toString()
                     else
                         return "${body}${eol}".toString()
                 }
@@ -103,12 +111,6 @@ class ConfluenceStorage {
         def hLevel = hIcon[5..-1]
         def childrenBody = n.children.size() > 0 ? n.children.collect { mkNode(it) }.join('') : ''
         return "<h${hLevel}>${nl}${getContent(n)}${nl}</h${hLevel}>${childrenBody}${eol}".toString()
-    }
-
-    static String _mkNonWikiLeafParagraph(String body, String nl) {
-        def map = ['--': '&ndash;', '>': '&gt;', '<': '&lt;']
-        map.each { body = body.replaceAll(it.key, it.value) }
-        return body.replaceAll(/\n/, "<br />${nl}")
     }
 
 
