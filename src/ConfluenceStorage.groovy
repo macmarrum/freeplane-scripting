@@ -86,6 +86,7 @@ class ConfluenceStorage {
             /\n--- /         : '\n&mdash; ',
             /([^-])--([^-])/ : '$1&ndash;$2',
             /([^-])---([^-])/: '$1&mdash;$2',
+            /\{\{([^{]+)\}\)}/: '<code>$1</code>',
     ]
 
     static String mkNode(FPN n) {
