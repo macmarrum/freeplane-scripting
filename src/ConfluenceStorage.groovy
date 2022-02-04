@@ -16,17 +16,18 @@ class ConfluenceStorage {
     ]
 
     static HashMap<String, String> icon = [
-            noEntry                 : 'emoji-26D4',
-            eol_chequeredFlag       : 'emoji-1F3C1',
-            noSep_cancer            : 'emoji-264B',
-            pButton                 : 'emoji-1F17F',
-            nl_rightArrowCurvingDown: 'emoji-2935',
-            ol_keycapHash           : 'emoji-0023-20E3',
-            border_unchecked        : 'unchecked',
-            nbsp_gemini             : 'emoji-264A',
-            numbers_inputNumbers    : 'emoji-1F522',
-            collapse_fastUpButton   : 'emoji-23EB',
-            xmlEscape_broom         : 'emoji-1F9F9',
+            noEntry                      : 'emoji-26D4',
+            eol_chequeredFlag            : 'emoji-1F3C1',
+            noSep_cancer                 : 'emoji-264B',
+            pButton                      : 'emoji-1F17F',
+            nl_rightArrowCurvingDown     : 'emoji-2935',
+            ol_keycapHash                : 'emoji-0023-20E3',
+            border_unchecked             : 'unchecked',
+            nbsp_gemini                  : 'emoji-264A',
+            numbers_inputNumbers         : 'emoji-1F522',
+            collapse_fastUpButton        : 'emoji-23EB',
+            xmlEscape_broom              : 'emoji-1F9F9',
+            pReplacements_doubleCurlyLoop: 'emoji-27BF',
     ]
 
     static HashMap<String, String> tbl = [
@@ -44,11 +45,13 @@ class ConfluenceStorage {
 
     /**
      * First escape xml, if broom present
-     * Only then replace each space with nbsp, if gemini present
+     * Only then do pReplacements if doubleCurlyLoop present
+     * and replace each space with nbsp, if gemini present
      */
     static String getContent(FPN n) {
         def content = n.note ? n.note.text : n.transformedText
         if (hasIcon(n, icon.xmlEscape_broom)) content = XmlUtil.escapeXml(content)
+        if (hasIcon(n, icon.pReplacements_doubleCurlyLoop)) content = _applyReplacements(n, content)
         return hasIcon(n, icon.nbsp_gemini) ? content.replaceAll(/ /, '&nbsp;') : content
     }
 
@@ -89,13 +92,19 @@ class ConfluenceStorage {
             /\{\{([^{]+)\}\)}/: '<code>$1</code>',
     ]
 
+    static String _applyReplacements(FPN n, String content) {
+        content = content.replaceAll(/\n\+ /, "\n${getSimBullet(n)} ")
+        pReplacements.each { content = content.replaceAll(it.key, it.value) }
+        return content.replaceAll(/\n/, "<br />${getNewLine(n)}")
+    }
+
     static String mkNode(FPN n) {
-        def eol = getEol(n)
-        def nl = getNewLine(n)
-        def isP = hasIcon(n, icon.pButton)
         if (hasIcon(n, icon.noEntry)) {
             return ''
         } else {
+            def eol = getEol(n)
+            def nl = getNewLine(n)
+            def isP = hasIcon(n, icon.pButton)
             if (isWikiLeaf(n)) {
                 if (isP)
                     return "<p>${nl}${n.note}</p>${eol}".toString()
@@ -103,14 +112,11 @@ class ConfluenceStorage {
                     return "${n.note}${eol}".toString()
             } else {
                 if (_isHeading(n)) {
-                    return _mkHeading(n, nl, eol)
+                    return "${_mkHeading(n, nl)}${eol}".toString()
                 } else {
                     def pContent = getContent(n)
-                    if (isP) {
-                        pContent = pContent.replaceAll(/\n\+ /, "\n${getSimBullet(n)} ")
-                        pReplacements.each { pContent = pContent.replaceAll(it.key, it.value) }
-                        pContent = pContent.replaceAll(/\n/, "<br />${nl}")
-                    }
+                    if (isP && !hasIcon(n, icon.pReplacements_doubleCurlyLoop)) // avoid double replacements
+                        pContent = _applyReplacements(n, pContent)
                     def body = "${pContent}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}".toString()
                     if (isP)
                         return "<p>${nl}${body}${nl}</p>${eol}".toString()
@@ -125,11 +131,11 @@ class ConfluenceStorage {
         return (n.icons.size() > 0 && n.icons.icons.any { it.startsWith('full-') })
     }
 
-    static String _mkHeading(FPN n, String nl, String eol) {
+    static String _mkHeading(FPN n, String nl) {
         def hIcon = n.icons.icons.find { it.startsWith('full-') }
         def hLevel = hIcon[5..-1]
         def childrenBody = n.children.size() > 0 ? n.children.collect { mkNode(it) }.join('') : ''
-        return "<h${hLevel}>${nl}${getContent(n)}${nl}</h${hLevel}>${childrenBody}${eol}".toString()
+        return "<h${hLevel}>${nl}${getContent(n)}${nl}</h${hLevel}>${childrenBody}".toString()
     }
 
 
@@ -272,14 +278,7 @@ class ConfluenceStorage {
 
     static String mkQuote(FPN n) {
         def nl = getNewLine(n)
-        def result = new StringBuilder()
-        result << "<blockquote>${nl}"
-        n.children.each { FPN child ->
-            if (!hasIcon(child, icon.noEntry))
-                result << "${mkNode(child)}${nl}"
-        }
-        result << "</blockquote>"
-        return result.toString()
+        return "<blockquote>${nl}${mkParent(n)}${nl}</blockquote>".toString()
     }
 
     static String mkLink(FPN n) {
