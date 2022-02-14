@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter
 @Field final static String dfShortIso = 'yyyy-MM-dd'
 @Field final static String dfLongIso = 'yyyy-MM-dd HH:mm'
 @Field final static String dfFullIso = '''yyyy-MM-dd'T'HH:mmZ'''
-@Field final static String dfLong = 'yyyy-MM-dd,E HH:mm z (Z)'
+@Field final static String dfLong = 'yyyy-MM-dd,E HH:mm:ss z (Z)'
 
 static Calendar addDaysCal(NodeRO node, num) {
     def d = node.to.calendar
