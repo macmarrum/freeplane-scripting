@@ -83,13 +83,13 @@ class ConfluenceStorage {
     }
 
     static LinkedHashMap<String, String> pReplacements = [
-            /\n=- /           : '\n&rarr; ',
-            /\n== /           : '\n&rarrtl; ',
-            /\n-- /           : '\n&ndash; ',
-            /\n--- /          : '\n&mdash; ',
-            /([^-])--([^-])/  : '$1&ndash;$2',
-            /([^-])---([^-])/ : '$1&mdash;$2',
-            /\{\{([^{]+)\}\}/: '<code>$1</code>',
+            /\n=- /            : '\n&rarr; ',
+            /\n== /            : '\n&rarrtl; ',
+            /\n-- /            : '\n&ndash; ',
+            /\n--- /           : '\n&mdash; ',
+            /([^-])?---([^-])?/: '$1&mdash;$2',
+            /([^-])?--([^-])?/ : '$1&ndash;$2',
+            /\{\{([^{]+)\}\}/  : '<code>$1</code>',
     ]
 
     static String _applyReplacements(FPN n, String content) {
@@ -232,7 +232,7 @@ class ConfluenceStorage {
         def nl = getNewLine(n)
         def bullet = getSimBullet(n)
         int smallerBranchChildrenSize = n.children.collect { branch -> branch.children.size() }.min()
-        def items = new HashMap<Integer, StringBuilder>()
+        def items = new LinkedHashMap<Integer, StringBuilder>()
         n.children.each { branch ->
             branch.children.eachWithIndex { levelOneChild, int idx ->
                 if (idx < smallerBranchChildrenSize) {
@@ -260,7 +260,7 @@ class ConfluenceStorage {
         if (child) {
             def grandchildsContent = getEachFirstChildsContent(child, sep)
             def sepGrandchildsContent = grandchildsContent != '' ? "${sep}${grandchildsContent}" : ''
-            return "${child.note ?: child.transformedText}${sepGrandchildsContent}".toString()
+            return "${getContent(child)}${sepGrandchildsContent}".toString()
         } else
             return ''
     }

@@ -5,7 +5,8 @@ import org.freeplane.api.NodeRO as FPN
 int getWidth(FPN node, float zoom) {
     def v = node.delegate.viewers
     assert v.size() == 1
-    return v[0].mainView.width / zoom
+    double width = v[0].mainView.width / zoom
+    return Math.ceil(width)
 }
 
 float zoom = c.getZoom()
