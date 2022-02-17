@@ -247,7 +247,7 @@ class ConfluenceStorage {
         }
         if (items.size() == 0) return '<!-- grandchildren are missing -->'
         def result = items.values().join("<br />${nl}")
-        return "<p>${nl}${result}${nl}</p>".toString()
+        return "<div>${nl}${result}${nl}</div>".toString()
     }
 
     static String getSimBullet(Node n) {
