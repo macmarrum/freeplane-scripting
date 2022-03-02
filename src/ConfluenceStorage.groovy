@@ -104,12 +104,13 @@ class ConfluenceStorage {
         } else {
             def eol = getEol(n)
             def nl = getNewLine(n)
+            def sep = getSep(n)
             def isP = hasIcon(n, icon.pButton)
             if (isWikiLeaf(n)) {
                 if (isP)
                     return "<p>${nl}${n.note}</p>${eol}".toString()
                 else
-                    return "${n.note}${eol}".toString()
+                    return "${n.note}${sep}${eol}".toString()
             } else {
                 if (_isHeading(n)) {
                     return "${_mkHeading(n, nl)}${eol}".toString()
@@ -117,7 +118,7 @@ class ConfluenceStorage {
                     def pContent = getContent(n)
                     if (isP && !hasIcon(n, icon.pReplacements_doubleCurlyLoop)) // avoid double replacements
                         pContent = _applyReplacements(n, pContent)
-                    def body = "${pContent}${getSep(n)}${n.children.collect { mkNode(it) }.join('')}".toString()
+                    def body = "${pContent}${sep}${n.children.collect { mkNode(it) }.join('')}".toString()
                     if (isP)
                         return "<p>${nl}${body}${nl}</p>${eol}".toString()
                     else
@@ -228,6 +229,10 @@ class ConfluenceStorage {
         return result.toString()
     }
 
+    /** mkZipList uses its own content gatherer instead of mkNode to consider only the first child on each level
+     *  TODO: consider if mkNode could be used instead, especially now that <div> is used in place of <p>
+     *      -- benefits / disadvantages
+     */
     static String mkZipList(FPN n) {
         def nl = getNewLine(n)
         def bullet = getSimBullet(n)
