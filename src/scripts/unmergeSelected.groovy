@@ -13,7 +13,7 @@ selecteds.each { FPN toBeSplit ->
     toBeSplit.children.eachWithIndex { child, i ->
         if (i > 0) {
             def clone = parent.appendAsCloneWithoutSubtree(toBeSplit)
-            clone.left = toBeSplit.isLeft()
+            clone.left = toBeSplit.left
             clone.moveTo(parent, ++position)
             child.moveTo(clone)
         }
