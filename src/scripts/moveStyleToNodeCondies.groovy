@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Move"})
 /*
  * Appends the current style to Node Conditional Styles
  */
@@ -11,7 +11,7 @@ import org.freeplane.features.styles.IStyle
 import org.freeplane.features.styles.LogicalStyleController
 import org.freeplane.features.styles.mindmapmode.MLogicalStyleController
 
-// from ManageNodeConditionalStylesAction.java
+// from org.freeplane.features.styles.mindmapmode.ManageNodeConditionalStylesAction.getConditionalStyleModel
 static ConditionalStyleModel getConditionalStyleModel(NodeModel node) {
 //    final Controller controller = Controller.getCurrentController()
 //    final NodeModel node = controller.getSelection().getSelected()
