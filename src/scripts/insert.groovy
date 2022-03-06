@@ -1,8 +1,9 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Insert"})
 import org.freeplane.api.Node as FPN
+
 def canCopyFormatToNewChild = config.getBooleanProperty("copyFormatToNewChild")
 def canCopyFormatToNewNodeIncludesIcons = config.getBooleanProperty("copyFormatToNewNodeIncludesIcons")
-def toBeSelected = new ArrayList()
+def toBeSelected = new LinkedList<FPN>()
 c.selecteds.each { FPN selected ->
     def newNode = selected.createChild()
     if (canCopyFormatToNewChild) {
