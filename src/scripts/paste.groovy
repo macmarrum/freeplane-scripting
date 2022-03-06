@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Paste"})
 /*
  * Alternative "paste" functionality
  *
@@ -13,7 +13,7 @@ def clipboardController = MMapClipboardController.controller
 def transferable = clipboardController.clipboardContents
 def initialListOfChildren
 def newlyPastedChildren
-def toBeSelected = new ArrayList()
+def toBeSelected = new LinkedList()
 c.selecteds.each { self ->
     initialListOfChildren = self.children.findAll { it.visible }
     def target = self.delegate

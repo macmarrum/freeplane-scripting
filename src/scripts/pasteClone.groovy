@@ -1,5 +1,5 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
-def toBeSelected = new ArrayList()
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Paste"})
+def toBeSelected = new LinkedList()
 def initialChildren
 c.selecteds.each{ self ->
 	initialChildren = self.children.collect()

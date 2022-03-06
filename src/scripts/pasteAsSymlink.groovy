@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Paste"})
 /*
  * Paste each copied node as a node with a link to the original and formula =link.node.text
  *
@@ -14,7 +14,7 @@ import java.awt.datatransfer.Transferable
 
 def copiedNodes = getNodesFromClipboard(getXml(MapClipboardController.controller.clipboardContents))
 if (copiedNodes.size() > 0) {
-    def toBeSelected = new ArrayList()
+    def toBeSelected = new LinkedList<FPN>()
     FPN target = node // temporary, for attrib
     def textAttrib = target.mindMap.root['pasteAsSymlinkText']
     def detailsAttrib = target.mindMap.root['pasteAsSymlinkDetails']

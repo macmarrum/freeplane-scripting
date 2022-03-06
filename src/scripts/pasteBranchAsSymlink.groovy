@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Paste"})
 /*
  * Consider each copied node as a branch root.
  * Paste each node in the branch as a node with a link to the original and formula =link.node.text
@@ -18,7 +18,7 @@ if (copiedNodes.size() != 1) {
     c.statusInfo = "ERROR: copied nodes size is ${copiedNodes.size()} -- expected 1"
     return
 }
-def toBeSelected = new ArrayList<FPN>()
+def toBeSelected = new LinkedList<FPN>()
 FPN source = copiedNodes[0]
 for (FPN targetLocalRoot : c.selecteds.collect()) {
     if (targetLocalRoot.children.size() > 0) {
