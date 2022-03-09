@@ -10,8 +10,8 @@ import java.awt.datatransfer.Transferable
 def toBeSelected = new LinkedList<FPN>()
 def copiedNodes = getNodesFromClipboardXml(getXml(MapClipboardController.controller.clipboardContents))
 List<FPN> selecteds = c.selecteds.collect()
-if (copiedNodes.size() != selecteds.size()) {
-    c.statusInfo = "convertToClone: got ${copiedNodes.size()} nodes from clipboard and ${selecteds.size()} target nodes are selected -- expected the same count"
+if (copiedNodes.size() != selecteds.size() && !(copiedNodes.size() == 1 && selecteds.size() > 1)) {
+    c.statusInfo = "convertToClone: got ${copiedNodes.size()} nodes from clipboard and ${selecteds.size()} target nodes are selected -- expected the same count or 1 to many"
 } else {
     def originalChildren
     FPN source
@@ -19,7 +19,7 @@ if (copiedNodes.size() != selecteds.size()) {
     FPN clone
     selecteds.eachWithIndex { target, i ->
         originalChildren = target.parent.children.collect()
-        source = copiedNodes[i]
+        source = copiedNodes.size() == 1 ? copiedNodes[0] : copiedNodes[i]
         c.select(source)
         menuUtils.executeMenuItems(['CopySingleAction'])
         position = target.parent.getChildPosition(target)
