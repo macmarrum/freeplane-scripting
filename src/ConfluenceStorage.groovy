@@ -55,7 +55,7 @@ class ConfluenceStorage {
         return hasIcon(n, icon.nbsp_gemini) ? content.replaceAll(/ /, '&nbsp;') : content
     }
 
-    static String getSep(FPN n) {
+    static String getSpaceSep(FPN n) {
         return hasIcon(n, icon.noSep_cancer) ? '' : ' '
     }
 
@@ -104,25 +104,34 @@ class ConfluenceStorage {
         } else {
             def eol = getEol(n)
             def nl = getNewLine(n)
-            def sep = getSep(n)
+            def sep = getSpaceSep(n)
             def isP = hasIcon(n, icon.pButton)
+            def result = new StringBuilder()
             if (isWikiLeaf(n)) {
-                if (isP)
-                    return "<p>${nl}${n.note}</p>${eol}".toString()
-                else
-                    return "${n.note}${sep}${eol}".toString()
+                if (isP) {
+                    result << '<p>' << nl << n.note << '</p>' << eol
+                    return result.toString()
+                } else {
+                    result << n.note << sep << eol
+                    return result.toString()
+                }
             } else {
                 if (_isHeading(n)) {
-                    return "${_mkHeading(n, nl)}${eol}".toString()
+                    result << _mkHeading(n, nl) << eol
+                    return result.toString()
                 } else {
-                    def pContent = getContent(n)
+                    String pContent
                     if (isP && !hasIcon(n, icon.pReplacements_doubleCurlyLoop)) // avoid double replacements
-                        pContent = _applyReplacements(n, pContent)
-                    def body = "${pContent}${sep}${n.children.collect { mkNode(it) }.join('')}".toString()
-                    if (isP)
-                        return "<p>${nl}${body}${nl}</p>${eol}".toString()
+                        pContent = _applyReplacements(n, getContent(n))
                     else
-                        return "${body}${eol}".toString()
+                        pContent = getContent(n)
+                    if (isP)
+                        result << '<p>'
+                    result << pContent << sep << n.children.collect { mkNode(it) }.join('')
+                    if (isP)
+                        result << '</p>'
+                    result << eol
+                    return result.toString()
                 }
             }
         }
@@ -136,7 +145,9 @@ class ConfluenceStorage {
         def hIcon = n.icons.icons.find { it.startsWith('full-') }
         def hLevel = hIcon[5..-1]
         def childrenBody = n.children.size() > 0 ? n.children.collect { mkNode(it) }.join('') : ''
-        return "<h${hLevel}>${nl}${getContent(n)}${nl}</h${hLevel}>${childrenBody}".toString()
+        def result = new StringBuilder()
+        result << '<h' << hLevel << '>' << nl << getContent(n) << nl << '</h' << hLevel << '>' << childrenBody
+        return result.toString()
     }
 
 
@@ -171,7 +182,7 @@ class ConfluenceStorage {
         def tableWiki = new StringBuilder()
         def colNum = 1
         def rowNum = 1
-        tableWiki << "<table>${nl}<colgroup><col /><col /></colgroup>${nl}<tbody>${nl}"
+        tableWiki << '<table>' << nl << '<colgroup><col /><col /></colgroup>' << nl << '<tbody>' << nl
         // clean up details containing old tbl.rowNum
         n.findAll().drop(1).each { if (it.details && it.details.text.startsWith(tbl.rowNum)) it.details = null }
         // the first column in each row is technical, therefore it's skipped
@@ -180,14 +191,14 @@ class ConfluenceStorage {
                 row.details = "${tbl.rowCnt}${_tbl_countFirstChildChain(row)}".toString()
 
                 if (row.children.size() > 0) {
-                    tableWiki << "<tr>${nl}"
+                    tableWiki << '<tr>' << nl
                     tableWiki << mkTableCell(row.children[0], rowNum, colNum, hiLite1st, nl)
-                    tableWiki << "</tr>${nl}"  // close the row
+                    tableWiki << '</tr>' << nl // close the row
                 }
                 rowNum++
             }
         }
-        tableWiki << "</tbody>${nl}</table>"
+        tableWiki << '</tbody>' << nl << '</table>'
         def result = tableWiki.toString()
         return result
     }
@@ -208,7 +219,7 @@ class ConfluenceStorage {
         }
         result << tag
         result << getContent(n)
-        result << "</${tag[1..-1]}${nl}"
+        result << '</' << tag[1..-1] << nl
         // canSkipLeafCheck=true because each cell is basically a top-level node, i.e. can be a wikiLeaf
         FPN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, true)
         if (firstChildIfNotIgnoreNode) {
@@ -221,11 +232,14 @@ class ConfluenceStorage {
         def nl = getNewLine(n)
         def result = new StringBuilder()
         def tag = hasIcon(n, icon.ol_keycapHash) ? '<ol>' : '<ul>'
-        result << "${tag}${nl}"
+        result << tag << nl
+        String body
         n.children.each {
-            result << "<li>${nl}${mkNode(it)}${nl}</li>${nl}"
+            body = mkNode(it)
+            if (body.trim().size() > 0)
+                result << '<li>' << nl << body << nl << '</li>' << nl
         }
-        result << "</${tag[1..-1]}"
+        result << '</' << tag[1..-1]
         return result.toString()
     }
 
@@ -272,7 +286,7 @@ class ConfluenceStorage {
 
     static List<FPN> getFirstChildChain(FPN n, List<FPN> firstChildChain = null) {
         if (firstChildChain.is(null))
-            firstChildChain = new ArrayList<>()
+            firstChildChain = new LinkedList<FPN>()
         firstChildChain.add(n)
         def child = getFirstChildIfNotIgnoreNode(n)
         if (child)
@@ -283,14 +297,18 @@ class ConfluenceStorage {
 
     static String mkQuote(FPN n) {
         def nl = getNewLine(n)
-        return "<blockquote>${nl}${mkParent(n)}${nl}</blockquote>".toString()
+        def result = new StringBuilder()
+        result << '<blockquote>' << nl << mkParent(n) << nl << '</blockquote>'
+        return result.toString()
     }
 
     static String mkLink(FPN n) {
         /* make link of the first child with a link */
         def nl = getNewLine(n)
         for (child in n.children.find { it.link }) {
-            return """<a href="${child.link.text}">${nl}${child.text}${nl}</a>""".toString()
+            def result = new StringBuilder()
+            result << '<a href="' << child.link.text << '">' << nl << child.text << nl << '</a>'
+            return result.toString()
         }
         return '<!-- a child with a link is missing -->'
     }
@@ -303,9 +321,15 @@ class ConfluenceStorage {
             canGenerate = true
         else if (!n[uuid].text.endsWith(n.id))
             canGenerate = true
-        if (canGenerate)
-            n[uuid] = "${UUID.randomUUID().toString()}-${n.id}"
-        return n[uuid].text[0..35]
+        if (canGenerate) {
+            def uuidValue = UUID.randomUUID().toString()
+            def result = new StringBuilder()
+            result << uuidValue << '-' << n.id
+            n[uuid] = result.toString()
+            return uuidValue
+        } else {
+            return n[uuid].text[0..35]
+        }
     }
 
     static String mkExpand(FPN n) {
@@ -343,14 +367,14 @@ class ConfluenceStorage {
     static String _mkMacroPlain(FPN n, String macro, String cdata, Map<String, String> parameters = null) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
-        result << """<ac:structured-macro ac:name="${macro}" ac:schema-version="1" ac:macro-id="${getUuid(n)}">${nl}"""
+        result << '<ac:structured-macro ac:name="' << macro << '" ac:schema-version="1" ac:macro-id="' << getUuid(n) << '">' << nl
         if (parameters)
             parameters.each {
-                result << """<ac:parameter ac:name="${it.key}">${it.value}</ac:parameter>${nl}"""
+                result << '<ac:parameter ac:name="' << it.key << '">' << it.value << '</ac:parameter>' << nl
             }
         if (cdata)
-            result << """<ac:plain-text-body>${nl}<![CDATA[${cdata}]]>${nl}</ac:plain-text-body>${nl}"""
-        result << """</ac:structured-macro>"""
+            result << '<ac:plain-text-body>' << nl << '<![CDATA[' << cdata << ']]>' << nl << '</ac:plain-text-body>' << nl
+        result << '</ac:structured-macro>'
         return result.toString()
     }
 
@@ -358,20 +382,26 @@ class ConfluenceStorage {
         def nl = getNewLine(n)
         def result = new StringBuilder()
         def _body = body ?: _mkParent(n)
-        result << """<ac:structured-macro ac:name="${macro}" ac:schema-version="1" ac:macro-id="${getUuid(n)}">${nl}"""
+        result << '<ac:structured-macro ac:name="' << macro << '" ac:schema-version="1" ac:macro-id="' << getUuid(n) << '">' << nl
         if (parameters)
             parameters.each {
-                result << """<ac:parameter ac:name="${it.key}">${it.value}</ac:parameter>${nl}"""
+                result << '<ac:parameter ac:name="' << it.key << '">' << it.value << '</ac:parameter>' << nl
             }
-        result << """<ac:rich-text-body>${nl}${_body}${nl}</ac:rich-text-body>${nl}"""
-        result << """</ac:structured-macro>"""
+        result << '<ac:rich-text-body>' << nl << _body << nl << '</ac:rich-text-body>' << nl
+        result << '</ac:structured-macro>'
         return result.toString()
     }
 
     static String mkDivExpand(FPN n) {
         return _execIfChildren(n, {
+            def nl = getNewLine(n)
             def title = n.details ? n.details.text : 'Click here to expand...'
-            return _mkMacroRich(n, 'div', [class: n.link.text ?: 'expand-in-a-box'], _mkMacroRich(n, 'expand', [title: title]))
+            def className = n.link.text ?: 'expand-in-a-box'
+            def result = new StringBuilder()
+            result << '<div class="' << className << '">' << nl
+            result << _mkMacroRich(n, 'expand', [title: title]) << nl
+            result << '</div>'
+            return result.toString()
         })
     }
 
@@ -379,7 +409,11 @@ class ConfluenceStorage {
         def nl = getNewLine(n)
         def canUpload = n['attachmentsUpload'].num0 == 1 ? 'true' : 'false'
         def canOld = n['attachmentsOld'].num0 == 1 ? 'true' : 'false'
-        return """<ac:structured-macro ac:name="attachments" ac:schema-version="1" ac:macro-id="${getUuid(n)}">${nl}<ac:parameter ac:name="upload">${canUpload}</ac:parameter>${nl}<ac:parameter ac:name="old">${canOld}</ac:parameter>${nl}</ac:structured-macro>"""
+        def result = new StringBuilder()
+        result << '<ac:structured-macro ac:name="attachments" ac:schema-version="1" ac:macro-id="' << getUuid(n) << '">' << nl
+        result << '<ac:parameter ac:name="upload">' << canUpload << '</ac:parameter>' << nl
+        result << '<ac:parameter ac:name="old">' << canOld << '</ac:parameter>' << nl << '</ac:structured-macro>'
+        return result.toString()
     }
 
     static String mkStyleImport(FPN n) {
@@ -404,34 +438,45 @@ class ConfluenceStorage {
     static String mkImage(FPN n) {
         for (child in n.children.find { FPN it -> it.text }) {
             def result = new StringBuilder()
-            def height = child.details ? /ac:height="${child.details}" / : ''
-            def border = hasIcon(child, icon.border_unchecked) ? /ac:border="true" / : ''
-            result << """<ac:image ${height}${border}>"""
-            result << """<ri:attachment ri:filename="${child.text}" />"""
-            result << """</ac:image>"""
+            result << '<ac:image '
+            if (child.details)
+                result << 'ac:height="' << child.details << '" '
+            if (hasIcon(child, icon.border_unchecked))
+                result << 'ac:border="true" '
+            result << '>'
+            result << '<ri:attachment ri:filename="' << child.text << '" />'
+            result << '</ac:image>'
             return result.toString()
         }
         return '<!-- a child with text is missing -->'
     }
 
+    /**
+     * mkCsv is lightweight mkParent, i.e. without headings, paragraphs, replacements, escapeXml
+     * + collects only the first child of each node
+     * + uses a comma or any string as the separator
+     */
     static String mkCsv(FPN n) {
         // sep can be defined as the attribute csvSep
         // sep can be defined in details
         // for table cells (details start with №), the default sep is used
         if (n.children.size() > 0) {
+            String spaceSep = getSpaceSep(n)
             String sep
-            final String csvSep = 'csvSep'
+            final defaultSep = ', '
+            final csvSep = 'csvSep'
             if (n[csvSep].text !== null)
                 sep = n[csvSep].text
             else if (n.details !== null)
-                sep = n.details.plain.startsWith(tbl.rowNum) ? ', ' : n.details.plain
+                sep = n.details.plain.startsWith(tbl.rowNum) ? defaultSep : n.details.plain
             else
-                sep = ', '
-            def cells = new ArrayList<FPN>()
+                sep = defaultSep
+            def cells = new LinkedList<FPN>()
             n.children.findAll { !hasIcon(it, icon.noEntry) }.each { cells.addAll(getFirstChildChain(it)) }
             def cellsSize = cells.size()
             int i
-            return cells.collect { "${it.note ?: it.transformedText}${++i == cellsSize || hasIcon(it, icon.noSep_cancer) ? '' : sep}" }.join('')
+            def body = cells.collect { "${it.note ?: it.transformedText}${++i == cellsSize || hasIcon(it, icon.noSep_cancer) ? '' : sep}" }.join('')
+            return "${body}${spaceSep}"
         } else
             return '<!-- a child is missing -->'
     }
