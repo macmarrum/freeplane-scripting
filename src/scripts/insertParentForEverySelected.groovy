@@ -4,13 +4,12 @@ import org.freeplane.api.Node as FPN
 /*
  * If copyFormatToNewChild, format is copied from the parent
  * else if copyFormatToNewSibling, format is copied from the selected node (child-to-be)
- * Cloud is copied alongside the format
+ * Cloud is copied alongside the format (part of FormatCopy/FormatPaste)
  * No format is copied if both options are off
- * If copyFormatToNewNodeIncludesIcons, icons are copied alongside the format
+ * If copyFormatToNewNodeIncludesIcons, icons are copied alongside the format (part of FormatCopy/FormatPaste)
  */
 boolean canCopyFormatToNewChild = config.getBooleanProperty("copyFormatToNewChild")
 boolean canCopyFormatToNewSibling = config.getBooleanProperty("copyFormatToNewSibling")
-boolean canCopyFormatToNewNodeIncludesIcons = config.getBooleanProperty("copyFormatToNewNodeIncludesIcons")
 FPN parent
 FPN newParent
 FPN source
@@ -27,11 +26,10 @@ selecteds.eachWithIndex { FPN selected, idx ->
     selected.moveTo(newParent)
     if (canCopyFormatToNewChild || canCopyFormatToNewSibling) {
         source = canCopyFormatToNewChild ? parent : canCopyFormatToNewSibling ? selected : null
-        newParent.style.name = source.style.name
-        newParent.cloud.color = source.cloud.color
-        newParent.cloud.shape = source.cloud.shape
-        if (canCopyFormatToNewNodeIncludesIcons)
-            source.icons.each { icon -> newParent.icons.add(icon) }
+        c.select(source)
+        menuUtils.executeMenuItems(['FormatCopy'])
+        c.select(newParent)
+        menuUtils.executeMenuItems(['FormatPaste'])
     }
     toBeSelected.add(newParent)
 }
