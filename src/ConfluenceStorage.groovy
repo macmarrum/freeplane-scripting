@@ -480,11 +480,11 @@ class ConfluenceStorage {
             else
                 sep = defaultSep
             def cells = new LinkedList<FPN>()
-            n.children.findAll { !hasIcon(it, icon.noEntry) }.each { cells.addAll(getFirstChildChain(it)) }
+            n.children.each {if (!hasIcon(it, icon.noEntry)) cells.addAll(getFirstChildChain(it)) }
             def cellsSize = cells.size()
             int i
-            def body = cells.collect { "${it.note ?: it.transformedText}${++i == cellsSize || hasIcon(it, icon.noSep_cancer) ? '' : sep}" }.join('')
-            return "${body}${spaceSep}"
+            def body = cells.collect { "${it.note ?: it.transformedText}${++i == cellsSize || (hasIcon(it, icon.noSep_cancer) && !isWikiLeaf(it)) ? '' : sep}" }.join('')
+            return "${body}${spaceSep}".toString()
         } else
             return '<!-- a child is missing -->'
     }
