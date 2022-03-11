@@ -83,13 +83,20 @@ class ConfluenceStorage {
     }
 
     static LinkedHashMap<String, String> pReplacements = [
-            /\n=- /            : '\n&rarr; ',
+            /(\n| )-> /        : '$1→ ',
+            /(\n| )=> /        : '$1&rArr; ',
+            /\n=- /            : '\n→ ',
             /\n== /            : '\n&rarrtl; ',
             /\n-- /            : '\n&ndash; ',
             /\n--- /           : '\n&mdash; ',
             /([^-])?---([^-])?/: '$1&mdash;$2',
             /([^-])?--([^-])?/ : '$1&ndash;$2',
             /\{\{([^{]+)\}\}/  : '<code>$1</code>',
+            /(?<!\*)\*\*\*([^*]+)\*\*\*(?!\*)/ : '<b><i>$1</i></b>',
+            /(?<!\*)\*\*([^*]+)\*\*(?!\*)/ : '<b>$1</b>',
+            /(?<!\*)\*([^*]+)\*(?!\*)/ : '<i>$1</i>',
+            /(?<!~)~~([^~]+)~~(?!~)/ : '<s>$1</s>',
+            /(?<!_)__([^_]+)__(?!_)/ : '<u>$1</u>',
     ]
 
     static String _applyReplacements(FPN n, String content) {
