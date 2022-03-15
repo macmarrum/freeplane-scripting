@@ -1,12 +1,12 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
-import org.freeplane.api.NodeRO
+import org.freeplane.api.Node
 
 def showAncestors = true
 def showDescendants = false
-def nodesToShow = new HashSet()
+def nodesToShow = new HashSet<Node>()
 
-c.selecteds.each { self ->
-    nodesToShow.add(self)
-    nodesToShow.addAll(self.nodesSharingContent)
+c.selecteds.each { Node sel ->
+    nodesToShow.add(sel)
+    nodesToShow.addAll(sel.nodesSharingContent)
 }
-map.filter(showAncestors, showDescendants, { nodesToShow.contains(it) })
+node.mindMap.filter(showAncestors, showDescendants, { nodesToShow.contains(it) })
