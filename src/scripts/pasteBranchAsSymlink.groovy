@@ -7,31 +7,38 @@
  */
 
 import groovy.xml.XmlParser
-import org.freeplane.api.Node as FPN
+import org.freeplane.api.Controller
+import org.freeplane.api.Node
+import org.freeplane.core.util.MenuUtils
 import org.freeplane.features.map.clipboard.MapClipboardController
 import org.freeplane.features.map.clipboard.MindMapNodesSelection
+import org.freeplane.features.map.mindmapmode.clipboard.MMapClipboardController
+import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.awt.datatransfer.Transferable
 
-def copiedNodes = getNodesFromClipboard(getXml(MapClipboardController.controller.clipboardContents))
+Controller c = ScriptUtils.c()
+final Transferable t = ((MMapClipboardController) MapClipboardController.controller).clipboardContents
+def copiedNodes = getNodesFromClipboard(getXml(t))
 if (copiedNodes.size() != 1) {
     c.statusInfo = "ERROR: copied nodes size is ${copiedNodes.size()} -- expected 1"
     return
 }
-def toBeSelected = new LinkedList<FPN>()
-FPN source = copiedNodes[0]
-for (FPN targetLocalRoot : c.selecteds.collect()) {
+def toBeSelected = new LinkedList<Node>()
+Node source = copiedNodes[0]
+final pasteAction = ['PasteAction']
+for (Node targetLocalRoot : c.selecteds.collect()) {
     if (targetLocalRoot.children.size() > 0) {
         c.statusInfo = 'ERROR: the selected target already has children'
         continue
     }
     c.select(targetLocalRoot)
-    menuUtils.executeMenuItems(['PasteAction',])
+    MenuUtils.executeMenuItems(pasteAction)
     convertToSymlinkRecursivelyAndAddToBeSelected(source, targetLocalRoot.children[0], toBeSelected)
     c.select(toBeSelected)
 }
 
-private List<FPN> getNodesFromClipboard(String xml) {
+private List<Node> getNodesFromClipboard(String xml) {
     try {
         def parser = new XmlParser()
         return xml.split(MapClipboardController.NODESEPARATOR).collect { String it ->
@@ -55,14 +62,14 @@ private static String getXml(Transferable t) {
     return null
 }
 
-void convertToSymlinkRecursivelyAndAddToBeSelected(FPN source, FPN target, ArrayList<FPN> toBeSelected) {
+static void convertToSymlinkRecursivelyAndAddToBeSelected(Node source, Node target, List<Node> toBeSelected) {
     convertToSymlinkAndAddToBeSelected(source, target, toBeSelected)
-    source.children.eachWithIndex { FPN sourceChild, int i ->
+    source.children.eachWithIndex { Node sourceChild, int i ->
         convertToSymlinkRecursivelyAndAddToBeSelected(sourceChild, target.children[i], toBeSelected)
     }
 }
 
-void convertToSymlinkAndAddToBeSelected(FPN source, FPN target, ArrayList<FPN> toBeSelected) {
+static void convertToSymlinkAndAddToBeSelected(Node source, Node target, List<Node> toBeSelected) {
     def textAttrib = target.mindMap.root['pasteAsSymlinkText']
     def detailsAttrib = target.mindMap.root['pasteAsSymlinkDetails']
     def noteAttrib = target.mindMap.root['pasteAsSymlinkNote']
@@ -71,7 +78,7 @@ void convertToSymlinkAndAddToBeSelected(FPN source, FPN target, ArrayList<FPN> t
     if (!detailsAttrib) {
         if (source.details)
             target.detailsText = '=link.node.details ?: \'(none)\''
-    } else if (detailsAttrib.startsWith(/'=/)) {
+    } else if (detailsAttrib.text.startsWith(/'=/)) {
         target.detailsText = detailsAttrib.text.drop(0)
     } else {
         switch (detailsAttrib.num0) {
@@ -82,6 +89,11 @@ void convertToSymlinkAndAddToBeSelected(FPN source, FPN target, ArrayList<FPN> t
             case 3: target.detailsText = "#${source.id}\n${source.transformedText}"
                 break
         }
+    }
+    if (!noteAttrib) {
+        if (source.note) target.note = '=link.node.note ?: \'\''
+    } else if (noteAttrib.text.startsWith(/'=/)) {
+        target.note = noteAttrib.text.drop(0)
     }
     toBeSelected.add(target)
 }
