@@ -6,22 +6,28 @@
  */
 
 import groovy.xml.XmlParser
-import org.freeplane.api.Node as FPN
+import org.freeplane.api.Controller
+import org.freeplane.api.Node
 import org.freeplane.features.map.clipboard.MapClipboardController
 import org.freeplane.features.map.clipboard.MindMapNodesSelection
+import org.freeplane.features.map.mindmapmode.clipboard.MMapClipboardController
+import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.awt.datatransfer.Transferable
 
-def copiedNodes = getNodesFromClipboard(getXml(MapClipboardController.controller.clipboardContents))
+Controller c = ScriptUtils.c()
+Node node = ScriptUtils.node()
+final Transferable t = ((MMapClipboardController) MapClipboardController.controller).clipboardContents
+def copiedNodes = getNodesFromClipboard(getXml(t))
 if (copiedNodes.size() > 0) {
-    def toBeSelected = new LinkedList<FPN>()
-    FPN target = node // temporary, for attrib
-    def textAttrib = target.mindMap.root['pasteAsSymlinkText']
-    def detailsAttrib = target.mindMap.root['pasteAsSymlinkDetails']
-    def noteAttrib = target.mindMap.root['pasteAsSymlinkNote']
+    def toBeSelected = new LinkedList<Node>()
+    Node target
+    def textAttrib = node.mindMap.root['pasteAsSymlinkText']
+    def detailsAttrib = node.mindMap.root['pasteAsSymlinkDetails']
+    def noteAttrib = node.mindMap.root['pasteAsSymlinkNote']
     c.statusInfo = "${textAttrib} | ${detailsAttrib}"
-    c.selecteds.each { FPN targetLocalRoot ->
-        copiedNodes.each { FPN source ->
+    c.selecteds.each { Node targetLocalRoot ->
+        copiedNodes.each { Node source ->
             target = targetLocalRoot.createChild()
             target.link.node = source
             target.text = !textAttrib ? '=link.node.transformedText' : textAttrib.text.replaceAll(/^'=/, '=')
@@ -41,7 +47,7 @@ if (copiedNodes.size() > 0) {
             }
             if (!noteAttrib) {
                 if (source.note) target.note = '=link.node.note ?: \'\''
-            } else if (noteAttrib.startsWith(/'=/)) {
+            } else if (noteAttrib.text.startsWith(/'=/)) {
                 target.note = noteAttrib.text.drop(0)
             }
             toBeSelected.add(target)
@@ -52,12 +58,12 @@ if (copiedNodes.size() > 0) {
     c.statusInfo = 'pasteAsSymlink: got zero nodes from clipboard (!)'
 }
 
-private List<FPN> getNodesFromClipboard(String xml) {
+private List<Node> getNodesFromClipboard(String xml) {
     try {
         def parser = new XmlParser()
         return xml.split(MapClipboardController.NODESEPARATOR).collect { String it ->
             def xmlRootNode = parser.parseText(it)
-            node.mindMap.node(xmlRootNode.@ID)
+            ScriptUtils.node().mindMap.node(xmlRootNode.@ID)
         }
     } catch (ignored) {
     }

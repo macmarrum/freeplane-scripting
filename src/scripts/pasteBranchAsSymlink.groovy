@@ -43,7 +43,7 @@ private List<Node> getNodesFromClipboard(String xml) {
         def parser = new XmlParser()
         return xml.split(MapClipboardController.NODESEPARATOR).collect { String it ->
             def xmlRootNode = parser.parseText(it)
-            node.mindMap.node(xmlRootNode.@ID)
+            ScriptUtils.node().mindMap.node(xmlRootNode.@ID)
         }
     }
     catch (ignored) {
