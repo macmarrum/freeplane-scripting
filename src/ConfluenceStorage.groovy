@@ -28,6 +28,7 @@ class ConfluenceStorage {
             collapse_fastUpButton        : 'emoji-23EB',
             xmlEscape_broom              : 'emoji-1F9F9',
             pReplacements_doubleCurlyLoop: 'emoji-27BF',
+            stopAtThis_stopSign          : 'emoji-1F6D1',
     ]
 
     static HashMap<String, String> tbl = [
@@ -83,21 +84,21 @@ class ConfluenceStorage {
     }
 
     static LinkedHashMap<String, String> pReplacements = [
-            /(\n| )-> /        : '$1→ ',
-            /(\n| )=> /        : '$1&rArr; ',
-            /(\n| )>> /        : '\n&#8611; ', // >->
-            /\n=- /            : '\n→ ',
-            /\n== /            : '\n&#8611; ', // >->
-            /\n-- /            : '\n&ndash; ',
-            /\n--- /           : '\n&mdash; ',
-            /([^-])?---([^-])?/: '$1&mdash;$2',
-            /([^-])?--([^-])?/ : '$1&ndash;$2',
-            /\{\{([^{]+)\}\}/  : '<code>$1</code>',
-            /(?<!\*)\*\*\*([^*]+)\*\*\*(?!\*)/ : '<b><i>$1</i></b>',
-            /(?<!\*)\*\*([^*]+)\*\*(?!\*)/ : '<b>$1</b>',
-            /(?<!\*)\*([^*]+)\*(?!\*)/ : '<i>$1</i>',
-            /(?<!~)~~([^~]+)~~(?!~)/ : '<s>$1</s>',
-            /(?<!_)__([^_]+)__(?!_)/ : '<u>$1</u>',
+            /(\n| )-> /                       : '$1→ ',
+            /(\n| )=> /                       : '$1&rArr; ',
+            /(\n| )>> /                       : '\n&#8611; ', // >->
+            /\n=- /                           : '\n→ ',
+            /\n== /                           : '\n&#8611; ', // >->
+            /\n-- /                           : '\n&ndash; ',
+            /\n--- /                          : '\n&mdash; ',
+            /([^-])?---([^-])?/               : '$1&mdash;$2',
+            /([^-])?--([^-])?/                : '$1&ndash;$2',
+            /\{\{([^{]+)\}\}/                 : '<code>$1</code>',
+            /(?<!\*)\*\*\*([^*]+)\*\*\*(?!\*)/: '<b><i>$1</i></b>',
+            /(?<!\*)\*\*([^*]+)\*\*(?!\*)/    : '<b>$1</b>',
+            /(?<!\*)\*([^*]+)\*(?!\*)/        : '<i>$1</i>',
+            /(?<!~)~~([^~]+)~~(?!~)/          : '<s>$1</s>',
+            /(?<!_)__([^_]+)__(?!_)/          : '<u>$1</u>',
     ]
 
     static String _applyReplacements(FPN n, String content) {
@@ -159,16 +160,16 @@ class ConfluenceStorage {
     }
 
 
-    static FPN getFirstChildIfNotIgnoreNode(FPN n, Boolean canSkipLeafCheck = false) {
-        def isLeafAndNotSkipped = isWikiLeaf(n) && !canSkipLeafCheck
-        if (isLeafAndNotSkipped || n.children.size() == 0 || hasIcon(n.children[0], icon.noEntry))
+    static FPN getFirstChildIfNotIgnoreNode(FPN n, boolean canExcludeWikiLeaf = true) {
+        def isLeafAndCanExcludeIt = isWikiLeaf(n) && canExcludeWikiLeaf
+        if (isLeafAndCanExcludeIt || n.children.size() == 0 || hasIcon(n, icon.stopAtThis_stopSign) || hasIcon(n.children[0], icon.noEntry))
             return null
         else
             return n.children[0]
     }
 
     static int _tbl_countFirstChildChain(FPN n, int cnt = 0) {
-        def child = getFirstChildIfNotIgnoreNode(n, true)
+        def child = getFirstChildIfNotIgnoreNode(n, false)
         if (child)
             return _tbl_countFirstChildChain(child, ++cnt)
         else
@@ -196,9 +197,9 @@ class ConfluenceStorage {
         // the first column in each row is technical, therefore it's skipped
         n.children.each { FPN row ->
             if (!hasIcon(row, icon.noEntry)) {  // not ignoreNode
-                row.details = "${tbl.rowCnt}${_tbl_countFirstChildChain(row)}".toString()
-
-                if (row.children.size() > 0) {
+                final firstChildChainSize = _tbl_countFirstChildChain(row)
+                row.details = (new StringBuilder() << tbl.rowNum << firstChildChainSize).toString()
+                if (firstChildChainSize > 0) {
                     tableWiki << '<tr>' << nl
                     tableWiki << mkTableCell(row.children[0], rowNum, colNum, hiLite1st, nl)
                     tableWiki << '</tr>' << nl // close the row
@@ -212,7 +213,7 @@ class ConfluenceStorage {
     }
 
     static String mkTableCell(FPN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl) {
-        n.details = "${tbl.rowNum}${colNum}"
+        n.details = (new StringBuilder() << tbl.rowCnt << colNum).toString()
         def result = new StringBuilder()
         def tag
         switch (hiLite1st) {
@@ -229,7 +230,7 @@ class ConfluenceStorage {
         result << getContent(n)
         result << '</' << tag[1..-1] << nl
         // canSkipLeafCheck=true because each cell is basically a top-level node, i.e. can be a wikiLeaf
-        FPN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, true)
+        FPN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, false)
         if (firstChildIfNotIgnoreNode) {
             result << mkTableCell(firstChildIfNotIgnoreNode, rowNum, ++colNum, hiLite1st, nl)
         }
@@ -264,30 +265,40 @@ class ConfluenceStorage {
             branch.children.eachWithIndex { levelOneChild, int idx ->
                 if (idx < smallerBranchChildrenSize) {
                     if (!items[idx]) {
-                        items[idx] = new StringBuilder()
-                        items[idx] << bullet
-                        items[idx] << ' '
+                        items[idx] = new StringBuilder() << bullet << ' '
                     }
                     items[idx] << getEachFirstChildsContent(levelOneChild)  // skip levelOneChild, which is a numbering
                 }
             }
         }
-        if (items.size() == 0) return '<!-- grandchildren are missing -->'
-        def result = items.values().join("<br />${nl}")
-        return "<div>${nl}${result}${nl}</div>".toString()
+        final itemsSize = items.size()
+        if (itemsSize == 0)
+            return '<!-- grandchildren are missing -->'
+        final sb = new StringBuilder() << '<div>' << nl
+        items.values().eachWithIndex { item, i ->
+            sb << item
+            if (i < itemsSize - 1)
+                sb << '<br />' << nl
+        }
+        sb << nl << '</div>'
+        return sb.toString()
     }
 
     static String getSimBullet(Node n) {
-        return n['simBullet'] ?: '●'
+        return n['simBullet'] ? n['simBullet'].text : '●'
     }
 
-    static String getEachFirstChildsContent(n, String sep = ' ', Boolean canSkipLeafCheck = false) {
-        /* canSkipLeafCheck for top-level nodes of mkSomething */
-        def child = getFirstChildIfNotIgnoreNode(n, canSkipLeafCheck)
+    static String getEachFirstChildsContent(n, String sep = ' ', boolean canExcludeWikiLeaf = true) {
+        /* canExcludeWikiLeaf for top-level nodes of mkSomething */
+        def child = getFirstChildIfNotIgnoreNode(n, canExcludeWikiLeaf)
         if (child) {
-            def grandchildsContent = getEachFirstChildsContent(child, sep)
-            def sepGrandchildsContent = grandchildsContent != '' ? "${sep}${grandchildsContent}" : ''
-            return "${getContent(child)}${sepGrandchildsContent}".toString()
+            final sb = new StringBuilder() << getContent(child)
+            if (!hasIcon(child, icon.noSep_cancer))
+                sb << sep
+            final grandchildsContent = getEachFirstChildsContent(child, sep)
+            if (grandchildsContent != '')
+                sb << grandchildsContent
+            return sb.toString()
         } else
             return ''
     }
@@ -480,7 +491,7 @@ class ConfluenceStorage {
             else
                 sep = defaultSep
             def cells = new LinkedList<FPN>()
-            n.children.each {if (!hasIcon(it, icon.noEntry)) cells.addAll(getFirstChildChain(it)) }
+            n.children.each { if (!hasIcon(it, icon.noEntry)) cells.addAll(getFirstChildChain(it)) }
             def cellsSize = cells.size()
             int i
             def body = cells.collect { "${it.note ?: it.transformedText}${++i == cellsSize || (hasIcon(it, icon.noSep_cancer) && !isWikiLeaf(it)) ? '' : sep}" }.join('')
