@@ -193,12 +193,12 @@ class ConfluenceStorage {
         def rowNum = 1
         tableWiki << '<table>' << nl << '<colgroup><col /><col /></colgroup>' << nl << '<tbody>' << nl
         // clean up details containing old tbl.rowNum
-        n.findAll().drop(1).each { if (it.details && it.details.text.startsWith(tbl.rowNum)) it.details = null }
+        n.findAll().drop(1).each { if (it.details && it.details.text.startsWith(tbl.rowCnt)) it.details = null }
         // the first column in each row is technical, therefore it's skipped
         n.children.each { FPN row ->
             if (!hasIcon(row, icon.noEntry)) {  // not ignoreNode
                 final firstChildChainSize = _tbl_countFirstChildChain(row)
-                row.details = (new StringBuilder() << tbl.rowNum << firstChildChainSize).toString()
+                row.details = (new StringBuilder() << tbl.rowCnt << firstChildChainSize).toString()
                 if (firstChildChainSize > 0) {
                     tableWiki << '<tr>' << nl
                     tableWiki << mkTableCell(row.children[0], rowNum, colNum, hiLite1st, nl)
@@ -213,7 +213,7 @@ class ConfluenceStorage {
     }
 
     static String mkTableCell(FPN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl) {
-        n.details = (new StringBuilder() << tbl.rowCnt << colNum).toString()
+        n.details = (new StringBuilder() << tbl.rowNum << colNum).toString()
         def result = new StringBuilder()
         def tag
         switch (hiLite1st) {
