@@ -1,6 +1,9 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Select"})
 
 import org.freeplane.api.Node as FPN
+import org.freeplane.core.ui.components.UITools
+import org.freeplane.features.map.NodeModel
+import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import javax.swing.*
 
@@ -15,13 +18,15 @@ for (FPN it in c.selecteds) {
     }
 }
 
-String input = ui.showInputDialog(c.selected.delegate, '', 'Select Every Nth', JOptionPane.QUESTION_MESSAGE)
+final c = ScriptUtils.c()
+NodeModel nodeModel = ScriptUtils.node().delegate
+String input = UITools.showInputDialog(nodeModel, '', 'Select Every Nth', JOptionPane.QUESTION_MESSAGE)
 if (input !== null) {
-    Integer everyNth
+    int everyNth
     try {
-        everyNth = Integer.valueOf(input)
+        everyNth = input as int
     } catch (NumberFormatException ignored) {
-        ui.showMessage("Not a number: $input", JOptionPane.ERROR_MESSAGE)
+        UITools.showMessage("Not a number: '$input'", JOptionPane.ERROR_MESSAGE)
         return
     }
     def toBeSelected = new LinkedList<FPN>()
