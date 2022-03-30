@@ -50,7 +50,7 @@ class ConfluenceStorage {
      * and replace each space with nbsp, if gemini present
      */
     static String getContent(FPN n) {
-        def content = n.note ? n.note.text : n.transformedText
+        String content = n.noteText !== null ? n.note.text : n.transformedText
         if (hasIcon(n, icon.xmlEscape_broom)) content = XmlUtil.escapeXml(content)
         if (hasIcon(n, icon.pReplacements_doubleCurlyLoop)) content = _applyReplacements(n, content)
         return hasIcon(n, icon.nbsp_gemini) ? content.replaceAll(/ /, '&nbsp;') : content
@@ -107,27 +107,27 @@ class ConfluenceStorage {
         return content.replaceAll(/\n/, "<br />${getNewLine(n)}")
     }
 
-    static String mkNode(FPN n) {
+    static StringBuilder mkNode(FPN n) {
+        def result = new StringBuilder()
         if (hasIcon(n, icon.noEntry)) {
-            return ''
+            return result
         } else {
             def eol = getEol(n)
             def nl = getNewLine(n)
             def sep = getSpaceSep(n)
             def isP = hasIcon(n, icon.pButton)
-            def result = new StringBuilder()
             if (isWikiLeaf(n)) {
                 if (isP) {
-                    result << '<p>' << nl << n.note << '</p>' << eol
-                    return result.toString()
+                    result << '<p>' << nl << n.note.text << '</p>' << eol
+                    return result
                 } else {
-                    result << n.note << sep << eol
-                    return result.toString()
+                    result << n.note.text << sep << eol
+                    return result
                 }
             } else {
                 if (_isHeading(n)) {
                     result << _mkHeading(n, nl) << eol
-                    return result.toString()
+                    return result
                 } else {
                     String pContent
                     if (isP && !hasIcon(n, icon.pReplacements_doubleCurlyLoop)) // avoid double replacements
@@ -140,7 +140,7 @@ class ConfluenceStorage {
                     if (isP)
                         result << '</p>'
                     result << eol
-                    return result.toString()
+                    return result
                 }
             }
         }
@@ -150,13 +150,13 @@ class ConfluenceStorage {
         return (n.icons.size() > 0 && n.icons.icons.any { it.startsWith('full-') })
     }
 
-    static String _mkHeading(FPN n, String nl) {
+    static StringBuilder _mkHeading(FPN n, String nl) {
         def hIcon = n.icons.icons.find { it.startsWith('full-') }
         def hLevel = hIcon[5..-1]
         def childrenBody = n.children.size() > 0 ? n.children.collect { mkNode(it) }.join('') : ''
         def result = new StringBuilder()
         result << '<h' << hLevel << '>' << nl << getContent(n) << nl << '</h' << hLevel << '>' << childrenBody
-        return result.toString()
+        return result
     }
 
 
@@ -180,7 +180,7 @@ class ConfluenceStorage {
         ROW, COLUMN, NONE
     }
 
-    static String mkTable(FPN n) {
+    static StringBuilder mkTable(FPN n) {
         def nl = getNewLine(n)
         HiLite1st hiLite1st
         if (n['hiLite1st']) {
@@ -192,8 +192,8 @@ class ConfluenceStorage {
         def colNum = 1
         def rowNum = 1
         tableWiki << '<table>' << nl << '<colgroup><col /><col /></colgroup>' << nl << '<tbody>' << nl
-        // clean up details containing old tbl.rowNum
-        n.findAll().drop(1).each { if (it.details && it.details.text.startsWith(tbl.rowCnt)) it.details = null }
+        // clean up details containing old tbl.rowCnt or tbl.rowNum
+        n.findAll().drop(1).each {Node it -> if (it.detailsText && (it.details.text.startsWith(tbl.rowCnt) || it.details.text.startsWith(tbl.rowNum))) it.details = null }
         // the first column in each row is technical, therefore it's skipped
         n.children.each { FPN row ->
             if (!hasIcon(row, icon.noEntry)) {  // not ignoreNode
@@ -201,20 +201,19 @@ class ConfluenceStorage {
                 row.details = (new StringBuilder() << tbl.rowCnt << firstChildChainSize).toString()
                 if (firstChildChainSize > 0) {
                     tableWiki << '<tr>' << nl
-                    tableWiki << mkTableCell(row.children[0], rowNum, colNum, hiLite1st, nl)
+                    mkTableCellAndAppendTo(tableWiki, row.children[0], rowNum, colNum, hiLite1st, nl)
                     tableWiki << '</tr>' << nl // close the row
                 }
                 rowNum++
             }
         }
         tableWiki << '</tbody>' << nl << '</table>'
-        def result = tableWiki.toString()
-        return result
+        return tableWiki
     }
 
-    static String mkTableCell(FPN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl) {
+    static StringBuilder mkTableCellAndAppendTo(StringBuilder result, FPN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl) {
         n.details = (new StringBuilder() << tbl.rowNum << colNum).toString()
-        def result = new StringBuilder()
+//        def result = new StringBuilder()
         def tag
         switch (hiLite1st) {
             case HiLite1st.ROW:
@@ -232,12 +231,12 @@ class ConfluenceStorage {
         // canSkipLeafCheck=true because each cell is basically a top-level node, i.e. can be a wikiLeaf
         FPN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, false)
         if (firstChildIfNotIgnoreNode) {
-            result << mkTableCell(firstChildIfNotIgnoreNode, rowNum, ++colNum, hiLite1st, nl)
+            mkTableCellAndAppendTo(result, firstChildIfNotIgnoreNode, rowNum, ++colNum, hiLite1st, nl)
         }
-        return result.toString()
+        return result
     }
 
-    static String mkList(FPN n) {
+    static StringBuilder mkList(FPN n) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
         def tag = hasIcon(n, icon.ol_keycapHash) ? '<ol>' : '<ul>'
@@ -249,14 +248,14 @@ class ConfluenceStorage {
                 result << '<li>' << nl << body << nl << '</li>' << nl
         }
         result << '</' << tag[1..-1]
-        return result.toString()
+        return result
     }
 
     /** mkZipList uses its own content gatherer instead of mkNode to consider only the first child on each level
      *  TODO: consider if mkNode could be used instead, especially now that <div> is used in place of <p>
      *      -- benefits / disadvantages
      */
-    static String mkZipList(FPN n) {
+    static StringBuilder mkZipList(FPN n) {
         def nl = getNewLine(n)
         def bullet = getSimBullet(n)
         int smallerBranchChildrenSize = n.children.collect { branch -> branch.children.size() }.min()
@@ -272,35 +271,38 @@ class ConfluenceStorage {
             }
         }
         final itemsSize = items.size()
-        if (itemsSize == 0)
-            return '<!-- grandchildren are missing -->'
-        final sb = new StringBuilder() << '<div>' << nl
+        final sb = new StringBuilder()
+        if (itemsSize == 0) {
+            sb << '<!-- grandchildren are missing -->'
+            return sb
+        }
+        sb << '<div>' << nl
         items.values().eachWithIndex { item, i ->
             sb << item
             if (i < itemsSize - 1)
                 sb << '<br />' << nl
         }
         sb << nl << '</div>'
-        return sb.toString()
+        return sb
     }
 
     static String getSimBullet(Node n) {
         return n['simBullet'] ? n['simBullet'].text : '●'
     }
 
-    static String getEachFirstChildsContent(n, String sep = ' ', boolean canExcludeWikiLeaf = true) {
+    static StringBuilder getEachFirstChildsContent(n, String sep = ' ', boolean canExcludeWikiLeaf = true) {
         /* canExcludeWikiLeaf for top-level nodes of mkSomething */
         def child = getFirstChildIfNotIgnoreNode(n, canExcludeWikiLeaf)
+        final sb = new StringBuilder()
         if (child) {
-            final sb = new StringBuilder() << getContent(child)
+            sb << getContent(child)
             if (!hasIcon(child, icon.noSep_cancer))
                 sb << sep
             final grandchildsContent = getEachFirstChildsContent(child, sep)
-            if (grandchildsContent != '')
+            if (!grandchildsContent.isBlank())
                 sb << grandchildsContent
-            return sb.toString()
-        } else
-            return ''
+        }
+        return sb
     }
 
     static List<FPN> getFirstChildChain(FPN n, List<FPN> firstChildChain = null) {
@@ -353,26 +355,26 @@ class ConfluenceStorage {
 
     static String mkExpand(FPN n) {
         return _execIfChildren(n, {
-            _mkMacroRich(n, 'expand', [title: n.details ? n.details.text : 'Click here to expand...'])
+            _mkMacroRich(n, 'expand', [title: n.details?.text ?: 'Click here to expand...'])
         })
     }
 
     static String mkDiv(FPN n) {
         return _execIfChildren(n, {
-            Map<String, String> params = n.details ? [class: n.details.text] : null
+            Map<String, String> params = n.detailsText ? [class: n.details.text] : null
             return _mkMacroRich(n, 'div', params)
         })
     }
 
     static String mkCode(FPN n) {
-        for (child in n.children.find { FPN it -> it.note }) {
+        for (child in n.children.find { FPN it -> it.noteText !== null }) {
             String lang = child.text ?: 'none'
             def params = [language: lang]
-            if (child.details) params.title = child.details.text
+            if (child.detailsText) params.title = child.details.text
             if (hasIcon(child, icon.collapse_fastUpButton)) params.collapse = 'true'
             if (hasIcon(child, icon.numbers_inputNumbers)) params.linenumbers = 'true'
             if (child.link.text) params.theme = child.link.text
-            String cdata = child.note.text
+            String cdata = child.plainNote  // no formula evaluation (unexposed method)
             return _mkMacroPlain(n, 'code', cdata, params)
         }
         return '<!-- a child with a note is missing -->'
@@ -414,7 +416,7 @@ class ConfluenceStorage {
     static String mkDivExpand(FPN n) {
         return _execIfChildren(n, {
             def nl = getNewLine(n)
-            def title = n.details ? n.details.text : 'Click here to expand...'
+            def title = n.detailsText ? n.details.text : 'Click here to expand...'
             def className = n.link.text ?: 'expand-in-a-box'
             def result = new StringBuilder()
             result << '<div class="' << className << '">' << nl
@@ -458,8 +460,8 @@ class ConfluenceStorage {
         for (child in n.children.find { FPN it -> it.text }) {
             def result = new StringBuilder()
             result << '<ac:image '
-            if (child.details)
-                result << 'ac:height="' << child.details << '" '
+            if (child.detailsText)
+                result << 'ac:height="' << child.details.text << '" '
             if (hasIcon(child, icon.border_unchecked))
                 result << 'ac:border="true" '
             result << '>'
@@ -486,15 +488,15 @@ class ConfluenceStorage {
             final csvSep = 'csvSep'
             if (n[csvSep].text !== null)
                 sep = n[csvSep].text
-            else if (n.details !== null)
-                sep = n.details.plain.startsWith(tbl.rowNum) ? defaultSep : n.details.plain
+            else if (n.detailsText !== null)
+                sep = n.details.text.startsWith(tbl.rowNum) ? defaultSep : n.details.text
             else
                 sep = defaultSep
             def cells = new LinkedList<FPN>()
             n.children.each { if (!hasIcon(it, icon.noEntry)) cells.addAll(getFirstChildChain(it)) }
             def cellsSize = cells.size()
             int i
-            def body = cells.collect { "${it.note ?: it.transformedText}${++i == cellsSize || (hasIcon(it, icon.noSep_cancer) && !isWikiLeaf(it)) ? '' : sep}" }.join('')
+            def body = cells.collect { "${it.noteText ? it.note.text : it.transformedText}${++i == cellsSize || (hasIcon(it, icon.noSep_cancer) && !isWikiLeaf(it)) ? '' : sep}" }.join('')
             return "${body}${spaceSep}".toString()
         } else
             return '<!-- a child is missing -->'
