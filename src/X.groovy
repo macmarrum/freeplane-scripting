@@ -32,8 +32,7 @@ static LocalDate localDateParse(String text, String dateFormat = null) {
         for (format in [df, dfShortIso, dfLongIso, dfFullIso, dfShortIsoDay]) {
             try {
                 return LocalDate.parse(text, format)
-            } catch (DateTimeParseException) {
-                // ignore
+            } catch (DateTimeParseException ignore) {
             }
         }
         return LocalDate.parse(text, df)  // will throw an exception describing format mismatch
@@ -72,11 +71,11 @@ static void setStyleAndTimestampInAttribute(String name, NodeRO node = null, Zon
     }
 }
 
-static String countDescendantsWithStyle(node, String styleName, Boolean isCountAllClones = true, String messageFormatPattern = null) {
+static String countDescendantsWithStyle(NodeRO node, String styleName, Boolean isCountAllClones = true, String messageFormatPattern = null) {
     Set<NodeRO> uniqueNodeIDs = new HashSet<>()
     Boolean isCloneExist
     Boolean isCountMeIn
-    def cnt = node.findAll().findAll {
+    def cnt = node.findAll().findAll { NodeRO it ->
         if (isCountAllClones) {
             isCountMeIn = true
             if (!isCloneExist)
@@ -108,11 +107,11 @@ class CountResult {
     }
 }
 
-static CountResult getCountOfDescendantsWithStyle(node, String styleName, Boolean isCountAllClones = true) {
+static CountResult getCountOfDescendantsWithStyle(NodeRO node, String styleName, Boolean isCountAllClones = true) {
     Set<NodeRO> uniqueNodes = new HashSet<>()
     Boolean isCloneExist
     Boolean isCountMeIn
-    def cnt = node.findAll().findAll {
+    def cnt = node.findAll().findAll { NodeRO it ->
         if (isCountAllClones) {
             isCountMeIn = true
             if (!isCloneExist)
@@ -177,7 +176,7 @@ def static getTransformedTextWithNewlinesReplaced(NodeRO n, CharSequence replace
     return n.transformedText.replaceAll(/\n/, replacement)
 }
 
-def makeTsv(CharSequence... args) {
+static String makeTsv(CharSequence... args) {
     return args.join(/\t/)
 }
 
@@ -219,7 +218,7 @@ static String makeJson(NodeRO node, int level = 1) {
      */
     final String indentSpaces = '  '
     final String indent = "${indentSpaces * level}"
-    def valueJson
+    String valueJson
     def body = node.children.findAll { !makeJson_isIgnored(it) }.collect { NodeRO key ->
         if (key.children.findAll { !makeJson_isIgnored(it) }.size() == 0)
             return null
