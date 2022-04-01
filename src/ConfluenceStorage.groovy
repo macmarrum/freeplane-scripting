@@ -9,13 +9,12 @@ import org.freeplane.api.Node as FPN
 
 class ConfluenceStorage {
 
-    static HashMap<String, String> style = [
-            wikiRoot: 'cWikiRoot',
-            wikiLeaf: 'cWikiLeaf',
-            wikiNode: 'cWikiNode'
+    static style = [
+            cStorageMarkupRoot : 'cStorageMarkupRoot',
+            cStorageMarkupMaker: 'cStorageMarkupMaker',
     ]
 
-    static HashMap<String, String> icon = [
+    static icon = [
             noEntry                      : 'emoji-26D4',
             eol_chequeredFlag            : 'emoji-1F3C1',
             noSep_cancer                 : 'emoji-264B',
@@ -31,13 +30,13 @@ class ConfluenceStorage {
             stopAtThis_stopSign          : 'emoji-1F6D1',
     ]
 
-    static HashMap<String, String> tbl = [
+    static tbl = [
             rowCnt: '₵',
             rowNum: '№',
     ]
 
-    static Boolean isWikiLeaf(FPN n) {
-        return n.style.name == style.wikiLeaf
+    static Boolean isMarkupMaker(FPN n) {
+        return n.style.name == style.cStorageMarkupMaker
     }
 
     static Boolean hasIcon(FPN n, String icon) {
@@ -50,10 +49,34 @@ class ConfluenceStorage {
      * and replace each space with nbsp, if gemini present
      */
     static String getContent(FPN n) {
-        String content = n.noteText !== null ? n.note.text : n.transformedText
+        String content = isMarkupMaker(n) ? makeMarkup(n) : n.noteText ? n.note.text : n.transformedText
         if (hasIcon(n, icon.xmlEscape_broom)) content = XmlUtil.escapeXml(content)
         if (hasIcon(n, icon.pReplacements_doubleCurlyLoop)) content = _applyReplacements(n, content)
         return hasIcon(n, icon.nbsp_gemini) ? content.replaceAll(/ /, '&nbsp;') : content
+    }
+
+    static String makeMarkup(FPN n) {
+        switch (n.text) {
+            case 'parent': return mkParent(n)
+            case 'table': return mkTable(n)
+            case 'list': return mkList(n)
+            case 'zip-list': return mkZipList(n)
+            case 'quote': return mkQuote(n)
+            case 'link': return mkLink(n)
+            case 'expand': return mkExpand(n)
+            case 'div': return mkDiv(n)
+            case 'code': return mkCode(n)
+            case 'page-info': return mkPageInfo(n)
+            case 'div-expand': return mkDivExpand(n)
+            case 'attachments': return mkAttachments(n)
+            case 'style-import': return mkStyleImport(n)
+            case 'style': return mkStyle(n)
+            case 'html': return mkHtml(n)
+            case 'image': return mkImage(n)
+            case 'csv': return mkCsv(n)
+            case 'wiki': return mkWiki(n)
+            default: return "<!-- mk function by that name not found: ${n.text} -->"
+        }
     }
 
     static String getSpaceSep(FPN n) {
@@ -80,7 +103,9 @@ class ConfluenceStorage {
     }
 
     static String _mkParent(FPN n) {
-        return n.children.collect { mkNode(it) }.join('')
+        def sb = new StringBuilder()
+        n.children.each { sb << mkNode(it) }
+        return sb.toString()
     }
 
     static LinkedHashMap<String, String> pReplacements = [
@@ -116,12 +141,12 @@ class ConfluenceStorage {
             def nl = getNewLine(n)
             def sep = getSpaceSep(n)
             def isP = hasIcon(n, icon.pButton)
-            if (isWikiLeaf(n)) {
+            if (isMarkupMaker(n)) {
                 if (isP) {
-                    result << '<p>' << nl << n.note.text << '</p>' << eol
+                    result << '<p>' << nl << makeMarkup(n) << '</p>' << eol
                     return result
                 } else {
-                    result << n.note.text << sep << eol
+                    result << makeMarkup(n) << sep << eol
                     return result
                 }
             } else {
@@ -136,7 +161,8 @@ class ConfluenceStorage {
                         pContent = getContent(n)
                     if (isP)
                         result << '<p>'
-                    result << pContent << sep << n.children.collect { mkNode(it) }.join('')
+                    result << pContent << sep
+                    n.children.each { result << mkNode(it) }
                     if (isP)
                         result << '</p>'
                     result << eol
@@ -160,9 +186,9 @@ class ConfluenceStorage {
     }
 
 
-    static FPN getFirstChildIfNotIgnoreNode(FPN n, boolean canExcludeWikiLeaf = true) {
-        def isLeafAndCanExcludeIt = isWikiLeaf(n) && canExcludeWikiLeaf
-        if (isLeafAndCanExcludeIt || n.children.size() == 0 || hasIcon(n, icon.stopAtThis_stopSign) || hasIcon(n.children[0], icon.noEntry))
+    static FPN getFirstChildIfNotIgnoreNode(FPN n, boolean canExcludeMarkupMaker = true) {
+        def isMarkupMakerAndCanExcludeIt = isMarkupMaker(n) && canExcludeMarkupMaker
+        if (isMarkupMakerAndCanExcludeIt || n.children.size() == 0 || hasIcon(n, icon.stopAtThis_stopSign) || hasIcon(n.children[0], icon.noEntry))
             return null
         else
             return n.children[0]
@@ -193,7 +219,7 @@ class ConfluenceStorage {
         def rowNum = 1
         tableWiki << '<table>' << nl << '<colgroup><col /><col /></colgroup>' << nl << '<tbody>' << nl
         // clean up details containing old tbl.rowCnt or tbl.rowNum
-        n.findAll().drop(1).each {Node it -> if (it.detailsText && (it.details.text.startsWith(tbl.rowCnt) || it.details.text.startsWith(tbl.rowNum))) it.details = null }
+        n.findAll().drop(1).each { Node it -> if (it.detailsText && (it.details.text.startsWith(tbl.rowCnt) || it.details.text.startsWith(tbl.rowNum))) it.details = null }
         // the first column in each row is technical, therefore it's skipped
         n.children.each { FPN row ->
             if (!hasIcon(row, icon.noEntry)) {  // not ignoreNode
@@ -228,7 +254,7 @@ class ConfluenceStorage {
         result << tag
         result << getContent(n)
         result << '</' << tag[1..-1] << nl
-        // canSkipLeafCheck=true because each cell is basically a top-level node, i.e. can be a wikiLeaf
+        // canExcludeMarkupMaker=false because each cell is basically a top-level node, i.e. can be a cStorageMarkupMaker
         FPN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, false)
         if (firstChildIfNotIgnoreNode) {
             mkTableCellAndAppendTo(result, firstChildIfNotIgnoreNode, rowNum, ++colNum, hiLite1st, nl)
@@ -290,9 +316,9 @@ class ConfluenceStorage {
         return n['simBullet'] ? n['simBullet'].text : '●'
     }
 
-    static StringBuilder getEachFirstChildsContent(n, String sep = ' ', boolean canExcludeWikiLeaf = true) {
-        /* canExcludeWikiLeaf for top-level nodes of mkSomething */
-        def child = getFirstChildIfNotIgnoreNode(n, canExcludeWikiLeaf)
+    static StringBuilder getEachFirstChildsContent(n, String sep = ' ', boolean canExcludeMarkupMaker = true) {
+        /* canExcludeMarkupMaker for top-level nodes of mkSomething */
+        def child = getFirstChildIfNotIgnoreNode(n, canExcludeMarkupMaker)
         final sb = new StringBuilder()
         if (child) {
             sb << getContent(child)
@@ -380,7 +406,12 @@ class ConfluenceStorage {
         return '<!-- a child with a note is missing -->'
     }
 
-    static String mkPageInfo(FPN n, String infoType, String type = 'Flat') {
+    static String mkPageInfo(FPN n) {
+        String infoType = n.detailsText ? n.details.text : 'Title'
+        return _mkPageInfo(n, infoType)
+    }
+
+    static String _mkPageInfo(FPN n, String infoType, String type = 'Flat') {
         /* Page id, Current version, Tiny url, Title, ...  */
         return _mkMacroPlain(n, 'page-info', null, [infoType: infoType, type: type])
     }
@@ -473,16 +504,16 @@ class ConfluenceStorage {
     }
 
     /**
-     * mkCsv is lightweight mkParent, i.e. without headings, paragraphs, replacements, escapeXml
+     * mkCsv is like mkParent but using getContent instead of mkNode (no headings or paragraphs)
      * + collects only the first child of each node
      * + uses a comma or any string as the separator
      */
-    static String mkCsv(FPN n) {
+    static StringBuilder mkCsv(FPN n) {
         // sep can be defined as the attribute csvSep
         // sep can be defined in details
         // for table cells (details start with №), the default sep is used
+        def sb = new StringBuilder()
         if (n.children.size() > 0) {
-            String spaceSep = getSpaceSep(n)
             String sep
             final defaultSep = ', '
             final csvSep = 'csvSep'
@@ -493,13 +524,18 @@ class ConfluenceStorage {
             else
                 sep = defaultSep
             def cells = new LinkedList<FPN>()
-            n.children.each { if (!hasIcon(it, icon.noEntry)) cells.addAll(getFirstChildChain(it)) }
+            n.children.each { Node it -> if (!hasIcon(it, icon.noEntry)) cells.addAll(getFirstChildChain(it)) }
             def cellsSize = cells.size()
             int i
-            def body = cells.collect { "${it.noteText ? it.note.text : it.transformedText}${++i == cellsSize || (hasIcon(it, icon.noSep_cancer) && !isWikiLeaf(it)) ? '' : sep}" }.join('')
-            return "${body}${spaceSep}".toString()
+            cells.each { Node it ->
+                sb << getContent(it)
+                if (++i < cellsSize && (!hasIcon(it, icon.noSep_cancer) || isMarkupMaker(it))) // getContent->makeMarkup->mk***->mkNode adds sep already
+                    sb << sep
+            }
+            sb << getSpaceSep(n)
+            return sb
         } else
-            return '<!-- a child is missing -->'
+            return sb << '<!-- a child is missing -->'
     }
 
     static String mkWiki(FPN n) {
