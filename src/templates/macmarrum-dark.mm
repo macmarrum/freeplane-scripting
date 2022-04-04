@@ -339,6 +339,14 @@ ol {
 <stylenode TEXT="^cloud.dark">
 <cloud COLOR="#152242" SHAPE="ROUND_RECT"/>
 </stylenode>
+<stylenode TEXT="cStorageMarkupRoot" BACKGROUND_COLOR="#003e9b" BORDER_WIDTH="4 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#ffab00">
+<icon BUILTIN="emoji-1F3AF"/>
+<font NAME="JetBrains Mono" SIZE="11"/>
+</stylenode>
+<stylenode TEXT="cStorageMarkupMaker" BACKGROUND_COLOR="#003e9b" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#ffab00">
+<icon BUILTIN="emoji-1F335"/>
+<font NAME="JetBrains Mono" SIZE="11"/>
+</stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="right" STYLE="bubble">
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level.root" ID="ID_1659178249" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="10 pt">
@@ -411,6 +419,100 @@ ol {
     </p>
   </body>
 </html></richcontent>
+</node>
+</node>
+<node TEXT="cStorage" ID="ID_951766552" CREATED="1649085904583" MODIFIED="1649085907120">
+<node TEXT="=style.name" STYLE_REF="cStorageMarkupRoot" ID="ID_1544493752" CREATED="1649085908743" MODIFIED="1649085926409"/>
+<node TEXT="=style.name" STYLE_REF="cStorageMarkupMaker" ID="ID_1910107600" CREATED="1649085908743" MODIFIED="1649085937436"/>
+<node TEXT="Icons" FOLDED="true" ID="ID_849269891" CREATED="1649085948500" MODIFIED="1649085956546">
+<node TEXT="new line within" ID="ID_1488552511" CREATED="1635001381775" MODIFIED="1635001401672">
+<icon BUILTIN="emoji-2935"/>
+<node TEXT="=parent.icons.icons[0]" STYLE_REF="=Table.cell" ID="ID_602893462" CREATED="1644862966326" MODIFIED="1646341577510"/>
+</node>
+<node TEXT="&lt;h1&gt; (mkNode)" ID="ID_528647596" CREATED="1634852592650" MODIFIED="1644862219070">
+<icon BUILTIN="full-1"/>
+<node ID="ID_1980373475" CONTENT_ID="ID_602893462"/>
+</node>
+<node TEXT="&lt;p&gt; + pReplacements (mkNode)" ID="ID_1665667454" CREATED="1634849634887" MODIFIED="1644862223511">
+<icon BUILTIN="emoji-1F17F"/>
+<node ID="ID_1082561284" CONTENT_ID="ID_602893462"/>
+</node>
+<node TEXT="pReplacements (mkNode, mkTableCell, _mkHeading, mkZipList)" ID="ID_115525689" CREATED="1643966151626" MODIFIED="1645100415839">
+<icon BUILTIN="emoji-27BF"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      usefull also for mkQuote to apply repl. without P
+    </p>
+  </body>
+</html></richcontent>
+<node ID="ID_1130543427" CONTENT_ID="ID_602893462"/>
+</node>
+<node TEXT="s/ /&amp;nbsp;/g (mkNode, mkTableCell)" ID="ID_1176339246" CREATED="1643900917785" MODIFIED="1643900967965">
+<icon BUILTIN="emoji-264A"/>
+<node ID="ID_1146814755" CONTENT_ID="ID_602893462"/>
+</node>
+<node TEXT="escapeXml (mkNode, mkTableCell)" ID="ID_1750916384" CREATED="1643898117259" MODIFIED="1643963940482">
+<icon BUILTIN="emoji-1F9F9"/>
+<node ID="ID_713564453" CONTENT_ID="ID_602893462"/>
+</node>
+<node TEXT="no trailing sep (mkNode)" ID="ID_624013854" CREATED="1634829512029" MODIFIED="1635004579869">
+<icon BUILTIN="emoji-264B"/>
+<node ID="ID_1623346704" CONTENT_ID="ID_602893462"/>
+</node>
+<node TEXT="no entry (mkNode, mkTableCell, mkTable)" ID="ID_1617878429" CREATED="1634829521270" MODIFIED="1647604389481">
+<icon BUILTIN="emoji-26D4"/>
+<node ID="ID_837428798" CONTENT_ID="ID_602893462"/>
+</node>
+<node TEXT="stop at this (mkTable, also: mkZipList, mkCsv)" ID="ID_750477354" CREATED="1647604339757" MODIFIED="1647621441134">
+<icon BUILTIN="emoji-1F6D1"/>
+<richcontent TYPE="NOTE" CONTENT-TYPE="xml/">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      mkTable continues to the next column even if it encounters a WikiLeaf
+    </p>
+    <p>
+      stopAtThis makes it work similar to mkNode, where children of a WikiLeaf are ignored
+    </p>
+  </body>
+</html></richcontent>
+<node ID="ID_1903483171" CONTENT_ID="ID_602893462"/>
+</node>
+<node TEXT="&lt;ol&gt; (mkList)" ID="ID_1762666438" CREATED="1634849042138" MODIFIED="1644862212203">
+<icon BUILTIN="emoji-0023-20E3"/>
+<node ID="ID_1044722284" CONTENT_ID="ID_602893462"/>
+</node>
+<node TEXT="collapse (mkCode)" ID="ID_1621722269" CREATED="1636544735079" MODIFIED="1636544747674">
+<icon BUILTIN="emoji-23EB"/>
+<node ID="ID_967168174" CONTENT_ID="ID_602893462"/>
+</node>
+<node TEXT="line numbers (mkCode)" ID="ID_192571165" CREATED="1636544749286" MODIFIED="1636544998576">
+<icon BUILTIN="emoji-1F522"/>
+<node ID="ID_1926239337" CONTENT_ID="ID_602893462"/>
+</node>
+<node TEXT="border (mkImage)" ID="ID_1937131038" CREATED="1635015705019" MODIFIED="1644862316153">
+<icon BUILTIN="unchecked"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      height
+    </p>
+  </body>
+</html></richcontent>
+<node ID="ID_1238023406" CONTENT_ID="ID_602893462"/>
+</node>
 </node>
 </node>
 </node>
