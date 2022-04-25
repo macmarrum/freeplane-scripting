@@ -1,8 +1,16 @@
 <map version="freeplane 1.9.13">
 <!--To view this file, download free mind mapping software Freeplane from https://www.freeplane.org -->
 <attribute_registry SHOW_ATTRIBUTES="hide"/>
-<node TEXT="Root" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1090958577" CREATED="1606664858024" MODIFIED="1645910056773" VGAP_QUANTITY="3 pt" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES" BACKGROUND_COLOR="#282828"><hook NAME="MapStyle" background="#2b2b2b">
+<node TEXT="Root" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1090958577" CREATED="1606664858024" MODIFIED="1650423065235" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES"><hook NAME="MapStyle" background="#2b2b2b">
     <conditional_styles>
+        <conditional_style ACTIVE="false" STYLE_REF="?bg" LAST="false"/>
+        <conditional_style ACTIVE="false" STYLE_REF="?gap" LAST="false">
+            <script_condition>
+                <script>!node.leaf &amp;&amp; node.children.every{ it.leaf }
+// https://issues.apache.org/jira/browse/GROOVY-7207
+// every() returns true for empty iterator/list</script>
+            </script_condition>
+        </conditional_style>
         <conditional_style ACTIVE="false" STYLE_REF="?=Table.row.accent" LAST="false">
             <script_condition>
                 <script>def cs=[&apos;?=Table&apos;,&apos;?=Table.row.accent&apos;]
@@ -125,6 +133,7 @@ ol {
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.user-defined" POSITION="right" STYLE="bubble">
 <stylenode TEXT="?bg" ID="ID_1783059692" BACKGROUND_COLOR="#333333" BORDER_COLOR="#808080" BORDER_DASH="SOLID"/>
+<stylenode TEXT="?gap" ID="ID_21091341" VGAP_QUANTITY="3 pt"/>
 <stylenode LOCALIZED_TEXT="styles.important" ID="ID_749235638" BORDER_WIDTH="3 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#cc241d">
 <icon BUILTIN="yes"/>
 <arrowlink COLOR="#cc241d" TRANSPARENCY="255" DESTINATION="ID_749235638"/>
@@ -138,7 +147,7 @@ ol {
 </hook>
 </stylenode>
 <stylenode TEXT="!WaitingFor.Closed" ID="ID_1769848801" BACKGROUND_COLOR="#435357" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#3693ad">
-<icon BUILTIN="emoji-231B"/>
+<icon BUILTIN="emoji-2705"/>
 <hook NAME="NodeConditionalStyles">
     <conditional_style ACTIVE="true" STYLE_REF="^gtd" LAST="false"/>
 </hook>
@@ -150,7 +159,7 @@ ol {
 </hook>
 </stylenode>
 <stylenode TEXT="!NextAction.Closed" ID="ID_311404969" BACKGROUND_COLOR="#59553f" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#b39a41">
-<icon BUILTIN="emoji-2705"/>
+<icon BUILTIN="emoji-2611"/>
 <hook NAME="NodeConditionalStyles">
     <conditional_style ACTIVE="true" STYLE_REF="^gtd" LAST="false"/>
 </hook>
@@ -347,45 +356,46 @@ ol {
 <icon BUILTIN="emoji-1F335"/>
 <font NAME="JetBrains Mono" SIZE="11"/>
 </stylenode>
+<stylenode TEXT="+max20cm" MAX_WIDTH="20 cm"/>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="right" STYLE="bubble">
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level.root" ID="ID_1659178249" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="10 pt">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level.root" ID="ID_1659178249" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="10 pt" VGAP_QUANTITY="20 pt">
 <font SIZE="20"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,1" ID="ID_771207535" COLOR="#52d273" BACKGROUND_COLOR="#455448" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="8 pt" SHAPE_VERTICAL_MARGIN="5 pt">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,1" ID="ID_771207535" COLOR="#52d273" BACKGROUND_COLOR="#455448" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="8 pt" SHAPE_VERTICAL_MARGIN="5 pt" VGAP_QUANTITY="18 pt">
 <font SIZE="18"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,2" ID="ID_814211067" COLOR="#e95065" BACKGROUND_COLOR="#574248" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="8 pt" SHAPE_VERTICAL_MARGIN="5 pt">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,2" ID="ID_814211067" COLOR="#e95065" BACKGROUND_COLOR="#574248" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="8 pt" SHAPE_VERTICAL_MARGIN="5 pt" VGAP_QUANTITY="16 pt">
 <font SIZE="16"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,3" ID="ID_352058479" COLOR="#e5c453" BACKGROUND_COLOR="#59553f">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,3" ID="ID_352058479" COLOR="#e5c453" BACKGROUND_COLOR="#59553f" VGAP_QUANTITY="14 pt">
 <font SIZE="14"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,4" ID="ID_294563152" COLOR="#d349a4" BACKGROUND_COLOR="#49434f">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,4" ID="ID_294563152" COLOR="#d349a4" BACKGROUND_COLOR="#49434f" VGAP_QUANTITY="14 pt">
 <font SIZE="14"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,5" ID="ID_119767224" COLOR="#46bddf" BACKGROUND_COLOR="#435357">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,5" ID="ID_119767224" COLOR="#46bddf" BACKGROUND_COLOR="#435357" VGAP_QUANTITY="14 pt">
 <font SIZE="14"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,6" ID="ID_1794312820" COLOR="#e57255" BACKGROUND_COLOR="#3d3d3d">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,6" ID="ID_1794312820" COLOR="#e57255" BACKGROUND_COLOR="#3d3d3d" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,7" ID="ID_759282133" COLOR="#52d273" BACKGROUND_COLOR="#3d3d3d">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,7" ID="ID_759282133" COLOR="#52d273" BACKGROUND_COLOR="#3d3d3d" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,8" ID="ID_94638384" COLOR="#e95065" BACKGROUND_COLOR="#3d3d3d">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,8" ID="ID_94638384" COLOR="#e95065" BACKGROUND_COLOR="#3d3d3d" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,9" ID="ID_885575204" COLOR="#e5c453" BACKGROUND_COLOR="#3d3d3d">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,9" ID="ID_885575204" COLOR="#e5c453" BACKGROUND_COLOR="#3d3d3d" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,10" ID="ID_703695337" COLOR="#d349a4" BACKGROUND_COLOR="#3d3d3d">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,10" ID="ID_703695337" COLOR="#d349a4" BACKGROUND_COLOR="#3d3d3d" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,11" COLOR="#46bddf" BACKGROUND_COLOR="#3d3d3d">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,11" COLOR="#46bddf" BACKGROUND_COLOR="#3d3d3d" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,12" COLOR="#e57255" BACKGROUND_COLOR="#3d3d3d">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,12" COLOR="#e57255" BACKGROUND_COLOR="#3d3d3d" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
 </stylenode>
 </stylenode>
@@ -525,7 +535,7 @@ ol {
 <attribute NAME="runMe" VALUE="menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node" OBJECT="java.net.URI|menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node"/>
 </node>
 <node TEXT="# Heading 1&#xa;Regular text. **Bold text.** *Italic text.* ***Both: bold and italic.***&#xa;&#xa;A line (horizontal ruler) using underscores:&#xa;___&#xa;&#xa;&lt;s&gt;Strike through&lt;/s&gt; NB. using `~~deleted text~~` doesn&apos;t work in Freeplane (Java html/css renderer)&#xa;&#xa;E.g. ~~deleted text~~&#xa;&#xa;&lt;u&gt;Underlined text&lt;/u&gt;&#xa;&#xa;## Heading 2&#xa;&gt; A quote, line 1.&#xa;&gt; Line 2 of the quote (will be joined with line 1).&#xa;&gt;&gt; A quote within a quote&#xa;&#xa;### Heading 3&#xa;Sample text with `an in-line piece of code`.&#xa;&#xa;```groovy&#xa;// a Groovy code example - as a block of code&#xa;def name = &apos;Freeplane User&apos;&#xa;&quot;Hello, ${name}!&quot;&#xa;```&#xa;&#xa;    Another example of a block of code&#xa;    introduced as indented Markdown (with a tab or 4 spaces)&#xa;&#xa;&gt;     An example of a quote&#xa;&gt;     containing a block of code&#xa;&gt;     At least 5 spaces need to be used&#xa;&gt; And it continues as a regular quote&#xa;&#xa;#### Heading 4&#xa;A table&#xa;&#xa;| # | Language | [Pangram](https://en.wikipedia.org/wiki/Pangram) |&#xa;|--|--|--|&#xa;| 1 | English | The quick brown fox jumps over the lazy dog |&#xa;| 2 | French | Portez ce vieux whisky au juge blond qui fume |&#xa;| 3 | German | Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich |&#xa;| 4 | Italian | Pranzo d&apos;acqua fa volti sghembi |&#xa;| 5 | Spanish | Benjamín pidió una bebida de kiwi y fresa. Noé, sin vergüenza, la más exquisita champaña del menú |&#xa;&#xa;##### Heading 5&#xa;A list of items&#xa;&#xa;* Item 1&#xa;* Item 2&#xa;* Item 3&#xa;&#xa;###### Heading 6&#xa;A numbered list&#xa;&#xa;1. Item A&#xa;2. Item B&#xa;3. Item C" STYLE_REF="=Markdown" POSITION="right" ID="ID_537463989" CREATED="1638625448884" MODIFIED="1644838324381">
-<node TEXT="a note; can be free; can have connectors" STYLE_REF="=FreeNote" ID="ID_103004008" CREATED="1642199524641" MODIFIED="1644838324413"/>
+<node TEXT="a note; can be free; can have connectors" STYLE_REF="=FreeNote" ID="ID_103004008" CREATED="1642199524641" MODIFIED="1650421284451"/>
 </node>
 <node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" STYLE_REF="?=Table" POSITION="right" ID="ID_759853847" CREATED="1646736098747" MODIFIED="1646751362279">
 <node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_1061321757" CREATED="1646736102594" MODIFIED="1646751370334" MAX_WIDTH="157 px" MIN_WIDTH="157 px">
