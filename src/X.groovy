@@ -98,17 +98,7 @@ static String countDescendantsWithStyle(NodeRO node, String styleName, Boolean i
     return MessageFormat.format(messageFormatPattern ?: '{1}: {0} {2}', cnt, styleName, isCountAllClones && isCloneExist ? 'nodes, when counting clones' : 'unique nodes')
 }
 
-class CountResult {
-    int count
-    Boolean hasClones
-
-    CountResult(int count, Boolean hasClones) {
-        this.count = count
-        this.hasClones = hasClones
-    }
-}
-
-static CountResult getCountOfDescendantsWithStyle(NodeRO node, String styleName, Boolean isCountAllClones = true) {
+static Map<String, Integer> getCountOfDescendantsWithStyle(NodeRO node, String styleName, Boolean isCountAllClones = true) {
     Set<NodeRO> uniqueNodes = new HashSet<>()
     Boolean isCloneExist
     Boolean isCountMeIn
@@ -131,7 +121,7 @@ static CountResult getCountOfDescendantsWithStyle(NodeRO node, String styleName,
         }
         isCountMeIn && it.style.name == styleName
     }.size()
-    return new CountResult(cnt, isCloneExist)
+    return [count: cnt, hasClones: isCloneExist ? 1 : 0]
 }
 
 def static reportCountOfDescendantsWithStyle(node = null, styleName = '!WaitingFor') {
@@ -266,13 +256,13 @@ static String zipJson(NodeRO node) {
                         key = keys[idx]
                         if (makeJson_isList(key)) {
                             if (makeJson_isNum(key))
-                                values << "[${levelOneChild.children.findAll { !makeJson_isIgnored(it) }.collect { it.transformedText }.join(', ')}]"
+                                values << /[${levelOneChild.children.findAll { !makeJson_isIgnored(it) }.collect { it.transformedText }.join(', ')}]/
                             else
-                                values << "[${levelOneChild.children.findAll { !makeJson_isIgnored(it) }.collect { "\"${it.transformedText}\"" }.join(', ')}]"
+                                values << /[${levelOneChild.children.findAll { !makeJson_isIgnored(it) }.collect { "${it.transformedText}" }.join(', ')}]/
                         } else if (makeJson_isNum(key))
-                            values << "${levelOneChild.children.find { !makeJson_isIgnored(it) }.transformedText}"
+                            values << /${levelOneChild.children.find { !makeJson_isIgnored(it) }.transformedText}/
                         else
-                            values << "\"${levelOneChild.children.find { !makeJson_isIgnored(it) }.transformedText}\""
+                            values << /"${levelOneChild.children.find { !makeJson_isIgnored(it) }.transformedText}"/
                     }
                 }
             }
