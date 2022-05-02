@@ -38,13 +38,13 @@ private static pasteAt(Node target, List<Node> toBeSelected) {
     }
 }
 
-private static List<Node> getNodesFromClipboard(String xml) {
+private static List<Node> getNodesFromClipboard(String xml, Node target) {
     try {
         def parser = new XmlParser()
         return xml.split(MapClipboardController.NODESEPARATOR).collect { String xmlSingleNode ->
             // replace &nbsp; to avoid the error: nbsp was referenced but not declared
             def xmlRootNode = parser.parseText(xmlSingleNode.replaceAll('&nbsp;', ' '))
-            ScriptUtils.node().mindMap.node(xmlRootNode.@ID)
+            target.mindMap.node(xmlRootNode.@ID)
         }
     } catch (ignored) {
     }
