@@ -30,9 +30,9 @@ selecteds.each { sel ->
 }
 c.select(toBeSelected)
 
-private static def pasteAt(Node target, List<Node> toBeSelected) {
-    final Transferable t = ((MMapClipboardController) MapClipboardController.controller).clipboardContents
-    final sourceNodes = getNodesFromClipboard(getXml(t))
+private static pasteAt(Node target, List<Node> toBeSelected) {
+    final Transferable t = (MapClipboardController.controller as MMapClipboardController).clipboardContents
+    final sourceNodes = getNodesFromClipboard(getXml(t), target)
     sourceNodes.each { Node source ->
         toBeSelected << replicate(source, target)
     }
@@ -41,8 +41,9 @@ private static def pasteAt(Node target, List<Node> toBeSelected) {
 private static List<Node> getNodesFromClipboard(String xml) {
     try {
         def parser = new XmlParser()
-        return xml.split(MapClipboardController.NODESEPARATOR).collect { String it ->
-            def xmlRootNode = parser.parseText(it)
+        return xml.split(MapClipboardController.NODESEPARATOR).collect { String xmlSingleNode ->
+            // replace &nbsp; to avoid the error: nbsp was referenced but not declared
+            def xmlRootNode = parser.parseText(xmlSingleNode.replaceAll('&nbsp;', ' '))
             ScriptUtils.node().mindMap.node(xmlRootNode.@ID)
         }
     } catch (ignored) {
@@ -57,10 +58,11 @@ private static String getXml(Transferable t) {
         } catch (ignored) {
         }
     } else {
-        println(":: tranferable is missing ${MindMapNodesSelection.mindMapNodesFlavor}")
+        println(":: tranferable is missing `${MindMapNodesSelection.mindMapNodesFlavor.mimeType}`")
         println(":: available transferables:")
         t.getTransferDataFlavors().each { DataFlavor dataFlavor ->
-            println(dataFlavor)
+            print('* ')
+            println(dataFlavor.mimeType)
         }
     }
     return null
