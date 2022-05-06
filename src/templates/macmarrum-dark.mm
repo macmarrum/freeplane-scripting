@@ -1,7 +1,7 @@
 <map version="freeplane 1.9.13">
 <!--To view this file, download free mind mapping software Freeplane from https://www.freeplane.org -->
 <attribute_registry SHOW_ATTRIBUTES="hide"/>
-<node TEXT="Root" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1090958577" CREATED="1606664858024" MODIFIED="1650423065235" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES"><hook NAME="MapStyle" background="#2b2b2b">
+<node TEXT="Root" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1090958577" CREATED="1606664858024" MODIFIED="1651783650827" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES"><hook NAME="MapStyle" background="#2b2b2b">
     <conditional_styles>
         <conditional_style ACTIVE="false" STYLE_REF="?bg" LAST="false"/>
         <conditional_style ACTIVE="false" STYLE_REF="?gap" LAST="false">
@@ -40,7 +40,7 @@ return CS.canApply(node, cs[1], cond)</script>
             </script_condition>
         </conditional_style>
     </conditional_styles>
-    <properties show_icon_for_attributes="false" edgeColorConfiguration="#a9b7c6,#52d273,#e95065,#e5c453,#d349a4,#46bddf,#e57255,#52d273,#e95065,#e5c453,#d349a4,#46bddf,#e57255" show_note_icons="true" fit_to_viewport="false"/>
+    <properties show_icon_for_attributes="false" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff" show_note_icons="true" fit_to_viewport="false"/>
 
 <map_styles>
 <stylenode LOCALIZED_TEXT="styles.root_node" ID="ID_680156716" STYLE="oval" UNIFORM_SHAPE="true" VGAP_QUANTITY="24 pt">
@@ -147,19 +147,19 @@ ol {
 </hook>
 </stylenode>
 <stylenode TEXT="!WaitingFor.Closed" ID="ID_1769848801" BACKGROUND_COLOR="#435357" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#3693ad">
-<icon BUILTIN="emoji-2705"/>
+<icon BUILTIN="emoji-2714"/>
 <hook NAME="NodeConditionalStyles">
     <conditional_style ACTIVE="true" STYLE_REF="^gtd" LAST="false"/>
 </hook>
 </stylenode>
 <stylenode TEXT="!NextAction" ID="ID_1127156037" COLOR="#e5c453" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e5c453">
-<icon BUILTIN="emoji-1F532"/>
+<icon BUILTIN="emoji-25FB"/>
 <hook NAME="NodeConditionalStyles">
     <conditional_style ACTIVE="true" STYLE_REF="^gtd" LAST="false"/>
 </hook>
 </stylenode>
 <stylenode TEXT="!NextAction.Closed" ID="ID_311404969" BACKGROUND_COLOR="#59553f" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#b39a41">
-<icon BUILTIN="emoji-2611"/>
+<icon BUILTIN="emoji-2714"/>
 <hook NAME="NodeConditionalStyles">
     <conditional_style ACTIVE="true" STYLE_REF="^gtd" LAST="false"/>
 </hook>
@@ -365,7 +365,7 @@ ol {
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,1" ID="ID_771207535" COLOR="#52d273" BACKGROUND_COLOR="#455448" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="8 pt" SHAPE_VERTICAL_MARGIN="5 pt" VGAP_QUANTITY="18 pt">
 <font SIZE="18"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,2" ID="ID_814211067" COLOR="#e95065" BACKGROUND_COLOR="#574248" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="8 pt" SHAPE_VERTICAL_MARGIN="5 pt" VGAP_QUANTITY="16 pt">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,2" ID="ID_814211067" COLOR="#f9556b" BACKGROUND_COLOR="#574248" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="8 pt" SHAPE_VERTICAL_MARGIN="5 pt" VGAP_QUANTITY="16 pt">
 <font SIZE="16"/>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,3" ID="ID_352058479" COLOR="#e5c453" BACKGROUND_COLOR="#59553f" VGAP_QUANTITY="14 pt">
@@ -383,7 +383,7 @@ ol {
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,7" ID="ID_759282133" COLOR="#52d273" BACKGROUND_COLOR="#3d3d3d" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,8" ID="ID_94638384" COLOR="#e95065" BACKGROUND_COLOR="#3d3d3d" VGAP_QUANTITY="14 pt">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,8" ID="ID_94638384" COLOR="#f9556b" BACKGROUND_COLOR="#3d3d3d" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,9" ID="ID_885575204" COLOR="#e5c453" BACKGROUND_COLOR="#3d3d3d" VGAP_QUANTITY="14 pt">
