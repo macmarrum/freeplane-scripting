@@ -17,7 +17,7 @@ final Transferable t = ((MMapClipboardController) MapClipboardController.control
 def copiedNodes = getNodesFromClipboardXml(getXml(t))
 Controller c = ScriptUtils.c()
 List<Node> selecteds = c.selecteds.collect()
-if (copiedNodes.size() != selecteds.size() && !(copiedNodes.size() == 1 && selecteds.size() > 1)) {
+if (!(copiedNodes.size() == selecteds.size() || copiedNodes.size() == 1 && selecteds.size() > 1)) {
     c.statusInfo = "convertToClone: got ${copiedNodes.size()} nodes from clipboard and ${selecteds.size()} target nodes are selected -- expected the same count or 1 to many"
 } else {
     def originalChildren
@@ -42,11 +42,12 @@ if (copiedNodes.size() != selecteds.size() && !(copiedNodes.size() == 1 && selec
 }
 c.select(toBeSelected)
 
-private List<Node> getNodesFromClipboardXml(String xml) {
+private static List<Node> getNodesFromClipboardXml(String xml) {
     try {
         def parser = new XmlParser()
-        return xml.split(MapClipboardController.NODESEPARATOR).collect { String it ->
-            def xmlRootNode = parser.parseText(it)
+        return xml.split(MapClipboardController.NODESEPARATOR).collect { String xmlSingleNode ->
+            // replace &nbsp; to avoid the error: nbsp was referenced but not declared
+            def xmlRootNode = parser.parseText(xmlSingleNode.replaceAll('&nbsp;', ' '))
             ScriptUtils.node().mindMap.node(xmlRootNode.@ID)
         }
     } catch (ignored) {

@@ -18,7 +18,7 @@ import java.awt.datatransfer.Transferable
 Controller c = ScriptUtils.c()
 Node node = ScriptUtils.node()
 final Transferable t = ((MMapClipboardController) MapClipboardController.controller).clipboardContents
-def copiedNodes = getNodesFromClipboard(getXml(t))
+def copiedNodes = getNodesFromClipboardXml(getXml(t))
 if (copiedNodes.size() > 0) {
     def toBeSelected = new LinkedList<Node>()
     Node target
@@ -58,11 +58,12 @@ if (copiedNodes.size() > 0) {
     c.statusInfo = 'pasteAsSymlink: got zero nodes from clipboard (!)'
 }
 
-private List<Node> getNodesFromClipboard(String xml) {
+private List<Node> getNodesFromClipboardXml(String xml) {
     try {
         def parser = new XmlParser()
-        return xml.split(MapClipboardController.NODESEPARATOR).collect { String it ->
-            def xmlRootNode = parser.parseText(it)
+        return xml.split(MapClipboardController.NODESEPARATOR).collect { String xmlSingleNode ->
+            // replace &nbsp; to avoid the error: nbsp was referenced but not declared
+            def xmlRootNode = parser.parseText(xmlSingleNode.replaceAll('&nbsp;', ' '))
             ScriptUtils.node().mindMap.node(xmlRootNode.@ID)
         }
     } catch (ignored) {

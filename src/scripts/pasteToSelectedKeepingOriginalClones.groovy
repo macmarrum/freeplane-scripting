@@ -32,13 +32,13 @@ c.select(toBeSelected)
 
 private static pasteAt(Node target, List<Node> toBeSelected) {
     final Transferable t = (MapClipboardController.controller as MMapClipboardController).clipboardContents
-    final sourceNodes = getNodesFromClipboard(getXml(t), target)
+    final sourceNodes = getNodesFromClipboardXml(getXml(t), target)
     sourceNodes.each { Node source ->
         toBeSelected << replicate(source, target)
     }
 }
 
-private static List<Node> getNodesFromClipboard(String xml, Node target) {
+private static List<Node> getNodesFromClipboardXml(String xml, Node target) {
     try {
         def parser = new XmlParser()
         return xml.split(MapClipboardController.NODESEPARATOR).collect { String xmlSingleNode ->
