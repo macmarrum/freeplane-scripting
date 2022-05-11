@@ -52,7 +52,8 @@ private static String getXml(Transferable t) {
 
 static void pasteAsSingleCloneRecursivelyAndAddToBeSelected(Node source, Node targetParent, List<Node> toBeSelected) {
     Node target = targetParent.appendAsCloneWithoutSubtree(source)
-    toBeSelected.add(target)
+    if (target.visible)
+        toBeSelected.add(target)
     source.children.eachWithIndex { Node sourceChild, int i ->
         pasteAsSingleCloneRecursivelyAndAddToBeSelected(sourceChild, target, toBeSelected)
     }
