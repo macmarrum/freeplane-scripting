@@ -1,8 +1,10 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 import org.freeplane.api.Node
+import org.freeplane.features.filter.FilterController
 
+def filterController = FilterController.currentFilterController
 def showAncestors = true
-def showDescendants = false
+def showDescendants = filterController.showDescendants.selected
 def nodesToShow = new HashSet<Node>()
 
 c.selecteds.each { Node sel ->
