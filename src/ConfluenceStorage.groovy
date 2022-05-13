@@ -35,6 +35,10 @@ class ConfluenceStorage {
             rowNum: '№',
     ]
 
+    static Boolean isMarkupRoot(FPN n) {
+        return n.style.name == style.cStorageMarkupRoot
+    }
+
     static Boolean isMarkupMaker(FPN n) {
         return n.style.name == style.cStorageMarkupMaker
     }
@@ -43,11 +47,12 @@ class ConfluenceStorage {
         return n.icons.icons.contains(icon)
     }
 
-    /**
+    /*
      * First escape xml, if broom present
      * Only then do pReplacements if doubleCurlyLoop present
      * and replace each space with nbsp, if gemini present
      */
+
     static String getContent(FPN n) {
         String content = isMarkupMaker(n) ? makeMarkup(n) : n.noteText ? n.note.text : n.transformedText
         if (hasIcon(n, icon.xmlEscape_broom)) content = XmlUtil.escapeXml(content)
@@ -207,10 +212,13 @@ class ConfluenceStorage {
     }
 
     static StringBuilder mkTable(FPN n) {
+        def tableAnnotateText = getTableAnnotateText(n)
+        def canAnnotate = tableAnnotateText == annotate
+        def canClearAnnotations = tableAnnotateText == clear
         def nl = getNewLine(n)
         HiLite1st hiLite1st
         if (n['hiLite1st']) {
-            hiLite1st = HiLite1st.valueOf(n['hiLite1st'].toString().toUpperCase())
+            hiLite1st = HiLite1st.valueOf(n['hiLite1st'].text.toUpperCase())
         } else {
             hiLite1st = HiLite1st.NONE
         }
@@ -219,15 +227,17 @@ class ConfluenceStorage {
         def rowNum = 1
         tableWiki << '<table>' << nl << '<colgroup><col /><col /></colgroup>' << nl << '<tbody>' << nl
         // clean up details containing old tbl.rowCnt or tbl.rowNum
-        n.findAll().drop(1).each { Node it -> if (it.detailsText && (it.details.text.startsWith(tbl.rowCnt) || it.details.text.startsWith(tbl.rowNum))) it.details = null }
+        if (canAnnotate || canClearAnnotations)
+            n.findAll().drop(1).each { Node it -> if (it.detailsText && (it.details.text.startsWith(tbl.rowCnt) || it.details.text.startsWith(tbl.rowNum))) it.details = null }
         // the first column in each row is technical, therefore it's skipped
         n.children.each { FPN row ->
             if (!hasIcon(row, icon.noEntry)) {  // not ignoreNode
                 final firstChildChainSize = _tbl_countFirstChildChain(row)
-                row.details = (new StringBuilder() << tbl.rowCnt << firstChildChainSize).toString()
+                if (canAnnotate)
+                    row.details = (new StringBuilder() << tbl.rowCnt << firstChildChainSize).toString()
                 if (firstChildChainSize > 0) {
                     tableWiki << '<tr>' << nl
-                    mkTableCellAndAppendTo(tableWiki, row.children[0], rowNum, colNum, hiLite1st, nl)
+                    mkTableCellAndAppendTo(tableWiki, row.children[0], rowNum, colNum, hiLite1st, nl, canAnnotate)
                     tableWiki << '</tr>' << nl // close the row
                 }
                 rowNum++
@@ -237,9 +247,9 @@ class ConfluenceStorage {
         return tableWiki
     }
 
-    static StringBuilder mkTableCellAndAppendTo(StringBuilder result, FPN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl) {
-        n.details = (new StringBuilder() << tbl.rowNum << colNum).toString()
-//        def result = new StringBuilder()
+    static StringBuilder mkTableCellAndAppendTo(StringBuilder result, FPN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
+        if (canAnnotate)
+            n.details = (new StringBuilder() << tbl.rowNum << colNum).toString()
         def tag
         switch (hiLite1st) {
             case HiLite1st.ROW:
@@ -257,9 +267,24 @@ class ConfluenceStorage {
         // canExcludeMarkupMaker=false because each cell is basically a top-level node, i.e. can be a cStorageMarkupMaker
         FPN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, false)
         if (firstChildIfNotIgnoreNode) {
-            mkTableCellAndAppendTo(result, firstChildIfNotIgnoreNode, rowNum, ++colNum, hiLite1st, nl)
+            mkTableCellAndAppendTo(result, firstChildIfNotIgnoreNode, rowNum, ++colNum, hiLite1st, nl, canAnnotate)
         }
         return result
+    }
+
+    static final String clear = 'clear'
+    static final String annotate = 'annotate'
+    static final String none = 'none'
+    static final ArrayList<String> clear_annotate_none = [clear, annotate, none]
+
+    static String getTableAnnotateText(FPN n) {
+        def detailsText = n.details?.text
+        if (detailsText in clear_annotate_none)
+            return detailsText
+        def markupRoot = n.pathToRoot.find { isMarkupRoot(it) }
+        def markupRootDetailsText = markupRoot.details?.text
+        if (markupRootDetailsText in clear_annotate_none)
+            return markupRootDetailsText
     }
 
     static StringBuilder mkList(FPN n) {
@@ -277,10 +302,11 @@ class ConfluenceStorage {
         return result
     }
 
-    /** mkZipList uses its own content gatherer instead of mkNode to consider only the first child on each level
+    /* mkZipList, like mkCsv, uses its own content gatherer, instead of mkNode, to consider only the first child on each level
      *  TODO: consider if mkNode could be used instead, especially now that <div> is used in place of <p>
      *      -- benefits / disadvantages
      */
+
     static StringBuilder mkZipList(FPN n) {
         def nl = getNewLine(n)
         def bullet = getSimBullet(n)
@@ -503,11 +529,12 @@ class ConfluenceStorage {
         return '<!-- a child with text is missing -->'
     }
 
-    /**
+    /*
      * mkCsv is like mkParent but using getContent instead of mkNode (no headings or paragraphs)
      * + collects only the first child of each node
      * + uses a comma or any string as the separator
      */
+
     static StringBuilder mkCsv(FPN n) {
         // sep can be defined as the attribute csvSep
         // sep can be defined in details
