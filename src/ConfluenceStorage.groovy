@@ -28,6 +28,7 @@ class ConfluenceStorage {
             xmlEscape_broom              : 'emoji-1F9F9',
             pReplacements_doubleCurlyLoop: 'emoji-27BF',
             stopAtThis_stopSign          : 'emoji-1F6D1',
+            noSepAfter_lastQuarterMoon   : 'emoji-1F317',
     ]
 
     static tbl = [
@@ -47,12 +48,15 @@ class ConfluenceStorage {
         return n.icons.icons.contains(icon)
     }
 
-    /*
+    static Boolean hasIcon(FPN n, List<String> icons) {
+        return n.icons.icons.any { it in icons }
+    }
+
+    /**
      * First escape xml, if broom present
      * Only then do pReplacements if doubleCurlyLoop present
      * and replace each space with nbsp, if gemini present
      */
-
     static String getContent(FPN n) {
         String content = isMarkupMaker(n) ? makeMarkup(n) : n.noteText ? n.note.text : n.transformedText
         if (hasIcon(n, icon.xmlEscape_broom)) content = XmlUtil.escapeXml(content)
@@ -86,8 +90,10 @@ class ConfluenceStorage {
         }
     }
 
+    static noSepIcons = [icon.noSepAfter_lastQuarterMoon, icon.noSep_cancer]
+
     static String getSpaceSep(FPN n) {
-        return hasIcon(n, icon.noSep_cancer) ? '' : ' '
+        return hasIcon(n, noSepIcons) ? '' : ' '
     }
 
     static String getNewLine(FPN n) {
@@ -169,7 +175,8 @@ class ConfluenceStorage {
                     if (isP)
                         result << '<p>'
                     result << pContent << sep
-                    n.children.each { result << mkNode(it) }
+                    if (!hasIcon(n, icon.stopAtThis_stopSign))
+                        n.children.each { result << mkNode(it) }
                     if (isP)
                         result << '</p>'
                     result << eol
@@ -193,6 +200,9 @@ class ConfluenceStorage {
     }
 
 
+    /**
+     * canExcludeMarkupMaker for getFirstChildChain, used by mkCsv – to stop at markupMaker nodes
+     */
     static FPN getFirstChildIfNotIgnoreNode(FPN n, boolean canExcludeMarkupMaker = true) {
         def isMarkupMakerAndCanExcludeIt = isMarkupMaker(n) && canExcludeMarkupMaker
         if (isMarkupMakerAndCanExcludeIt || n.children.size() == 0 || hasIcon(n, icon.stopAtThis_stopSign) || hasIcon(n.children[0], icon.noEntry))
@@ -304,11 +314,11 @@ class ConfluenceStorage {
         return result
     }
 
-    /* mkZipList, like mkCsv, uses its own content gatherer, instead of mkNode, to consider only the first child on each level
+    /**
+     * mkZipList, like mkCsv, uses its own content gatherer, instead of mkNode, to consider only the first child on each level
      *  TODO: consider if mkNode could be used instead, especially now that <div> is used in place of <p>
      *      -- benefits / disadvantages
      */
-
     static StringBuilder mkZipList(FPN n) {
         def nl = getNewLine(n)
         def bullet = getSimBullet(n)
@@ -320,7 +330,7 @@ class ConfluenceStorage {
                     if (!items[idx]) {
                         items[idx] = new StringBuilder() << bullet << ' '
                     }
-                    items[idx] << getEachFirstChildsContent(levelOneChild)  // skip levelOneChild, which is a numbering
+                    items[idx] << getEachFirstChildsContent(levelOneChild, ' ', true)  // skip levelOneChild, which is a numbering
                 }
             }
         }
@@ -344,13 +354,17 @@ class ConfluenceStorage {
         return n['simBullet'] ? n['simBullet'].text : '●'
     }
 
+    /**
+     * canExcludeMarkupMaker for getFirstChildIfNotIgnoreNode
+     * then for getFirstChildChain, used by mkCsv – to stop at markupMaker nodes
+     */
     static StringBuilder getEachFirstChildsContent(n, String sep = ' ', boolean canExcludeMarkupMaker = true) {
         /* canExcludeMarkupMaker for top-level nodes of mkSomething */
         def child = getFirstChildIfNotIgnoreNode(n, canExcludeMarkupMaker)
         final sb = new StringBuilder()
         if (child) {
             sb << getContent(child)
-            if (!hasIcon(child, icon.noSep_cancer))
+            if (!hasIcon(child, noSepIcons))
                 sb << sep
             final grandchildsContent = getEachFirstChildsContent(child, sep)
             if (!grandchildsContent.isBlank())
@@ -545,12 +559,11 @@ class ConfluenceStorage {
         return '<!-- a child with text is missing -->'
     }
 
-    /*
+    /**
      * mkCsv is like mkParent but using getContent instead of mkNode (no headings or paragraphs)
      * + collects only the first child of each node
      * + uses a comma or any string as the separator
      */
-
     static StringBuilder mkCsv(FPN n) {
         // sep can be defined as the attribute csvSep
         // sep can be defined in details
@@ -572,10 +585,13 @@ class ConfluenceStorage {
             int i
             cells.each { Node it ->
                 sb << getContent(it)
-                if (++i < cellsSize && (!hasIcon(it, icon.noSep_cancer) || isMarkupMaker(it))) // getContent->makeMarkup->mk***->mkNode adds sep already
-                    sb << sep
+                if (++i < cellsSize) { // not the last element
+                    if (!hasIcon(it, noSepIcons)) // noSepAfter is missing
+                        sb << sep
+                } else // last item – space if noSepAfter is missing
+                    sb << getSpaceSep(it)
             }
-            sb << getSpaceSep(n)
+            // NB. getContent->makeMarkup->mk***->mkNode adds a trailing space (unless noSepAfter)
             return sb
         } else
             return sb << '<!-- a child is missing -->'
