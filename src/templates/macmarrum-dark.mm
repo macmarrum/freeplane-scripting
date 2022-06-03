@@ -1,7 +1,7 @@
 <map version="freeplane 1.9.13">
 <!--To view this file, download free mind mapping software Freeplane from https://www.freeplane.org -->
 <attribute_registry SHOW_ATTRIBUTES="hide"/>
-<node TEXT="Root" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1090958577" CREATED="1606664858024" MODIFIED="1651783650827" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES"><hook NAME="MapStyle" background="#2b2b2b">
+<node TEXT="Root" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1090958577" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES"><hook NAME="MapStyle" background="#2b2b2b">
     <conditional_styles>
         <conditional_style ACTIVE="false" STYLE_REF="?bg" LAST="false"/>
         <conditional_style ACTIVE="false" STYLE_REF="?gap" LAST="false">
@@ -402,10 +402,10 @@ ol {
 </stylenode>
 </map_styles>
 </hook>
-<node TEXT="Style" GLOBALLY_VISIBLE="true" POSITION="left" ID="ID_495636280" CREATED="1633868442261" MODIFIED="1645431661351">
-<node TEXT="GTD (with scripts)" ID="ID_251954954" CREATED="1633868477751" MODIFIED="1633868659021">
-<node TEXT="=style.name" STYLE_REF="!WaitingFor" ID="ID_333083603" CREATED="1633868481127" MODIFIED="1633868500545"/>
-<node TEXT="=style.name" STYLE_REF="!WaitingFor.Closed" ID="ID_1670631305" CREATED="1633868481127" MODIFIED="1646137920042"><richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<node TEXT="Style" GLOBALLY_VISIBLE="true" POSITION="left" ID="ID_495636280">
+<node TEXT="GTD (with scripts)" ID="ID_251954954">
+<node TEXT="=style.name" STYLE_REF="!WaitingFor" ID="ID_333083603"/>
+<node TEXT="=style.name" STYLE_REF="!WaitingFor.Closed" ID="ID_1670631305"><richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
 <html>
   <head>
     
@@ -417,8 +417,8 @@ ol {
   </body>
 </html></richcontent>
 </node>
-<node TEXT="=style.name" STYLE_REF="!NextAction" ID="ID_604624365" CREATED="1633868481127" MODIFIED="1633868581384"/>
-<node TEXT="=style.name" STYLE_REF="!NextAction.Closed" ID="ID_1039839128" CREATED="1633868481127" MODIFIED="1646137911521"><richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<node TEXT="=style.name" STYLE_REF="!NextAction" ID="ID_604624365"/>
+<node TEXT="=style.name" STYLE_REF="!NextAction.Closed" ID="ID_1039839128"><richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
 <html>
   <head>
     
@@ -431,23 +431,23 @@ ol {
 </html></richcontent>
 </node>
 </node>
-<node TEXT="cStorage" ID="ID_951766552" CREATED="1649085904583" MODIFIED="1649085907120">
-<node TEXT="=style.name" STYLE_REF="cStorageMarkupRoot" ID="ID_1544493752" CREATED="1649085908743" MODIFIED="1649085926409"/>
-<node TEXT="=style.name" STYLE_REF="cStorageMarkupMaker" ID="ID_1910107600" CREATED="1649085908743" MODIFIED="1649085937436"/>
-<node TEXT="Icons" FOLDED="true" ID="ID_849269891" CREATED="1649085948500" MODIFIED="1649085956546">
-<node TEXT="new line within" ID="ID_1488552511" CREATED="1635001381775" MODIFIED="1635001401672">
+<node TEXT="cStorage" ID="ID_951766552">
+<node TEXT="=style.name" STYLE_REF="cStorageMarkupRoot" ID="ID_1544493752"/>
+<node TEXT="=style.name" STYLE_REF="cStorageMarkupMaker" ID="ID_1910107600"/>
+<node TEXT="Icons" ID="ID_849269891">
+<node TEXT="new line within" ID="ID_1488552511">
 <icon BUILTIN="emoji-2935"/>
-<node TEXT="=parent.icons.icons[0]" STYLE_REF="=Table.cell" ID="ID_602893462" CREATED="1644862966326" MODIFIED="1646341577510"/>
+<node TEXT="=parent.delegate.icons[0].translatedDescription" STYLE_REF="=Table.cell" ID="ID_602893462"/>
 </node>
-<node TEXT="&lt;h1&gt; (mkNode)" ID="ID_528647596" CREATED="1634852592650" MODIFIED="1644862219070">
+<node TEXT="&lt;h1&gt; (mkNode)" ID="ID_528647596">
 <icon BUILTIN="full-1"/>
 <node ID="ID_1980373475" CONTENT_ID="ID_602893462"/>
 </node>
-<node TEXT="&lt;p&gt; + pReplacements (mkNode)" ID="ID_1665667454" CREATED="1634849634887" MODIFIED="1644862223511">
+<node TEXT="&lt;p&gt; + pReplacements (mkNode)" ID="ID_1665667454">
 <icon BUILTIN="emoji-1F17F"/>
 <node ID="ID_1082561284" CONTENT_ID="ID_602893462"/>
 </node>
-<node TEXT="pReplacements (mkNode, mkTableCell, _mkHeading, mkZipList)" ID="ID_115525689" CREATED="1643966151626" MODIFIED="1645100415839">
+<node TEXT="pReplacements (mkNode, mkTableCell, _mkHeading, mkZipList)" ID="ID_115525689">
 <icon BUILTIN="emoji-27BF"/>
 <richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
 <html>
@@ -462,23 +462,23 @@ ol {
 </html></richcontent>
 <node ID="ID_1130543427" CONTENT_ID="ID_602893462"/>
 </node>
-<node TEXT="s/ /&amp;nbsp;/g (mkNode, mkTableCell)" ID="ID_1176339246" CREATED="1643900917785" MODIFIED="1643900967965">
+<node TEXT="s/ /&amp;nbsp;/g (mkNode, mkTableCell)" ID="ID_1176339246">
 <icon BUILTIN="emoji-264A"/>
 <node ID="ID_1146814755" CONTENT_ID="ID_602893462"/>
 </node>
-<node TEXT="escapeXml (mkNode, mkTableCell)" ID="ID_1750916384" CREATED="1643898117259" MODIFIED="1643963940482">
+<node TEXT="escapeXml (mkNode, mkTableCell)" ID="ID_1750916384">
 <icon BUILTIN="emoji-1F9F9"/>
 <node ID="ID_713564453" CONTENT_ID="ID_602893462"/>
 </node>
-<node TEXT="no trailing sep (mkNode)" ID="ID_624013854" CREATED="1634829512029" MODIFIED="1635004579869">
+<node TEXT="no trailing sep (mkNode)" ID="ID_624013854">
 <icon BUILTIN="emoji-264B"/>
 <node ID="ID_1623346704" CONTENT_ID="ID_602893462"/>
 </node>
-<node TEXT="no entry (mkNode, mkTableCell, mkTable)" ID="ID_1617878429" CREATED="1634829521270" MODIFIED="1647604389481">
+<node TEXT="no entry (mkNode, mkTableCell, mkTable)" ID="ID_1617878429">
 <icon BUILTIN="emoji-26D4"/>
 <node ID="ID_837428798" CONTENT_ID="ID_602893462"/>
 </node>
-<node TEXT="stop at this (mkTable, also: mkZipList, mkCsv)" ID="ID_750477354" CREATED="1647604339757" MODIFIED="1647621441134">
+<node TEXT="stop at this (mkTable, also: mkZipList, mkCsv)" ID="ID_750477354">
 <icon BUILTIN="emoji-1F6D1"/>
 <richcontent TYPE="NOTE" CONTENT-TYPE="xml/">
 <html>
@@ -496,19 +496,19 @@ ol {
 </html></richcontent>
 <node ID="ID_1903483171" CONTENT_ID="ID_602893462"/>
 </node>
-<node TEXT="&lt;ol&gt; (mkList)" ID="ID_1762666438" CREATED="1634849042138" MODIFIED="1644862212203">
+<node TEXT="&lt;ol&gt; (mkList)" ID="ID_1762666438">
 <icon BUILTIN="emoji-0023-20E3"/>
 <node ID="ID_1044722284" CONTENT_ID="ID_602893462"/>
 </node>
-<node TEXT="collapse (mkCode)" ID="ID_1621722269" CREATED="1636544735079" MODIFIED="1636544747674">
+<node TEXT="collapse (mkCode)" ID="ID_1621722269">
 <icon BUILTIN="emoji-23EB"/>
 <node ID="ID_967168174" CONTENT_ID="ID_602893462"/>
 </node>
-<node TEXT="line numbers (mkCode)" ID="ID_192571165" CREATED="1636544749286" MODIFIED="1636544998576">
+<node TEXT="line numbers (mkCode)" ID="ID_192571165">
 <icon BUILTIN="emoji-1F522"/>
 <node ID="ID_1926239337" CONTENT_ID="ID_602893462"/>
 </node>
-<node TEXT="border (mkImage)" ID="ID_1937131038" CREATED="1635015705019" MODIFIED="1644862316153">
+<node TEXT="border (mkImage, mkSection)" ID="ID_1937131038">
 <icon BUILTIN="unchecked"/>
 <richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
 <html>
@@ -517,49 +517,50 @@ ol {
   </head>
   <body>
     <p>
-      height
+      height (image) | width (column)
     </p>
   </body>
-</html></richcontent>
+</html>
+</richcontent>
 <node ID="ID_1238023406" CONTENT_ID="ID_602893462"/>
 </node>
 </node>
 </node>
 </node>
-<node TEXT="minimize nodes if text is longer NCL" GLOBALLY_VISIBLE="true" ALIAS="minimize_nodes_if_text_is_longer_NCL" POSITION="left" ID="ID_758845119" CREATED="1644847138539" MODIFIED="1645028456681">
+<node TEXT="minimize nodes if text is longer NCL" GLOBALLY_VISIBLE="true" ALIAS="minimize_nodes_if_text_is_longer_NCL" POSITION="left" ID="ID_758845119">
 <attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="166.5 pt"/>
 <attribute NAME="runMe" VALUE="menuitem:_MinimizeNodesIfTextIsLongerNCL_on_single_node" OBJECT="java.net.URI|menuitem:_MinimizeNodesIfTextIsLongerNCL_on_single_node"/>
 </node>
-<node TEXT="minimize all nodes if text is longer" POSITION="left" ID="ID_811994631" CREATED="1644788693320" MODIFIED="1644847738872">
+<node TEXT="minimize all nodes if text is longer" POSITION="left" ID="ID_811994631">
 <attribute_layout NAME_WIDTH="33 pt" VALUE_WIDTH="167.99999 pt"/>
 <attribute NAME="runMe" VALUE="menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node" OBJECT="java.net.URI|menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node"/>
 </node>
-<node TEXT="# Heading 1&#xa;Regular text. **Bold text.** *Italic text.* ***Both: bold and italic.***&#xa;&#xa;A line (horizontal ruler) using underscores:&#xa;___&#xa;&#xa;&lt;s&gt;Strike through&lt;/s&gt; NB. using `~~deleted text~~` doesn&apos;t work in Freeplane (Java html/css renderer)&#xa;&#xa;E.g. ~~deleted text~~&#xa;&#xa;&lt;u&gt;Underlined text&lt;/u&gt;&#xa;&#xa;## Heading 2&#xa;&gt; A quote, line 1.&#xa;&gt; Line 2 of the quote (will be joined with line 1).&#xa;&gt;&gt; A quote within a quote&#xa;&#xa;### Heading 3&#xa;Sample text with `an in-line piece of code`.&#xa;&#xa;```groovy&#xa;// a Groovy code example - as a block of code&#xa;def name = &apos;Freeplane User&apos;&#xa;&quot;Hello, ${name}!&quot;&#xa;```&#xa;&#xa;    Another example of a block of code&#xa;    introduced as indented Markdown (with a tab or 4 spaces)&#xa;&#xa;&gt;     An example of a quote&#xa;&gt;     containing a block of code&#xa;&gt;     At least 5 spaces need to be used&#xa;&gt; And it continues as a regular quote&#xa;&#xa;#### Heading 4&#xa;A table&#xa;&#xa;| # | Language | [Pangram](https://en.wikipedia.org/wiki/Pangram) |&#xa;|--|--|--|&#xa;| 1 | English | The quick brown fox jumps over the lazy dog |&#xa;| 2 | French | Portez ce vieux whisky au juge blond qui fume |&#xa;| 3 | German | Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich |&#xa;| 4 | Italian | Pranzo d&apos;acqua fa volti sghembi |&#xa;| 5 | Spanish | Benjamín pidió una bebida de kiwi y fresa. Noé, sin vergüenza, la más exquisita champaña del menú |&#xa;&#xa;##### Heading 5&#xa;A list of items&#xa;&#xa;* Item 1&#xa;* Item 2&#xa;* Item 3&#xa;&#xa;###### Heading 6&#xa;A numbered list&#xa;&#xa;1. Item A&#xa;2. Item B&#xa;3. Item C" STYLE_REF="=Markdown" POSITION="right" ID="ID_537463989" CREATED="1638625448884" MODIFIED="1644838324381">
-<node TEXT="a note; can be free; can have connectors" STYLE_REF="=FreeNote" ID="ID_103004008" CREATED="1642199524641" MODIFIED="1650421284451"/>
+<node TEXT="# Heading 1&#xa;Regular text. **Bold text.** *Italic text.* ***Both: bold and italic.***&#xa;&#xa;A line (horizontal ruler) using underscores:&#xa;___&#xa;&#xa;&lt;s&gt;Strike through&lt;/s&gt; NB. using `~~deleted text~~` doesn&apos;t work in Freeplane (Java html/css renderer)&#xa;&#xa;E.g. ~~deleted text~~&#xa;&#xa;&lt;u&gt;Underlined text&lt;/u&gt;&#xa;&#xa;## Heading 2&#xa;&gt; A quote, line 1.&#xa;&gt; Line 2 of the quote (will be joined with line 1).&#xa;&gt;&gt; A quote within a quote&#xa;&#xa;### Heading 3&#xa;Sample text with `an in-line piece of code`.&#xa;&#xa;```groovy&#xa;// a Groovy code example - as a block of code&#xa;def name = &apos;Freeplane User&apos;&#xa;&quot;Hello, ${name}!&quot;&#xa;```&#xa;&#xa;    Another example of a block of code&#xa;    introduced as indented Markdown (with a tab or 4 spaces)&#xa;&#xa;&gt;     An example of a quote&#xa;&gt;     containing a block of code&#xa;&gt;     At least 5 spaces need to be used&#xa;&gt; And it continues as a regular quote&#xa;&#xa;#### Heading 4&#xa;A table&#xa;&#xa;| # | Language | [Pangram](https://en.wikipedia.org/wiki/Pangram) |&#xa;|--|--|--|&#xa;| 1 | English | The quick brown fox jumps over the lazy dog |&#xa;| 2 | French | Portez ce vieux whisky au juge blond qui fume |&#xa;| 3 | German | Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich |&#xa;| 4 | Italian | Pranzo d&apos;acqua fa volti sghembi |&#xa;| 5 | Spanish | Benjamín pidió una bebida de kiwi y fresa. Noé, sin vergüenza, la más exquisita champaña del menú |&#xa;&#xa;##### Heading 5&#xa;A list of items&#xa;&#xa;* Item 1&#xa;* Item 2&#xa;* Item 3&#xa;&#xa;###### Heading 6&#xa;A numbered list&#xa;&#xa;1. Item A&#xa;2. Item B&#xa;3. Item C" STYLE_REF="=Markdown" POSITION="right" ID="ID_537463989">
+<node TEXT="a note; can be free; can have connectors" STYLE_REF="=FreeNote" ID="ID_103004008"/>
 </node>
-<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" STYLE_REF="?=Table" POSITION="right" ID="ID_759853847" CREATED="1646736098747" MODIFIED="1646751362279">
-<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_1061321757" CREATED="1646736102594" MODIFIED="1646751370334" MAX_WIDTH="157 px" MIN_WIDTH="157 px">
+<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" STYLE_REF="?=Table" POSITION="right" ID="ID_759853847">
+<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_1061321757" MAX_WIDTH="157 px" MIN_WIDTH="157 px">
 <attribute NAME="condiStyle" VALUE="?=Table.row.accent"/>
-<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_650307212" CREATED="1646736196581" MODIFIED="1646751379319" MAX_WIDTH="162 px" MIN_WIDTH="162 px">
+<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_650307212" MAX_WIDTH="162 px" MIN_WIDTH="162 px">
 <attribute NAME="condiStyle" VALUE="?=Table.cell.accent"/>
-<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_494801256" CREATED="1646736944998" MODIFIED="1646751383943" MAX_WIDTH="162 px" MIN_WIDTH="162 px">
+<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_494801256" MAX_WIDTH="162 px" MIN_WIDTH="162 px">
 <attribute NAME="condiStyle" VALUE="?=Table.cell.accent"/>
 </node>
 </node>
 </node>
-<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_1054433569" CREATED="1646736581213" MODIFIED="1646752526709" MAX_WIDTH="157 px" MIN_WIDTH="157 px">
+<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_1054433569" MAX_WIDTH="157 px" MIN_WIDTH="157 px">
 <attribute NAME="condiStyle" VALUE="?=Table.row"/>
-<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_1232181415" CREATED="1646736696727" MODIFIED="1646752526802" MAX_WIDTH="162 px" MIN_WIDTH="162 px">
+<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_1232181415" MAX_WIDTH="162 px" MIN_WIDTH="162 px">
 <attribute NAME="condiStyle" VALUE="?=Table.cell"/>
-<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_1553818585" CREATED="1646736737808" MODIFIED="1646752526805" MAX_WIDTH="162 px" MIN_WIDTH="162 px">
+<node TEXT="=org.freeplane.features.styles.LogicalStyleController.controller.getFirstStyle(node.delegate)" ID="ID_1553818585" MAX_WIDTH="162 px" MIN_WIDTH="162 px">
 <attribute NAME="condiStyle" VALUE="?=Table.cell"/>
 </node>
 </node>
 </node>
 </node>
-<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table" POSITION="right" ID="ID_1079790042" CREATED="1646736397888" MODIFIED="1646736412378">
-<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table.row.accent" ID="ID_1237473870" CREATED="1646736414065" MODIFIED="1646736424299">
-<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table.cell.accent" ID="ID_672303643" CREATED="1646736427866" MODIFIED="1646736433875"/>
+<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table" POSITION="right" ID="ID_1079790042">
+<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table.row.accent" ID="ID_1237473870">
+<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table.cell.accent" ID="ID_672303643"/>
 </node>
 </node>
 </node>

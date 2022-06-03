@@ -80,6 +80,8 @@ class ConfluenceStorage {
             case 'image': return mkImage(n)
             case 'csv': return mkCsv(n)
             case 'wiki': return mkWiki(n)
+            case 'section': return mkSection(n)
+            case 'column': return mkColumn(n)
             default: return "<!-- mk function by that name not found: ${n.text} -->"
         }
     }
@@ -415,6 +417,20 @@ class ConfluenceStorage {
         return _execIfChildren(n, {
             Map<String, String> params = n.detailsText ? [class: n.details.text] : null
             return _mkMacroRich(n, 'div', params)
+        })
+    }
+
+    static String mkSection(FPN n) {
+        return _execIfChildren(n, {
+            Map<String, String> params = n.icons.contains(icon.border_unchecked) ? [border: 'true'] : null
+            return _mkMacroRich(n, 'section', params)
+        })
+    }
+
+    static String mkColumn(FPN n) {
+        return _execIfChildren(n, {
+            Map<String, String> params = n.detailsText ? [width: n.details.text] : null
+            return _mkMacroRich(n, 'column', params)
         })
     }
 
