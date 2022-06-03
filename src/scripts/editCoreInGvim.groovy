@@ -1,0 +1,7 @@
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
+def tempFile = File.createTempFile(node.id + '~', '.tmp')
+tempFile.setText(node.text, 'UTF-8')
+def editorProcess = ['gvim', '--nofork', tempFile].execute()
+editorProcess.waitFor()
+node.text = tempFile.getText('UTF-8')
+tempFile.delete()
