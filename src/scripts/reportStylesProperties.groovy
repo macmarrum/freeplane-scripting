@@ -4,29 +4,20 @@
  * - copies it to clipboard
  * - saves it in Note of "Styles" node (child of root)
  */
+
 import org.freeplane.core.util.ColorUtils
 import org.freeplane.core.util.TextUtils
 import org.freeplane.features.cloud.CloudModel
 import org.freeplane.features.edge.EdgeModel
-import org.freeplane.features.format.IFormattedObject
-import org.freeplane.features.map.NodeModel
 import org.freeplane.features.nodelocation.LocationModel
 import org.freeplane.features.nodestyle.*
 import org.freeplane.features.note.NoteModel
 import org.freeplane.features.styles.MapStyleModel
 import org.freeplane.features.text.DetailModel
-import org.freeplane.features.text.TextController
 
 import java.awt.*
 
-static String getFormat(NodeModel nodeModel) {
-    final String format = TextController.controller.getNodeFormat(nodeModel)
-    if (format === null && nodeModel.userObject instanceof IFormattedObject)
-        return (nodeModel.userObject as IFormattedObject).pattern
-    return format
-}
-
-static def colorToString(Color color) {
+static String colorToString(Color color) {
     if (color === null)
         return null
     def stringColor = ColorUtils.colorToString(color)
@@ -34,9 +25,9 @@ static def colorToString(Color color) {
 }
 
 def none = 'none'
-def m = MapStyleModel.getExtension(node.delegate.map)
-def styleProperties = m.styles.collect { it ->
-    def n = m.getStyleNode(it)
+def mapStyleModel = MapStyleModel.getExtension(node.delegate.map)
+def styleProperties = mapStyleModel.styles.collect { it ->
+    def n = mapStyleModel.getStyleNode(it)
     def nsm = n.getExtension(NodeStyleModel.class)
     def nodeCss = n.getExtension(NodeCss.class)
     def nodeGeometryModel = nsm?.shapeConfiguration === NodeGeometryModel.NULL_SHAPE ? null : nsm?.shapeConfiguration
@@ -58,7 +49,7 @@ def styleProperties = m.styles.collect { it ->
             'Italic'            : nsm?.isItalic(),
             'Text Alignment'    : nsm?.horizontalTextAlignment,
             'CSS'               : nodeCss != null ? nodeCss.css[0..<Math.min(nodeCss.css.size(), 20)] : null,
-            'Icons:'              : none,
+            'Icons:'            : none,
             'Icon size'         : n.sharedData.icons.iconSize,
             'Core text:'        : none,
             Format              : nsm?.nodeFormat,
@@ -93,5 +84,6 @@ def styleProperties = m.styles.collect { it ->
     return d.collect { e -> e.value == none ? e.key : "${e.key}\t${e.value}" }.join('\n')
 }
 def root = node.mindMap.root
-(root.children.find { it.text == 'Styles' } ?: root.createChild('Styles')).note = styleProperties.join('\n')
-TextUtils.copyToClipboard(styleProperties.join('\n'))
+def result = styleProperties.join('\n')
+(root.children.find { it.text == 'Styles' } ?: root.createChild('Styles')).note = result
+TextUtils.copyToClipboard(result)
