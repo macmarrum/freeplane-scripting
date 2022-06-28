@@ -1,6 +1,5 @@
-import org.freeplane.features.styles.MapStyleModel
-
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
+import org.freeplane.features.styles.MapStyleModel
 
 final journalRootStyleName = 'Journal root'
 final journalNodeStyleName = 'Journal'
