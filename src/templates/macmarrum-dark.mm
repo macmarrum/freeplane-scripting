@@ -234,7 +234,7 @@ ol {
 </hook>
 </stylenode>
 <stylenode TEXT="=FreeNote" ID="ID_477157958" BACKGROUND_COLOR="#484747" STYLE="rectangle" SHAPE_HORIZONTAL_MARGIN="8 pt" SHAPE_VERTICAL_MARGIN="5 pt" FORMAT="markdownPatternFormat" BORDER_WIDTH_LIKE_EDGE="true">
-<arrowlink SHAPE="LINE" COLOR="#59657c" TRANSPARENCY="255" DASH="7 7" DESTINATION="ID_477157958" STARTARROW="NONE" ENDARROW="NONE"/>
+<arrowlink SHAPE="EDGE_LIKE" COLOR="#59657c" TRANSPARENCY="255" DASH="7 7" FONT_SIZE="0" DESTINATION="ID_477157958" STARTARROW="NONE" ENDARROW="NONE"/>
 <edge STYLE="linear" COLOR="#59657c" WIDTH="2" DASH="DASHES"/>
 <hook NAME="NodeConditionalStyles">
     <conditional_style ACTIVE="true" STYLE_REF="^CSS" LAST="false"/>
@@ -437,7 +437,7 @@ ol {
 <node TEXT="Icons" ID="ID_849269891">
 <node TEXT="new line within" ID="ID_1488552511">
 <icon BUILTIN="emoji-2935"/>
-<node TEXT="=parent.delegate.icons[0].translatedDescription" STYLE_REF="=Table.cell" ID="ID_602893462"/>
+<node TEXT="=parent.delegate.icons*.translatedDescription.join(&apos; | &apos;)" STYLE_REF="=Table.cell" ID="ID_602893462"/>
 </node>
 <node TEXT="&lt;h1&gt; (mkNode)" ID="ID_528647596">
 <icon BUILTIN="full-1"/>
@@ -471,6 +471,7 @@ ol {
 <node ID="ID_713564453" CONTENT_ID="ID_602893462"/>
 </node>
 <node TEXT="no trailing sep (mkNode)" ID="ID_624013854">
+<icon BUILTIN="emoji-1F317"/>
 <icon BUILTIN="emoji-264B"/>
 <node ID="ID_1623346704" CONTENT_ID="ID_602893462"/>
 </node>
@@ -520,14 +521,13 @@ ol {
       height (image) | width (column)
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 <node ID="ID_1238023406" CONTENT_ID="ID_602893462"/>
 </node>
 </node>
 </node>
 </node>
-<node TEXT="minimize nodes if text is longer NCL" GLOBALLY_VISIBLE="true" ALIAS="minimize_nodes_if_text_is_longer_NCL" POSITION="left" ID="ID_758845119">
+<node TEXT="minimize nodes if text is longer NCL" GLOBALLY_VISIBLE="true" ALIAS="minimize_nodes_if_text_is_longer_NCL" POSITION="left" ID="ID_758845119" VGAP_QUANTITY="3 pt">
 <attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="166.5 pt"/>
 <attribute NAME="runMe" VALUE="menuitem:_MinimizeNodesIfTextIsLongerNCL_on_single_node" OBJECT="java.net.URI|menuitem:_MinimizeNodesIfTextIsLongerNCL_on_single_node"/>
 </node>
