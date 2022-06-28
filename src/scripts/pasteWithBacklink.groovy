@@ -3,15 +3,20 @@
  * To each selected node paste each copied node, adding a link to the original
  * Limitation: among the copied nodes, only the topmost ones are considered (no descendants)
  *
- * Extends https://www.freeplane.org/wiki/index.php/Scripts_collection#Access_nodes_from_clipboard
+ * Extends https://docs.freeplane.org/#/scripting/Scripts_collection#paste-clipboard
  */
 
 import groovy.xml.XmlParser
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
+import org.freeplane.features.icon.mindmapmode.MIconController
+import org.freeplane.features.map.NodeModel
 import org.freeplane.features.map.clipboard.MapClipboardController
 import org.freeplane.features.map.clipboard.MindMapNodesSelection
 import org.freeplane.features.map.mindmapmode.clipboard.MMapClipboardController
+import org.freeplane.features.mode.ModeController
+import org.freeplane.features.styles.ConditionalStyleModel
+import org.freeplane.features.styles.LogicalStyleKeys
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.awt.datatransfer.Transferable
@@ -26,14 +31,14 @@ if (copiedNodes.size() > 0) {
         copiedNodes.each { Node source ->
             target = targetLocalRoot.createChild(source.text)
             target.link.node = source
-            target.icons.addAll(source.icons)
-            target.style.name = source.style.name
             target.detailsText = source.detailsText
             target.noteText = source.noteText
-            source.attributes.each {entry ->
+            //TODO attribute key can be repeated, fix copying such attributes
+            source.attributes.each { entry ->
                 target[entry.key] = entry.value
             }
-            //TODO node conditionals
+            copyNodeConditionalStylesBetween(source.delegate, target.delegate)
+            copyFormatAndIconsBetween(source.delegate, target.delegate)
             toBeSelected.add(target)
         }
     }
@@ -64,4 +69,28 @@ private static String getXml(Transferable t) {
         }
     }
     return null
+}
+
+// based on org.freeplane.features.styles.mindmapmode.ManageNodeConditionalStylesAction.getConditionalStyleModel
+private static copyNodeConditionalStylesBetween(NodeModel sourceModel, NodeModel targetModel) {
+    targetModel.removeExtension(ConditionalStyleModel.class)
+    ConditionalStyleModel sourceCondiStyleModel = sourceModel.getExtension(ConditionalStyleModel.class)
+    if (sourceCondiStyleModel != null) {
+        ConditionalStyleModel targetCondiStyleModel = new ConditionalStyleModel()
+        targetModel.addExtension(targetCondiStyleModel)
+        sourceCondiStyleModel.styles.each { targetCondiStyleModel.styles << new ConditionalStyleModel.Item(it) }
+    }
+}
+
+// from org.freeplane.features.nodestyle.mindmapmode.PasteFormat
+private static copyFormatAndIconsBetween(NodeModel source, NodeModel target) {
+    final ModeController modeController = org.freeplane.features.mode.Controller.getCurrentModeController()
+    modeController.undoableRemoveExtensions(LogicalStyleKeys.LOGICAL_STYLE, target, target)
+    modeController.undoableCopyExtensions(LogicalStyleKeys.LOGICAL_STYLE, source, target)
+    modeController.undoableRemoveExtensions(LogicalStyleKeys.NODE_STYLE, target, target)
+    modeController.undoableCopyExtensions(LogicalStyleKeys.NODE_STYLE, source, target)
+    //if(ResourceController.getResourceController().getBooleanProperty("copyFormatToNewNodeIncludesIcons")) {
+    modeController.undoableRemoveExtensions(MIconController.Keys.ICONS, target, target)
+    modeController.undoableCopyExtensions(MIconController.Keys.ICONS, source, target)
+    //}
 }
