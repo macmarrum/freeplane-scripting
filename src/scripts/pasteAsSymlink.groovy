@@ -15,9 +15,9 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.awt.datatransfer.Transferable
 
-Controller c = ScriptUtils.c()
-Node node = ScriptUtils.node()
-final Transferable t = ((MMapClipboardController) MapClipboardController.controller).clipboardContents
+//Controller c = ScriptUtils.c()
+//Node node = ScriptUtils.node()
+final Transferable t = (MapClipboardController.controller as MMapClipboardController).clipboardContents
 def copiedNodes = getNodesFromClipboardXml(getXml(t))
 if (copiedNodes.size() > 0) {
     def toBeSelected = new LinkedList<Node>()
@@ -64,7 +64,8 @@ private List<Node> getNodesFromClipboardXml(String xml) {
         return xml.split(MapClipboardController.NODESEPARATOR).collect { String xmlSingleNode ->
             // replace &nbsp; to avoid the error: nbsp was referenced but not declared
             def xmlRootNode = parser.parseText(xmlSingleNode.replaceAll('&nbsp;', ' '))
-            ScriptUtils.node().mindMap.node(xmlRootNode.@ID)
+//            Node node = ScriptUtils.node()
+            node.mindMap.node(xmlRootNode.@ID)
         }
     } catch (ignored) {
     }
