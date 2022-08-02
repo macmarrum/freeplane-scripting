@@ -527,7 +527,7 @@ ol {
 </node>
 </node>
 </node>
-<node TEXT="minimize nodes if text is longer NCL" GLOBALLY_VISIBLE="true" ALIAS="minimize_nodes_if_text_is_longer_NCL" POSITION="left" ID="ID_758845119" VGAP_QUANTITY="3 pt">
+<node TEXT="macmarrum NodeChangeListener" GLOBALLY_VISIBLE="true" ALIAS="macmarrum_NodeChangeListener" POSITION="left" ID="ID_758845119" VGAP_QUANTITY="3 pt">
 <attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="166.5 pt"/>
 <attribute NAME="runMe" VALUE="menuitem:_MinimizeNodesIfTextIsLongerNCL_on_single_node" OBJECT="java.net.URI|menuitem:_MinimizeNodesIfTextIsLongerNCL_on_single_node"/>
 </node>
