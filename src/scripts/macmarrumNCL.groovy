@@ -1,22 +1,23 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac3"})
 
+
 import org.freeplane.api.LengthUnit
-import org.freeplane.api.Quantity
 import org.freeplane.api.Node as FPN
 import org.freeplane.api.NodeChangeListener
 import org.freeplane.api.NodeChanged
 import org.freeplane.api.NodeChanged.ChangedElement
-import org.freeplane.features.map.MapModel
-import org.freeplane.features.map.NodeModel
-import org.freeplane.features.nodelocation.LocationModel
-import org.freeplane.plugin.script.FreeplaneScriptBaseClass.ConfigProperties
-import java.awt.Color
+import org.freeplane.api.Quantity
 import org.freeplane.features.edge.EdgeController
 import org.freeplane.features.edge.mindmapmode.MEdgeController
+import org.freeplane.features.map.MapModel
+import org.freeplane.features.map.NodeModel
 import org.freeplane.features.nodestyle.NodeBorderModel
+import org.freeplane.plugin.script.FreeplaneScriptBaseClass.ConfigProperties
 
+import java.awt.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.util.List
 
 class MacmarrumNodeChangeListener implements NodeChangeListener {
     static boolean canReact = true
@@ -25,6 +26,11 @@ class MacmarrumNodeChangeListener implements NodeChangeListener {
     static Quantity<LengthUnit> hGap = Quantity.fromString(horizontalShift, LengthUnit.px)
     static final controller = EdgeController.controller as MEdgeController
     static final config = new ConfigProperties()
+    static final changedElementsForObservation = [
+            ChangedElement.TEXT, ChangedElement.DETAILS, ChangedElement.NOTE,
+            ChangedElement.ICON, ChangedElement.ATTRIBUTE, ChangedElement.FORMULA_RESULT,
+            ChangedElement.UNKNOWN,
+    ]
 
     static updateHGapIfNotNull(String horizontalShift) {
         if (horizontalShift != null) {
@@ -42,15 +48,13 @@ class MacmarrumNodeChangeListener implements NodeChangeListener {
     }
 
     static setHorizontalShift(FPN node) {
-        if (horizontalShift != 'none' && node.visible) {
-//            LocationModel.createLocationModel(node.getDelegate()).setHGap(hGap)
-//            canReact = false
-            node.setHorizontalShift(horizontalShift)
-//            canReact = true
+        if (horizontalShift != 'none' && node.visible && node.horizontalShiftAsLength != hGap) {
+            println(">> setHorizontalShift")
+            node.horizontalShift = hGap
         }
     }
 
-    static int getGrandchildPosition(FPN leaf) {
+    static int getGrandchildVisiblePosition(FPN leaf) {
         def parent = leaf.parent
         if (parent == null) // root node
             return 0
@@ -73,27 +77,22 @@ class MacmarrumNodeChangeListener implements NodeChangeListener {
     }
 
     static applyEdgeColorsToBranchesAndAlteringColorsToLeafs(FPN node) {
+        int colorCounter
+        Color edgeColor
+        Color bgColor
         MapModel mapModel = node.mindMap.delegate
         node.mindMap.root.children.eachWithIndex { level1, i ->
-            def colorCounter = i + 1
-            def edgeColor = controller.getEdgeColor(mapModel, colorCounter)
-            Color bgColor
-            level1.findAll().each { FPN it ->
-                if (it.visible) {
-                    NodeModel nodeModel = it.delegate
-                    NodeBorderModel.createNodeBorderModel(nodeModel).setBorderColorMatchesEdgeColor(true)
-                    it.style.edge.color = edgeColor
-                    if (it.isLeaf() && it.getNodeLevel(false) > 1) {
-                        if (getGrandchildPosition(it) % 2 == 0) {
-                            bgColor = edgeColor.brighter()
-                        } else {
-                            bgColor = edgeColor.darker()
-                        }
-                    } else {
-                        bgColor = edgeColor
-                    }
-                    it.style.backgroundColor = bgColor
-                }
+            colorCounter = i + 1
+            edgeColor = controller.getEdgeColor(mapModel, colorCounter)
+            level1.find { it.visible }.each { FPN it ->
+                NodeModel nodeModel = it.delegate
+                NodeBorderModel.createNodeBorderModel(nodeModel).borderColorMatchesEdgeColor = true
+                it.style.edge.color = edgeColor
+                if (it.isLeaf() && it.getNodeLevel(false) > 1)
+                    bgColor = getGrandchildVisiblePosition(it) % 2 == 0 ? edgeColor.brighter() : edgeColor.darker()
+                else
+                    bgColor = edgeColor
+                it.style.backgroundColor = bgColor
             }
         }
     }
@@ -104,8 +103,10 @@ class MacmarrumNodeChangeListener implements NodeChangeListener {
             return
         println(":: ${df.format(new Date())} ${event.node.id} ${event.changedElement} ${event.node.transformedText}")
         canReact = false
-        setHorizontalShift(event.node)
-        applyEdgeColorsToBranchesAndAlteringColorsToLeafs(event.node)
+        if (event.changedElement == ChangedElement.UNKNOWN)
+            setHorizontalShift(event.node)
+        if (event.changedElement == ChangedElement.UNKNOWN)
+            applyEdgeColorsToBranchesAndAlteringColorsToLeafs(event.node)
         if (event.changedElement == ChangedElement.TEXT)
             minimizeNodeIfTextIsLonger(event.node)
         canReact = true
@@ -114,7 +115,7 @@ class MacmarrumNodeChangeListener implements NodeChangeListener {
 
 def listeners = node.mindMap.listeners
 String alias = 'macmarrum_NodeChangeListener'
-List<FPN> foundlings = c.find {FPN it -> it.isGlobal && it.alias == alias }
+List<FPN> foundlings = c.find { FPN it -> it.isGlobal && it.alias == alias }
 FPN target = foundlings.size() == 1 ? foundlings[0] : null
 if (!target) {
     target = node.mindMap.root.createChild(alias.replaceAll(/_/, ' '))
