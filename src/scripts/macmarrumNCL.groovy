@@ -1,5 +1,5 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac3"})
-
+// Note: config is read only at start-up. If changed afterwards, the Listener needs to be restarted.
 
 import org.freeplane.api.LengthUnit
 import org.freeplane.api.Node as FPN
@@ -26,11 +26,7 @@ class MacmarrumNodeChangeListener implements NodeChangeListener {
     static Quantity<LengthUnit> hGap = Quantity.fromString(horizontalShift, LengthUnit.px)
     static final controller = EdgeController.controller as MEdgeController
     static final config = new ConfigProperties()
-    static final changedElementsForObservation = [
-            ChangedElement.TEXT, ChangedElement.DETAILS, ChangedElement.NOTE,
-            ChangedElement.ICON, ChangedElement.ATTRIBUTE, ChangedElement.FORMULA_RESULT,
-            ChangedElement.UNKNOWN,
-    ]
+    static final max_shortened_text_length = config.getIntProperty("max_shortened_text_length")
 
     static updateHGapIfNotNull(String horizontalShift) {
         if (horizontalShift != null) {
@@ -42,14 +38,15 @@ class MacmarrumNodeChangeListener implements NodeChangeListener {
 
     static minimizeNodeIfTextIsLonger(FPN node) {
         if (node.visible) {
-            def max_shortened_text_length = config.getIntProperty("max_shortened_text_length")
+            // use node.to to get the size of the resulting value (formula evaluated), not the underlying formula
+            // NB. node.to triggers formula evaluation if core is not IFormattedObject, Number or Date
             node.minimized = node.to.plain.size() > max_shortened_text_length
         }
     }
 
     static setHorizontalShift(FPN node) {
         if (horizontalShift != 'none' && node.visible && node.horizontalShiftAsLength != hGap) {
-            println(">> setHorizontalShift")
+//            println(">> setHorizontalShift")
             node.horizontalShift = hGap
         }
     }
@@ -101,14 +98,17 @@ class MacmarrumNodeChangeListener implements NodeChangeListener {
         /* enum ChangedElement {TEXT, DETAILS, NOTE, ICON, ATTRIBUTE, FORMULA_RESULT, UNKNOWN} */
         if (!canReact)
             return
-        println(":: ${df.format(new Date())} ${event.node.id} ${event.changedElement} ${event.node.transformedText}")
+//        println(":: ${df.format(new Date())} ${event.node.id} ${event.changedElement} ${event.node.transformedText}")
         canReact = false
-        if (event.changedElement == ChangedElement.UNKNOWN)
-            setHorizontalShift(event.node)
-        if (event.changedElement == ChangedElement.UNKNOWN)
-            applyEdgeColorsToBranchesAndAlteringColorsToLeafs(event.node)
-        if (event.changedElement == ChangedElement.TEXT)
-            minimizeNodeIfTextIsLonger(event.node)
+        switch (event.changedElement) {
+            case ChangedElement.UNKNOWN:
+                setHorizontalShift(event.node)
+                applyEdgeColorsToBranchesAndAlteringColorsToLeafs(event.node)
+                break
+            case ChangedElement.TEXT:
+                minimizeNodeIfTextIsLonger(event.node)
+                break
+        }
         canReact = true
     }
 }
@@ -133,7 +133,7 @@ if (listeners.size() > 0) {
     }
 } else {
     target['on'] = now
-    if (triangular_flag !in target.icons)
+    if (triangular_flag !in target.icons.icons)
         target.icons.add(triangular_flag)
     MacmarrumNodeChangeListener.updateHGapIfNotNull(node.mindMap.root['h.shift']?.text)
     c.findAll().drop(1).each { FPN it ->
