@@ -38,7 +38,7 @@ class MacmarrumNodeChangeListener implements NodeChangeListener {
 
     static minimizeNodeIfTextIsLonger(FPN node) {
         if (node.visible) {
-            // use node.to to get the size of the resulting value (formula evaluated), not the underlying formula
+            // use node.to to get the size of the resulting value, not the underlying formula
             // NB. node.to triggers formula evaluation if core is not IFormattedObject, Number or Date
             node.minimized = node.to.plain.size() > max_shortened_text_length
         }
@@ -83,12 +83,16 @@ class MacmarrumNodeChangeListener implements NodeChangeListener {
             edgeColor = controller.getEdgeColor(mapModel, colorCounter)
             level1.find { it.visible }.each { FPN it ->
                 NodeModel nodeModel = it.delegate
-                NodeBorderModel.createNodeBorderModel(nodeModel).borderColorMatchesEdgeColor = true
-                it.style.edge.color = edgeColor
-                if (it.isLeaf() && it.getNodeLevel(false) > 1)
+                def nodeBorderModel = NodeBorderModel.createNodeBorderModel(nodeModel)
+                if (it.isLeaf() && it.getNodeLevel(false) > 1) {
                     bgColor = getGrandchildVisiblePosition(it) % 2 == 0 ? edgeColor.brighter() : edgeColor.darker()
-                else
+                    nodeBorderModel.borderColorMatchesEdgeColor = false
+                } else {
                     bgColor = edgeColor
+                    nodeBorderModel.borderColorMatchesEdgeColor = true
+                }
+                it.style.edge.color = edgeColor
+                nodeBorderModel.borderColor = bgColor
                 it.style.backgroundColor = bgColor
             }
         }
