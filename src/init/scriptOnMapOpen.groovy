@@ -1,6 +1,6 @@
 import org.freeplane.core.util.LogUtils
-import org.freeplane.plugin.script.proxy.ScriptUtils
 import org.freeplane.plugin.script.ScriptingEngine
+import org.freeplane.plugin.script.proxy.ScriptUtils
 
 def c = ScriptUtils.c()
 String script
