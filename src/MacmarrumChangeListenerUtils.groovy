@@ -20,7 +20,7 @@ class MacmarrumChangeListenerUtils {
     static toggleChangeListeners(Node root) {
         int n = toggleNodeChangeListner(root)
         int m = toggleMapChangeListener(root)
-        updateNode(root, n + m)
+//        updateNode(root, n + m)
     }
 
     static int toggleNodeChangeListner(Node root) {
@@ -137,7 +137,7 @@ class MacmarrumChangeListenerUtils {
                 level1.find { it.visible }.each { Node it ->
                     NodeModel nodeModel = it.delegate
                     def nodeBorderModel = NodeBorderModel.createNodeBorderModel(nodeModel)
-                    if (it.isLeaf() && it.getNodeLevel(false) > 1) {
+                    if (it.leaf && it.getNodeLevel(false) > 1) {
                         bgColor = getGrandchildVisiblePosition(it) % 2 == 0 ? edgeColor.brighter() : edgeColor.darker()
                         nodeBorderModel.borderColorMatchesEdgeColor = false
                     } else {
