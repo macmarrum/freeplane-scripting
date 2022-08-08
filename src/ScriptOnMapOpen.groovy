@@ -1,8 +1,8 @@
 import org.freeplane.api.Node
+import org.freeplane.core.extension.IExtension
 import org.freeplane.core.util.LogUtils
 import org.freeplane.features.map.NodeModel
 import org.freeplane.features.mode.Controller
-import org.freeplane.features.url.LastChoosenDirectory
 import org.freeplane.plugin.script.ScriptingEngine
 
 import java.text.SimpleDateFormat
@@ -13,9 +13,7 @@ import java.text.SimpleDateFormat
  * On root node, add an attribute named scriptOnMapOpen containing the script to be executed, e.g.
  *   MacmarrumChangeListenerUtils.toggleChangeListeners(node)
  *
- * There is little possibility for a script to make sure it runs only once.
- * The library uses LastChoosenDirectory.class to record its execution. Freeplane uses the class on the map level,
- * but not on the node level, so no conflict there.
+ * The library saves on root node the extension ScriptOnMapOpenAlreadyRun to record that execution was already done.
  */
 class ScriptOnMapOpen {
     static dfTime = new SimpleDateFormat('HH:mm:ss.S')
@@ -25,8 +23,8 @@ class ScriptOnMapOpen {
         if (Controller.currentController.map === null) // if map isn't fully loaded yet
             return false
         NodeModel rootNodeModel = root.delegate
-        if (rootNodeModel.getExtension(LastChoosenDirectory.class) === null) {
-            rootNodeModel.addExtension(new LastChoosenDirectory())
+        if (rootNodeModel.getExtension(ScriptOnMapOpenAlreadyRun.class) === null) {
+            rootNodeModel.addExtension(new ScriptOnMapOpenAlreadyRun())
             def script = root['scriptOnMapOpen']?.text
             if (script) {
                 LogUtils.info("executing scriptOnMapOpen for ${root.mindMap.file.name}")
@@ -35,4 +33,6 @@ class ScriptOnMapOpen {
         }
         return false
     }
+
+    static class ScriptOnMapOpenAlreadyRun implements IExtension {}
 }
