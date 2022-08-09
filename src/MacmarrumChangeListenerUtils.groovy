@@ -18,37 +18,36 @@ class MacmarrumChangeListenerUtils {
      */
 
     static toggleChangeListeners(Node root) {
-        int n = toggleNodeChangeListner(root)
+        int n = toggleNodeChangeListener(root)
         int m = toggleMapChangeListener(root)
 //        updateNode(root, n + m)
     }
 
-    static int toggleNodeChangeListner(Node root) {
-        def listeners = root.mindMap.listeners
-        if (listeners.size() > 0) {
-            listeners.each {
-                if (it.class.simpleName == MacmarrumNodeChangeListener.class.simpleName)
-                    root.mindMap.removeListener(it)
-            }
-            return 0
-        } else {
-//            root.findAll().drop(1).each { Node it -> X.minimizeNodeIfTextIsLonger(it) }
+    static int toggleNodeChangeListener(Node root) {
+        def macmarrumListeners = root.mindMap.listeners.findAll {
+            it.class.simpleName == MacmarrumNodeChangeListener.class.simpleName
+        }
+        if (macmarrumListeners.size() == 0) {
             root.mindMap.addListener(new MacmarrumNodeChangeListener())
             return 1
+        } else {
+            macmarrumListeners.each {
+                root.mindMap.removeListener(it)
+            }
+            return 0
         }
     }
 
     static int toggleMapChangeListener(Node root) {
         def mapController = Controller.currentModeController.mapController
-        def listeners = mapController.mapChangeListeners
-        def macmarrumListeners = listeners.findAll {
+        def macmarrumListeners = mapController.mapChangeListeners.findAll {
             it.class.simpleName == MacmarrumMapChangeListener.class.simpleName
         }
         if (macmarrumListeners.size() == 0) {
-            def mapChangeListner = new MacmarrumMapChangeListener(root)
+            def mapChangeListener = new MacmarrumMapChangeListener(root)
             Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafs(root)
             root.findAll().drop(1).each { Node it -> Utils.setHorizontalShift(it) }
-            mapController.addMapChangeListener(mapChangeListner)
+            mapController.addMapChangeListener(mapChangeListener)
             return 1
         } else {
             macmarrumListeners.each {
