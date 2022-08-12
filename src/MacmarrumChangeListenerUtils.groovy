@@ -140,9 +140,9 @@ class MacmarrumChangeListenerUtils {
             if (grandparent) {
                 def parentPosition = grandparent.getChildPosition(parent)
                 if (parentPosition > 0) {
-                    def grandparentVisibleChildren = grandparent.children.findAll { it.visible }
+                    def grandparentChildren = grandparent.children
                     (0..<parentPosition).each { i ->
-                        leafCount += grandparentVisibleChildren[i].children.findAll { it.visible }.size()
+                        leafCount += grandparentChildren[i].children.findAll { it.visible }.size()
                     }
                 }
             }
@@ -213,7 +213,7 @@ class MacmarrumChangeListenerUtils {
             return node.hasVisibleContent(FilterController.getFilter(node.map))
         }
 
-        static MacmarrumMapChangeListenerEnablerForMap getEnabler(MapModel mapModel) {
+        static IExtension getEnabler(MapModel mapModel) {
             return MacmarrumMapChangeListenerEnablerForMap.getExtensionOf(mapModel.rootNode)
         }
 
