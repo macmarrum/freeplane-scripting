@@ -1,6 +1,8 @@
 import org.freeplane.api.*
+import org.freeplane.core.extension.IExtension
 import org.freeplane.features.edge.EdgeController
 import org.freeplane.features.edge.mindmapmode.MEdgeController
+import org.freeplane.features.filter.FilterController
 import org.freeplane.features.map.*
 import org.freeplane.features.mode.Controller
 import org.freeplane.features.nodestyle.NodeBorderModel
@@ -17,10 +19,11 @@ class MacmarrumChangeListenerUtils {
      * Note: config is read only at start-up. If changed afterwards, the Listener needs to be restarted.
      */
 
-    static toggleChangeListeners(Node root) {
+    static int toggleChangeListeners(Node root) {
         int n = toggleNodeChangeListener(root)
         int m = toggleMapChangeListener(root)
 //        updateNode(root, n + m)
+        return n + m
     }
 
     static int toggleNodeChangeListener(Node root) {
@@ -29,11 +32,13 @@ class MacmarrumChangeListenerUtils {
         }
         if (macmarrumListeners.size() == 0) {
             root.mindMap.addListener(new MacmarrumNodeChangeListener())
+            println(":: toggleNodeChangeListener => ON")
             return 1
         } else {
             macmarrumListeners.each {
                 root.mindMap.removeListener(it)
             }
+            println(":: toggleNodeChangeListener => OFF")
             return 0
         }
     }
@@ -43,17 +48,36 @@ class MacmarrumChangeListenerUtils {
         def macmarrumListeners = mapController.mapChangeListeners.findAll {
             it.class.simpleName == MacmarrumMapChangeListener.class.simpleName
         }
-        if (macmarrumListeners.size() == 0) {
-            def mapChangeListener = new MacmarrumMapChangeListener(root)
-            Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafs(root)
+        NodeModel rootModel = root.delegate
+        def macmarrumMapChangeListenerEnablerForMap = MacmarrumMapChangeListenerEnablerForMap.getExtensionOf(rootModel)
+        if (!macmarrumMapChangeListenerEnablerForMap) {
+            rootModel.addExtension(new MacmarrumMapChangeListenerEnablerForMap(root))
+            println(":: toggleMapChangeListener for ${root.mindMap.file.name} => ON")
+            Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
             root.findAll().drop(1).each { Node it -> Utils.setHorizontalShift(it) }
-            mapController.addMapChangeListener(mapChangeListener)
+            enableMapChangeListenerIfNotYetEnabled(root, macmarrumListeners, mapController)
             return 1
         } else {
-            macmarrumListeners.each {
-                mapController.removeMapChangeListener(it)
-            }
+            rootModel.removeExtension(macmarrumMapChangeListenerEnablerForMap)
+            println(":: toggleMapChangeListener for ${root.mindMap.file.name} => OFF")
             return 0
+        }
+    }
+
+    static boolean enableMapChangeListenerIfNotYetEnabled(Node root, Collection<IMapChangeListener> macmarrumListeners, MapController mapController) {
+        if (macmarrumListeners.size() == 0) {
+            mapController.addMapChangeListener(new MacmarrumMapChangeListener())
+            println(":: enableMapChangeListenerIfNotYetEnabled => ON")
+            return true
+        } else {
+            println(":: enableMapChangeListenerIfNotYetEnabled => already enabled")
+            return false
+        }
+    }
+
+    static disableMapChangeListener(Collection<IMapChangeListener> macmarrumListeners, MapController mapController) {
+        macmarrumListeners.each {
+            mapController.removeMapChangeListener(it)
         }
     }
 
@@ -112,8 +136,9 @@ class MacmarrumChangeListenerUtils {
             if (grandparent) {
                 def parentPosition = grandparent.getChildPosition(parent)
                 if (parentPosition > 0) {
+                    def grandparentVisibleChildren = grandparent.children.findAll { it.visible }
                     (0..<parentPosition).each { i ->
-                        leafCount += grandparent.children[i].children.findAll { it.visible }.size()
+                        leafCount += grandparentVisibleChildren[i].children.findAll { it.visible }.size()
                     }
                 }
             }
@@ -125,7 +150,7 @@ class MacmarrumChangeListenerUtils {
             }
         }
 
-        static applyEdgeColorsToBranchesAndAlteringColorsToLeafs(Node root) {
+        static applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(Node root) {
             int colorCounter
             Color edgeColor
             Color bgColor
@@ -162,30 +187,58 @@ class MacmarrumChangeListenerUtils {
         }
     }
 
-    static class MacmarrumMapChangeListener implements IMapChangeListener {
-        static Node root
+    static class MacmarrumMapChangeListenerEnablerForMap implements IExtension {
+        Node root
 
-        MacmarrumMapChangeListener(Node root) {
-            this.root = root
-            Utils.pullAndUpdateHGapIfNotNull(root)
+        MacmarrumMapChangeListenerEnablerForMap(Node root) {
+            this.@root = root
+        }
+
+        static MacmarrumMapChangeListenerEnablerForMap getExtensionOf(NodeModel nodeModel) {
+            return nodeModel.sharedExtensions.values().find {
+                it.class.name == this.class.name
+            } as MacmarrumMapChangeListenerEnablerForMap
+        }
+    }
+
+    static class MacmarrumMapChangeListener implements IMapChangeListener {
+
+        static boolean isVisible(NodeModel node) {
+            return node.hasVisibleContent(FilterController.getFilter(node.map))
+        }
+
+        static MacmarrumMapChangeListenerEnablerForMap getEnabler(MapModel mapModel) {
+            return MacmarrumMapChangeListenerEnablerForMap.getExtensionOf(mapModel.rootNode)
         }
 
         void onNodeInserted(NodeModel parent, NodeModel child, int newIndex) {
-            def id = child.createID() // gets id or generates it
-//            println("++ ${id}")
-            def node = root.mindMap.node(id)
-            Utils.setHorizontalShift(node)
-            Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafs(root)
+            def macmarrumMapChangeListenerEnablerForMap = getEnabler(child.map)
+            if (macmarrumMapChangeListenerEnablerForMap && isVisible(child)) {
+                def id = child.createID() // gets id or generates it
+//                println("++ ${id}")
+                def root = macmarrumMapChangeListenerEnablerForMap.root
+                def node = root.mindMap.node(id)
+                Utils.setHorizontalShift(node)
+                Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
+            }
         }
 
         void onNodeMoved(NodeMoveEvent nodeMoveEvent) {
-//            println("-> ${nodeMoveEvent.child.id}")
-            Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafs(root)
+            def macmarrumMapChangeListenerEnablerForMap = getEnabler(nodeMoveEvent.child.map)
+            if (macmarrumMapChangeListenerEnablerForMap && isVisible(nodeMoveEvent.child)) {
+//                println("-> ${nodeMoveEvent.child.id}")
+                def root = macmarrumMapChangeListenerEnablerForMap.root
+                Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
+            }
         }
 
         void onNodeDeleted(NodeDeletionEvent nodeDeletionEvent) {
-//            println("-- ${nodeDeletionEvent.node.id}")
-            Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafs(root)
+            def macmarrumMapChangeListenerEnablerForMap = getEnabler(nodeDeletionEvent.node.map)
+            if (macmarrumMapChangeListenerEnablerForMap && isVisible(nodeDeletionEvent.node)) {
+//                println("-- ${nodeDeletionEvent.node.id}")
+                def root = macmarrumMapChangeListenerEnablerForMap.root
+                Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
+            }
         }
     }
 
