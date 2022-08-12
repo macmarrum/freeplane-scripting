@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat
  * On root node, add an attribute named scriptOnMapOpen containing the script to be executed, e.g.
  *   MacmarrumChangeListenerUtils.toggleChangeListeners(node)
  *
- * The library saves on root node the extension ScriptOnMapOpenAlreadyRun to record that execution was already done.
+ * The library saves on root node the extension ScriptOnMapOpenFlag to record that execution was already done.
  */
 class ScriptOnMapOpen {
     static dfTime = new SimpleDateFormat('HH:mm:ss.S')
@@ -23,8 +23,8 @@ class ScriptOnMapOpen {
         if (Controller.currentController.map === null) // if map isn't fully loaded yet
             return false
         NodeModel rootNodeModel = root.delegate
-        if (rootNodeModel.getExtension(ScriptOnMapOpenAlreadyRun.class) === null) {
-            rootNodeModel.addExtension(new ScriptOnMapOpenAlreadyRun())
+        if (rootNodeModel.getExtension(ScriptOnMapOpenFlag.class) === null) {
+            rootNodeModel.addExtension(new ScriptOnMapOpenFlag())
             def script = root['scriptOnMapOpen']?.text
             if (script) {
                 LogUtils.info("executing scriptOnMapOpen for ${root.mindMap.file.name}")
@@ -34,5 +34,5 @@ class ScriptOnMapOpen {
         return false
     }
 
-    static class ScriptOnMapOpenAlreadyRun implements IExtension {}
+    static class ScriptOnMapOpenFlag implements IExtension {}
 }
