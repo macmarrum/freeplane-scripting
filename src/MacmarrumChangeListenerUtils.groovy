@@ -50,7 +50,7 @@ class MacmarrumChangeListenerUtils {
         }
         NodeModel rootModel = root.delegate
         def macmarrumMapChangeListenerEnablerForMap = MacmarrumMapChangeListenerEnablerForMap.getExtensionOf(rootModel)
-        if (!macmarrumMapChangeListenerEnablerForMap) {
+        if (macmarrumMapChangeListenerEnablerForMap === null) {
             rootModel.addExtension(new MacmarrumMapChangeListenerEnablerForMap(root))
             println(":: toggleMapChangeListener for ${root.mindMap.file.name} => ON")
             Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
@@ -58,7 +58,11 @@ class MacmarrumChangeListenerUtils {
             enableMapChangeListenerIfNotYetEnabled(root, macmarrumListeners, mapController)
             return 1
         } else {
-            rootModel.removeExtension(macmarrumMapChangeListenerEnablerForMap)
+            def extensions = rootModel.sharedExtensions.values()
+            extensions.collect().each {
+                if (it.class.name == MacmarrumMapChangeListenerEnablerForMap.class.name)
+                    extensions.remove(it)
+            }
             println(":: toggleMapChangeListener for ${root.mindMap.file.name} => OFF")
             return 0
         }
@@ -194,10 +198,12 @@ class MacmarrumChangeListenerUtils {
             this.@root = root
         }
 
-        static MacmarrumMapChangeListenerEnablerForMap getExtensionOf(NodeModel nodeModel) {
-            return nodeModel.sharedExtensions.values().find {
-                it.class.name == this.class.name
-            } as MacmarrumMapChangeListenerEnablerForMap
+        static IExtension getExtensionOf(NodeModel nodeModel) {
+            def extensions = nodeModel.sharedExtensions.values()
+//            println(extensions.collect{it.class.simpleName})
+            def ext = extensions.find { it.class.name == this.name }
+//            println("== MacmarrumMapChangeListenerEnablerForMap is ${ext ? 'not ' : ''}null")
+            return ext
         }
     }
 
