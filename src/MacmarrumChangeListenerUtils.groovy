@@ -55,20 +55,21 @@ class MacmarrumChangeListenerUtils {
             println(":: toggleMapChangeListener for ${root.mindMap.file.name} => ON")
             Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
             root.findAll().drop(1).each { Node it -> Utils.setHorizontalShift(it) }
-            enableMapChangeListenerIfNotYetEnabled(root, macmarrumListeners, mapController)
+            enableMapChangeListenerIfNotYetEnabled(macmarrumListeners, mapController)
             return 1
         } else {
             def extensions = rootModel.sharedExtensions.values()
             extensions.collect().each {
-                if (it.class.name == MacmarrumMapChangeListenerEnablerForMap.class.name)
+                if (it.class.name == MacmarrumMapChangeListenerEnablerForMap.class.name && it.root == root) {
                     extensions.remove(it)
+                    println(":: toggleMapChangeListener for ${root.mindMap.file.name} => OFF")
+                }
             }
-            println(":: toggleMapChangeListener for ${root.mindMap.file.name} => OFF")
             return 0
         }
     }
 
-    static boolean enableMapChangeListenerIfNotYetEnabled(Node root, Collection<IMapChangeListener> macmarrumListeners, MapController mapController) {
+    static boolean enableMapChangeListenerIfNotYetEnabled(Collection<IMapChangeListener> macmarrumListeners, MapController mapController) {
         if (macmarrumListeners.size() == 0) {
             mapController.addMapChangeListener(new MacmarrumMapChangeListener())
             println(":: enableMapChangeListenerIfNotYetEnabled => ON")
