@@ -22,7 +22,8 @@ selecteds.eachWithIndex { FPN selected, idx ->
     parent = selected.parent
     position = positions[idx]
     newParent = parent.createChild(position)
-    newParent.left = selected.left
+    if (parent.root)
+        newParent.left = selected.left
     selected.moveTo(newParent)
     if (canCopyFormatToNewChild || canCopyFormatToNewSibling) {
         source = canCopyFormatToNewChild ? parent : canCopyFormatToNewSibling ? selected : null
