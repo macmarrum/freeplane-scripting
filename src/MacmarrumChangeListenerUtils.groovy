@@ -193,10 +193,10 @@ class MacmarrumChangeListenerUtils {
     }
 
     static class MacmarrumMapChangeListenerEnablerForMap implements IExtension {
-        Node root
+        public Node root
 
         MacmarrumMapChangeListenerEnablerForMap(Node root) {
-            this.@root = root
+            this.root = root
         }
 
         static IExtension getExtensionOf(NodeModel nodeModel) {
