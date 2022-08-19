@@ -15,8 +15,8 @@ uniqueNodes.each {
     nodeCount++
 }
 def message = """\
-${wordCount} words
-${charCount} characters
-in ${nodeCount} node(s), including descendants
+${wordCount} words (where space is a separator)
+${charCount} characters (including spaces)
+in ${nodeCount} nodes (including descendants)
 """
-ui.informationMessage(ui.frame, message, "Word Count")
+ui.informationMessage(ui.frame, message, "Statistics")
