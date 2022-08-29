@@ -348,7 +348,7 @@ ol {
 <stylenode TEXT="^cloud.dark">
 <cloud COLOR="#152242" SHAPE="ROUND_RECT"/>
 </stylenode>
-<stylenode TEXT="cStorageMarkupRoot" BACKGROUND_COLOR="#003e9b" BORDER_WIDTH="4 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#ffab00">
+<stylenode TEXT="cStorageMarkupRoot" BACKGROUND_COLOR="#003e9b" BORDER_WIDTH="4 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#ffab00" VGAP_QUANTITY="15 pt">
 <icon BUILTIN="emoji-1F3AF"/>
 <font NAME="JetBrains Mono" SIZE="11"/>
 </stylenode>
@@ -357,6 +357,9 @@ ol {
 <font NAME="JetBrains Mono" SIZE="11"/>
 </stylenode>
 <stylenode TEXT="+max20cm" MAX_WIDTH="20 cm"/>
+<stylenode TEXT="MaterializedSymlink">
+<icon BUILTIN="emoji-2744"/>
+</stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="right" STYLE="bubble">
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level.root" ID="ID_1659178249" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="10 pt" VGAP_QUANTITY="20 pt">
