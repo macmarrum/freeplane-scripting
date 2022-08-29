@@ -1,21 +1,40 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 
+
 import org.freeplane.api.Node
 import org.freeplane.core.util.HtmlUtils
+import org.freeplane.features.icon.factory.IconStoreFactory
+import org.freeplane.features.map.MapModel
+import org.freeplane.features.map.NodeModel
+import org.freeplane.features.styles.*
+import org.freeplane.features.styles.mindmapmode.MLogicalStyleController
 
+def materializedSymlinkStyleName = 'MaterializedSymlink'
+def snowflake = 'emoji-2744'
+def formulaPrefix = ' '
+
+def materializedSymlinkIStyle = StyleFactory.create(materializedSymlinkStyleName)
+MapModel mapModel = node.mindMap.delegate
+
+// set up the style
+def materializedSymlinkStyleNode = getOrCreateUserDefStyle(mapModel, materializedSymlinkIStyle)
+if (!materializedSymlinkStyleNode.icons.any { it.name == snowflake }) {
+    def namedIcon = IconStoreFactory.ICON_STORE.getMindIcon(snowflake)
+    materializedSymlinkStyleNode.addIcon(namedIcon)
+}
+
+def logicalStyleController = (LogicalStyleController.controller as MLogicalStyleController)
 String lnk
 String text
-def prefix = ' '
-def snowflake = 'emoji-2744'
 c.selecteds.each { Node it ->
     lnk = it.link.text
     if (lnk) {
-        if (snowflake !in it.icons.icons)
-            it.icons.add(snowflake)
-        it['pasteAsSymlinkUri'] = prefix + lnk
+        def condiStyleModel = getOrCreateConditionalStyleModelOf(it.delegate)
+        logicalStyleController.addConditionalStyle(mapModel, condiStyleModel, true, null, materializedSymlinkIStyle, false)
+        it['pasteAsSymlinkUri'] = formulaPrefix + lnk
         if (it.text.startsWith('=')) {
             // save the original formula
-            it['pasteAsSymlinkText'] = prefix + it.text
+            it['pasteAsSymlinkText'] = formulaPrefix + it.text
             // materialize content
             text = it.transformedText
             it.text = text
@@ -25,7 +44,7 @@ c.selecteds.each { Node it ->
             def plainDetailsText = HtmlUtils.htmlToPlain(detailsText)
             if (plainDetailsText.startsWith('=')) {
                 // save the original formula
-                it['pasteAsSymlinkDetails'] = prefix + plainDetailsText
+                it['pasteAsSymlinkDetails'] = formulaPrefix + plainDetailsText
                 // materialize content
                 text = it.details
                 it.details = text
@@ -36,11 +55,34 @@ c.selecteds.each { Node it ->
             def plainNoteText = HtmlUtils.htmlToPlain(noteText)
             if (plainNoteText.startsWith('=')) {
                 // save the original formula
-                it['pasteAsSymlinkNote'] = prefix + plainNoteText
+                it['pasteAsSymlinkNote'] = formulaPrefix + plainNoteText
                 // materialize content
                 text = it.note
                 it.note = text
             }
         }
     }
+}
+
+static NodeModel getOrCreateUserDefStyle(MapModel mapModel, IStyle iStyle) {
+    def mapStyleModel = MapStyleModel.getExtension(mapModel)
+    def styleNode = mapStyleModel.getStyleNode(iStyle)
+    if (!styleNode) {
+        styleNode = new NodeModel(mapModel)
+        styleNode.setUserObject(iStyle)
+        def userStyleParentNode = mapStyleModel.getStyleNodeGroup(mapStyleModel.styleMap, MapStyleModel.STYLES_USER_DEFINED)
+//        (Controller.currentModeController.mapController as MMapController).insertNode(styleNode, userStyleParentNode) // event triggered
+        userStyleParentNode.insert(styleNode, userStyleParentNode.childCount) // no event triggered
+        mapStyleModel.addStyleNode(styleNode)
+    }
+    return styleNode
+}
+
+static ConditionalStyleModel getOrCreateConditionalStyleModelOf(NodeModel node) {
+    def conditionalStyleModel = node.getExtension(ConditionalStyleModel.class) as ConditionalStyleModel
+    if (conditionalStyleModel == null) {
+        conditionalStyleModel = new ConditionalStyleModel()
+        node.addExtension(conditionalStyleModel)
+    }
+    return conditionalStyleModel
 }
