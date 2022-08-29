@@ -25,18 +25,19 @@ def copiedNodes = getNodesFromClipboardXml(getXml(t))
 if (copiedNodes.size() > 0) {
     def toBeSelected = new LinkedList<Node>()
     Node target
-    def textAttrib = node.mindMap.root['pasteAsSymlinkText']
-    def detailsAttrib = node.mindMap.root['pasteAsSymlinkDetails']
-    def noteAttrib = node.mindMap.root['pasteAsSymlinkNote']
+    def root = node.mindMap.root
+    def textAttrib = root['pasteAsSymlinkText']
+    def detailsAttrib = root['pasteAsSymlinkDetails']
+    def noteAttrib = root['pasteAsSymlinkNote']
     c.statusInfo = "${textAttrib} | ${detailsAttrib}"
     c.selecteds.each { Node targetLocalRoot ->
         copiedNodes.each { Node source ->
             target = targetLocalRoot.createChild()
             target.link.node = source
-            target.text = !textAttrib ? '=link.node.transformedText' : textAttrib.text.replaceAll(/^'=/, '=')
+            target.text = !textAttrib ? '=link.node.transformedText' : textAttrib.text.replaceAll(/^[' ]=/, '=')
             if (!detailsAttrib) {
-                if (source.details) target.detailsText = '=link.node.details ?: \'\''
-            } else if (detailsAttrib.startsWith(/'=/)) {
+                if (source.details) target.detailsText = "=link.node.details ?: ''"
+            } else if (detailsAttrib.text.matches(/^[' ]=/)) {
                 target.detailsText = detailsAttrib.text.drop(0)
             } else {
                 switch (detailsAttrib.num0) {
@@ -50,7 +51,7 @@ if (copiedNodes.size() > 0) {
             }
             if (!noteAttrib) {
                 if (source.note) target.note = '=link.node.note ?: \'\''
-            } else if (noteAttrib.text.startsWith(/'=/)) {
+            } else if (noteAttrib.text.matches(/^[' ]=/)) {
                 target.note = noteAttrib.text.drop(0)
             }
             toBeSelected.add(target)
