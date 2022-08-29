@@ -6,9 +6,12 @@ import org.freeplane.core.util.HtmlUtils
 String lnk
 String text
 def prefix = ' '
+def snowflake = 'emoji-2744'
 c.selecteds.each { Node it ->
     lnk = it.link.text
     if (lnk) {
+        if (snowflake !in it.icons.icons)
+            it.icons.add(snowflake)
         it['pasteAsSymlinkUri'] = prefix + lnk
         if (it.text.startsWith('=')) {
             // save the original formula
