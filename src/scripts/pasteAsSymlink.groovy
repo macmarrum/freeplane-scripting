@@ -1,17 +1,20 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Paste"})
-/*
- * Paste each copied node as a node with a link to the original and formula =link.node.text
+/**
+ * Paste each copied node as a node with a link to the original and formula
+ * for core: =link.node.transformedText
+ * for details: =link.node.details
+ * for note: =link.node.note
+ * i.e. plain text after formula evaluation
  *
  * Extends https://www.freeplane.org/wiki/index.php/Scripts_collection#Access_nodes_from_clipboard
  */
 
+
 import groovy.xml.XmlParser
-import org.freeplane.api.Controller
 import org.freeplane.api.Node
 import org.freeplane.features.map.clipboard.MapClipboardController
 import org.freeplane.features.map.clipboard.MindMapNodesSelection
 import org.freeplane.features.map.mindmapmode.clipboard.MMapClipboardController
-import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.awt.datatransfer.Transferable
 
