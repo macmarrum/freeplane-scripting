@@ -3,27 +3,41 @@
 import org.freeplane.api.Node
 import org.freeplane.core.util.HtmlUtils
 
+String lnk
+String text
+def prefix = ' '
 c.selecteds.each { Node it ->
-    def lnk = it.link.text
+    lnk = it.link.text
     if (lnk) {
-        def prefix = ' '
-        it['pasetAsSymlinkUri'] = prefix + lnk
-        String text
-        if (it.text) {
+        it['pasteAsSymlinkUri'] = prefix + lnk
+        if (it.text.startsWith('=')) {
+            // save the original formula
             it['pasteAsSymlinkText'] = prefix + it.text
+            // materialize content
             text = it.transformedText
             it.text = text
         }
-        if (it.detailsText) {
-            // save the oroiginal formula
-            it['pasteAsSymlinkDetails'] = prefix + HtmlUtils.htmlToPlain(it.detailsText)
-            text = it.details
-            it.details = text
+        def detailsText = it.detailsText
+        if (detailsText) {
+            def plainDetailsText = HtmlUtils.htmlToPlain(detailsText)
+            if (plainDetailsText.startsWith('=')) {
+                // save the original formula
+                it['pasteAsSymlinkDetails'] = prefix + plainDetailsText
+                // materialize content
+                text = it.details
+                it.details = text
+            }
         }
-        if (it.noteText) {
-            it['pasteAsSymlinkNote'] = prefix + HtmlUtils.htmlToPlain(it.noteText)
-            text = it.note
-            it.note = text
+        def noteText = it.noteText
+        if (noteText) {
+            def plainNoteText = HtmlUtils.htmlToPlain(noteText)
+            if (plainNoteText.startsWith('=')) {
+                // save the original formula
+                it['pasteAsSymlinkNote'] = prefix + plainNoteText
+                // materialize content
+                text = it.note
+                it.note = text
+            }
         }
     }
 }
