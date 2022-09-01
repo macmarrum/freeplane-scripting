@@ -7,6 +7,8 @@ import groovy.xml.XmlUtil
 import org.freeplane.api.Node
 import org.freeplane.api.Node as FPN
 
+import java.text.MessageFormat
+
 class ConfluenceStorage {
 
     static style = [
@@ -65,28 +67,29 @@ class ConfluenceStorage {
     }
 
     static String makeMarkup(FPN n) {
-        switch (n.text) {
-            case 'parent': return mkParent(n)
-            case 'table': return mkTable(n)
-            case 'list': return mkList(n)
-            case 'zip-list': return mkZipList(n)
-            case 'quote': return mkQuote(n)
-            case 'link': return mkLink(n)
-            case 'expand': return mkExpand(n)
-            case 'div': return mkDiv(n)
-            case 'code': return mkCode(n)
-            case 'page-info': return mkPageInfo(n)
-            case 'div-expand': return mkDivExpand(n)
-            case 'attachments': return mkAttachments(n)
-            case 'style-import': return mkStyleImport(n)
-            case 'style': return mkStyle(n)
-            case 'html': return mkHtml(n)
-            case 'image': return mkImage(n)
-            case 'csv': return mkCsv(n)
-            case 'wiki': return mkWiki(n)
-            case 'section': return mkSection(n)
-            case 'column': return mkColumn(n)
-            default: return "<!-- mk function by that name not found: ${n.text} -->"
+        return switch (n.text) {
+            case 'parent' -> mkParent(n)
+            case 'table' -> mkTable(n)
+            case 'list' -> mkList(n)
+            case 'zip-list' -> mkZipList(n)
+            case 'quote' -> mkQuote(n)
+            case 'link' -> mkLink(n)
+            case 'expand' -> mkExpand(n)
+            case 'div' -> mkDiv(n)
+            case 'code' -> mkCode(n)
+            case 'page-info' -> mkPageInfo(n)
+            case 'div-expand' -> mkDivExpand(n)
+            case 'attachments' -> mkAttachments(n)
+            case 'style-import' -> mkStyleImport(n)
+            case 'style' -> mkStyle(n)
+            case 'html' -> mkHtml(n)
+            case 'image' -> mkImage(n)
+            case 'csv' -> mkCsv(n)
+            case 'wiki' -> mkWiki(n)
+            case 'section' -> mkSection(n)
+            case 'column' -> mkColumn(n)
+            case 'template' -> mkTemplate(n)
+            default -> "<!-- mk function by that name not found: ${n.text} -->"
         }
     }
 
@@ -601,5 +604,17 @@ class ConfluenceStorage {
         return _execIfChildren(n, {
             return _mkMacroPlain(n, 'unmigrated-wiki-markup', _mkParent(n))
         })
+    }
+
+    static String mkTemplate(FPN n) {
+        if (n.children.size() == 0)
+            return '<!-- a child is missing -->'
+        else if (!n.detailsText)
+            return '<!-- template in details is missing -->'
+        else {
+            def firstChildChain = getFirstChildChain(n.children[0])
+            def contentList = firstChildChain.collect { getContent(it) }
+            return MessageFormat.format(n.details.text, *contentList)
+        }
     }
 }
