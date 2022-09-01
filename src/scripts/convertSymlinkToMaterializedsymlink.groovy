@@ -9,11 +9,12 @@ import org.freeplane.features.map.NodeModel
 import org.freeplane.features.styles.*
 import org.freeplane.features.styles.mindmapmode.MLogicalStyleController
 
-def materializedSymlinkStyleName = 'MaterializedSymlink'
+import static org.freeplane.features.styles.MapStyleModel.STYLES_USER_DEFINED
+
+def materializedSymlinkIStyle = StyleFactory.create('MaterializedSymlink')
 def snowflake = 'emoji-2744'
 def formulaPrefix = ' '
 
-def materializedSymlinkIStyle = StyleFactory.create(materializedSymlinkStyleName)
 MapModel mapModel = node.mindMap.delegate
 
 // set up the style
@@ -70,7 +71,8 @@ static NodeModel getOrCreateUserDefStyle(MapModel mapModel, IStyle iStyle) {
     if (!styleNode) {
         styleNode = new NodeModel(mapModel)
         styleNode.setUserObject(iStyle)
-        def userStyleParentNode = mapStyleModel.getStyleNodeGroup(mapStyleModel.styleMap, MapStyleModel.STYLES_USER_DEFINED)
+        def userStyleParentNode = mapStyleModel.getStyleNodeGroup(mapStyleModel.styleMap, STYLES_USER_DEFINED)
+//        def userStyleParentNode = mapStyleModel.styleMap.root.children.find { (it.userObject as StyleTranslatedObject).object == STYLES_USER_DEFINED }
 //        (Controller.currentModeController.mapController as MMapController).insertNode(styleNode, userStyleParentNode) // event triggered
         userStyleParentNode.insert(styleNode, userStyleParentNode.childCount) // no event triggered
         mapStyleModel.addStyleNode(styleNode)
