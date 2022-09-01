@@ -210,20 +210,23 @@ class MacmarrumChangeListenerUtils {
 
     static class MacmarrumMapChangeListener implements IMapChangeListener {
 
+        static Node getRootIfListenerIsEnabled(MapModel mapModel) {
+            return MacmarrumMapChangeListenerEnablerForMap.getExtensionOf(mapModel.rootNode)?.root
+        }
+
+        static boolean isRegularMap(Node root, NodeModel changedNode) {
+            return root.id == changedNode.map.rootNode.id
+        }
+
         static boolean isVisible(NodeModel node) {
             return node.hasVisibleContent(FilterController.getFilter(node.map))
         }
 
-        static IExtension getEnabler(MapModel mapModel) {
-            return MacmarrumMapChangeListenerEnablerForMap.getExtensionOf(mapModel.rootNode)
-        }
-
         void onNodeInserted(NodeModel parent, NodeModel child, int newIndex) {
-            def macmarrumMapChangeListenerEnablerForMap = getEnabler(child.map)
-            if (macmarrumMapChangeListenerEnablerForMap && isVisible(child)) {
+            Node root = getRootIfListenerIsEnabled(child.map)
+            if (root && isRegularMap(root, child)) {
                 def id = child.createID() // gets id or generates it
 //                println("++ ${id}")
-                def root = macmarrumMapChangeListenerEnablerForMap.root
                 def node = root.mindMap.node(id)
                 Utils.setHorizontalShift(node)
                 Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
@@ -231,19 +234,17 @@ class MacmarrumChangeListenerUtils {
         }
 
         void onNodeMoved(NodeMoveEvent nodeMoveEvent) {
-            def macmarrumMapChangeListenerEnablerForMap = getEnabler(nodeMoveEvent.child.map)
-            if (macmarrumMapChangeListenerEnablerForMap && isVisible(nodeMoveEvent.child)) {
+            Node root = getRootIfListenerIsEnabled(nodeMoveEvent.child.map)
+            if (root && isRegularMap(root, nodeMoveEvent.child)) {
 //                println("-> ${nodeMoveEvent.child.id}")
-                def root = macmarrumMapChangeListenerEnablerForMap.root
                 Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
             }
         }
 
         void onNodeDeleted(NodeDeletionEvent nodeDeletionEvent) {
-            def macmarrumMapChangeListenerEnablerForMap = getEnabler(nodeDeletionEvent.node.map)
-            if (macmarrumMapChangeListenerEnablerForMap && isVisible(nodeDeletionEvent.node)) {
+            Node root = getRootIfListenerIsEnabled(nodeDeletionEvent.node.map)
+            if (root && isRegularMap(root, nodeDeletionEvent.node)) {
 //                println("-- ${nodeDeletionEvent.node.id}")
-                def root = macmarrumMapChangeListenerEnablerForMap.root
                 Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
             }
         }
