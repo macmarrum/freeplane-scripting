@@ -55,6 +55,7 @@ class ConfluenceStorage {
     }
 
     /**
+     * makeMarkup if it's a markup maker, otherwise
      * First escape xml, if broom present
      * Only then do pReplacements if doubleCurlyLoop present
      * and replace each space with nbsp, if gemini present
@@ -607,12 +608,13 @@ class ConfluenceStorage {
     }
 
     static String mkTemplate(FPN n) {
-        if (n.children.size() == 0)
-            return '<!-- a child is missing -->'
+        def yesEntryChildren = n.children.findAll { !hasIcon(it, icon.noEntry) }
+        if (yesEntryChildren.size() == 0)
+            return '<!-- a (yes-entry) child is missing -->'
         else if (!n.detailsText)
-            return '<!-- template in details is missing -->'
+            return '<!-- pattern in details is missing -->'
         else {
-            def firstChildChain = getFirstChildChain(n.children[0])
+            def firstChildChain = yesEntryChildren.collect { getFirstChildChain(it) }.flatten()
             def contentList = firstChildChain.collect { getContent(it) }
             return MessageFormat.format(n.details.text, *contentList)
         }
