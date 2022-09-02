@@ -608,15 +608,19 @@ class ConfluenceStorage {
     }
 
     static String mkTemplate(FPN n) {
-        def yesEntryChildren = n.children.findAll { !hasIcon(it, icon.noEntry) }
-        if (yesEntryChildren.size() == 0)
-            return '<!-- a (yes-entry) child is missing -->'
-        else if (!n.detailsText)
-            return '<!-- pattern in details is missing -->'
+        def yesentryChildren = n.children.findAll { !hasIcon(it, icon.noEntry) }
+        if (yesentryChildren.size() == 0)
+            return '<!-- a child (pattern) is missing -->'
         else {
-            def firstChildChain = yesEntryChildren.collect { getFirstChildChain(it) }.flatten()
-            def contentList = firstChildChain.collect { getContent(it) }
-            return MessageFormat.format(n.details.text, *contentList)
+            def patternNode = yesentryChildren[0]
+            def yesentryPatternChildren = patternNode.children.findAll { !hasIcon(it, icon.noEntry) }
+            if (yesentryPatternChildren.size() == 0)
+                return '<!-- a (yes-entry) child is missing -->'
+            else {
+                def firstChildChain = yesentryPatternChildren.collect { getFirstChildChain(it) }.flatten()
+                def contentList = firstChildChain.collect { getContent(it) }
+                return MessageFormat.format(patternNode.transformedText, *contentList)
+            }
         }
     }
 }
