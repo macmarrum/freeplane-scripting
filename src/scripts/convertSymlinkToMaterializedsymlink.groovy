@@ -24,7 +24,7 @@ if (!materializedSymlinkStyleNode.icons.any { it.name == snowflake }) {
     materializedSymlinkStyleNode.addIcon(namedIcon)
 }
 
-def logicalStyleController = (LogicalStyleController.controller as MLogicalStyleController)
+def logicalStyleController = LogicalStyleController.controller as MLogicalStyleController
 String lnk
 String text
 c.selecteds.each { Node it ->
