@@ -1,6 +1,7 @@
 // @ExecutionModes({ON_SINGLE_NODE})
 // https://github.com/freeplane/freeplane/discussions/662
 
+
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
 import org.freeplane.features.attribute.mindmapmode.MAttributeController
@@ -11,6 +12,8 @@ import org.freeplane.features.mode.Controller
 import org.freeplane.features.mode.ModeController
 import org.freeplane.features.styles.ConditionalStyleModel
 import org.freeplane.features.styles.LogicalStyleKeys
+import org.freeplane.features.url.UrlManager
+import org.freeplane.features.url.mindmapmode.MFileManager
 
 import javax.swing.*
 import java.nio.file.Files
@@ -18,18 +21,43 @@ import java.nio.file.StandardCopyOption
 
 Node srcNode = node
 NodeModel sourceModel = srcNode.delegate
-def shortText = srcNode.shortText.replaceAll(/ \.\.\.$/, '')
 def sourceFile = srcNode.mindMap.file
-def targetFile = new File(sourceFile.parent, shortText + '.mm')
+def targetFile = chooseTargetFile(srcNode, sourceModel, sourceFile)
+if (targetFile)
+    createNewMapFromNode(srcNode, sourceModel, sourceFile, targetFile)
 
-def canAct = true
-if (targetFile.exists()) {
+// based on org.freeplane.features.url.mindmapmode.ExportBranchAction
+static chooseTargetFile(Node srcNode, NodeModel sourceModel, File sourceFile) {
+    def shortText = srcNode.shortText.replaceAll(/ \.\.\.$/, '')
+    def chooser = UITools.newFileChooser(sourceFile.parentFile)
+    def targetFile_ = new File(sourceFile.parent, shortText + '.mm')
+    chooser.selectedFile = targetFile_
+    def fileManager = UrlManager.controller as MFileManager
+    if (fileManager.fileFilter !== null)
+        chooser.setFileFilter(fileManager.fileFilter)
+    def returnVal = chooser.showSaveDialog(Controller.currentController.viewController.currentRootComponent)
+    def canAct = false
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+        targetFile_ = addMmExtensionIfMissing(chooser.selectedFile)
+        canAct = targetFile_.exists() ? confirmOverwrite(targetFile_, sourceModel) : true
+    }
+    return canAct ? targetFile_ : null
+}
+
+static addMmExtensionIfMissing(File target) {
+    def extension = target.name.find(/\.mm$/)
+    if (extension)
+        return target
+    else
+        return new File(target.path + '.mm')
+}
+
+static confirmOverwrite(File targetFile, NodeModel sourceModel) {
     def title = 'Confirm overwrite'
     def msg = "The file already exists:\n${targetFile.name}\nOverwire it?"
-    def decision = UITools.showConfirmDialog(sourceModel, msg, title, JOptionPane.YES_OPTION, JOptionPane.WARNING_MESSAGE)
-    canAct = decision == 0
+    def decision = UITools.showConfirmDialog(sourceModel, msg, title, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)
+    return decision == 0
 }
-if (canAct) createNewMapFromNode(srcNode, sourceModel, sourceFile, targetFile)
 
 def createNewMapFromNode(Node srcNode, NodeModel sourceModel, File sourceFile, File targetFile) {
     srcNode.mindMap.save(true)
