@@ -19,16 +19,16 @@ import javax.swing.*
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
-Node srcNode = node
-NodeModel sourceModel = srcNode.delegate
-def sourceFile = srcNode.mindMap.file
-def targetFile = chooseTargetFile(srcNode, sourceModel, sourceFile)
+Node sourceNode = node
+NodeModel sourceModel = sourceNode.delegate
+def sourceFile = sourceNode.mindMap.file
+def targetFile = chooseTargetFile(sourceNode, sourceModel, sourceFile)
 if (targetFile)
-    createNewMapFromNode(srcNode, sourceModel, sourceFile, targetFile)
+    createNewMapFromNode(sourceNode, sourceModel, sourceFile, targetFile)
 
 // based on org.freeplane.features.url.mindmapmode.ExportBranchAction
-static chooseTargetFile(Node srcNode, NodeModel sourceModel, File sourceFile) {
-    def shortText = srcNode.shortText.replaceAll(/ \.\.\.$/, '')
+static File chooseTargetFile(Node sourceNode, NodeModel sourceModel, File sourceFile) {
+    def shortText = sourceNode.shortText.replaceAll(/ \.\.\.$/, '')
     def chooser = UITools.newFileChooser(sourceFile.parentFile)
     def targetFile_ = new File(sourceFile.parent, shortText + '.mm')
     chooser.selectedFile = targetFile_
@@ -44,7 +44,7 @@ static chooseTargetFile(Node srcNode, NodeModel sourceModel, File sourceFile) {
     return canAct ? targetFile_ : null
 }
 
-static addMmExtensionIfMissing(File target) {
+static File addMmExtensionIfMissing(File target) {
     def extension = target.name.find(/\.mm$/)
     if (extension)
         return target
@@ -52,33 +52,32 @@ static addMmExtensionIfMissing(File target) {
         return new File(target.path + '.mm')
 }
 
-static confirmOverwrite(File targetFile, NodeModel sourceModel) {
+static boolean confirmOverwrite(File targetFile, NodeModel sourceModel) {
     def title = 'Confirm overwrite'
     def msg = "The file already exists:\n${targetFile.name}\nOverwire it?"
     def decision = UITools.showConfirmDialog(sourceModel, msg, title, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)
     return decision == 0
 }
 
-def createNewMapFromNode(Node srcNode, NodeModel sourceModel, File sourceFile, File targetFile) {
-    srcNode.mindMap.save(true)
-    Files.copy(srcNode.mindMap.file.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+def createNewMapFromNode(Node sourceNode, NodeModel sourceModel, File sourceFile, File targetFile) {
+    sourceNode.mindMap.save(true)
+    Files.copy(sourceNode.mindMap.file.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
     def mapLoader = c.mapLoader(targetFile)
     mapLoader.withView()
     def targetMindMap = mapLoader.mindMap
-    def trgRoot = targetMindMap.root
-    NodeModel targetModel = trgRoot.delegate
-    trgRoot.text = srcNode.text
-    trgRoot.detailsText = srcNode.detailsText
-    trgRoot.noteText = srcNode.noteText
-    trgRoot.attributes.clear()
-    def attributeController = MAttributeController.controller
-    attributeController.copyAttributesToNode(sourceModel, targetModel)
+    def targetRoot = targetMindMap.root
+    NodeModel targetModel = targetRoot.delegate
+    targetRoot.text = sourceNode.text
+    targetRoot.detailsText = sourceNode.detailsText
+    targetRoot.noteText = sourceNode.noteText
+    targetRoot.attributes.clear()
+    MAttributeController.controller.copyAttributesToNode(sourceModel, targetModel)
     copyFormatAndIconsBetween(sourceModel, targetModel)
     copyNodeConditionalStylesBetween(sourceModel, targetModel)
-    trgRoot.children.each { it.delete() }
+    targetRoot.children.each { it.delete() }
     def linkController = LinkController.controller
-    trgRoot.link.uri = linkController.createRelativeURI(targetFile.toURI(), new URI(sourceFile.toURI().toString() + '#' + srcNode.id))
-    srcNode.link.uri = linkController.createRelativeURI(sourceFile.toURI(), targetFile.toURI())
+    targetRoot.link.uri = linkController.createRelativeURI(targetFile.toURI(), new URI(sourceFile.toURI().toString() + '#' + sourceNode.id))
+    sourceNode.link.uri = linkController.createRelativeURI(sourceFile.toURI(), targetFile.toURI())
     targetMindMap.save(true)
 }
 
