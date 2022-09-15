@@ -9,6 +9,7 @@
 import groovy.xml.XmlParser
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
+import org.freeplane.features.attribute.mindmapmode.MAttributeController
 import org.freeplane.features.icon.mindmapmode.MIconController
 import org.freeplane.features.map.NodeModel
 import org.freeplane.features.map.clipboard.MapClipboardController
@@ -30,15 +31,14 @@ if (copiedNodes.size() > 0) {
     c.selecteds.each { Node targetLocalRoot ->
         copiedNodes.each { Node source ->
             target = targetLocalRoot.createChild(source.text)
+            NodeModel sourceModel = source.delegate
+            NodeModel targetModel = target.delegate
             target.link.node = source
             target.detailsText = source.detailsText
             target.noteText = source.noteText
-            //TODO attribute key can be repeated, fix copying such attributes
-            source.attributes.each { entry ->
-                target[entry.key] = entry.value
-            }
-            copyNodeConditionalStylesBetween(source.delegate, target.delegate)
-            copyFormatAndIconsBetween(source.delegate, target.delegate)
+            MAttributeController.controller.copyAttributesToNode(sourceModel, targetModel)
+            copyNodeConditionalStylesBetween(sourceModel, targetModel)
+            copyFormatAndIconsBetween(sourceModel, targetModel)
             toBeSelected.add(target)
         }
     }
