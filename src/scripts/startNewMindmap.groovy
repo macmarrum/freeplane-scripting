@@ -75,9 +75,15 @@ def createNewMapFromNode(Node sourceNode, NodeModel sourceModel, File sourceFile
     copyFormatAndIconsBetween(sourceModel, targetModel)
     copyNodeConditionalStylesBetween(sourceModel, targetModel)
     targetRoot.children.each { it.delete() }
-    def linkController = LinkController.controller
-    targetRoot.link.uri = linkController.createRelativeURI(targetFile.toURI(), new URI(sourceFile.toURI().toString() + '#' + sourceNode.id))
-    sourceNode.link.uri = linkController.createRelativeURI(sourceFile.toURI(), targetFile.toURI())
+    URI sourcePathWithNodeId = new URI(sourceFile.toURI().toString() + '#' + sourceNode.id)
+    if (config.getProperty('links') == 'relative') {
+        def linkController = LinkController.controller
+        targetRoot.link.uri = linkController.createRelativeURI(targetFile.toURI(), sourcePathWithNodeId)
+        sourceNode.link.uri = linkController.createRelativeURI(sourceFile.toURI(), targetFile.toURI())
+    } else {
+        targetRoot.link.uri = sourcePathWithNodeId
+        sourceNode.link.uri = targetFile.toURI()
+    }
     targetMindMap.save(true)
 }
 
