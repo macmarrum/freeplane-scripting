@@ -6,7 +6,6 @@ import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
 import org.freeplane.features.attribute.mindmapmode.MAttributeController
 import org.freeplane.features.icon.mindmapmode.MIconController
-import org.freeplane.features.link.LinkController
 import org.freeplane.features.map.NodeModel
 import org.freeplane.features.mode.Controller
 import org.freeplane.features.mode.ModeController
@@ -75,13 +74,11 @@ def createNewMapFromNode(Node sourceNode, NodeModel sourceModel, File sourceFile
     copyFormatAndIconsBetween(sourceModel, targetModel)
     copyNodeConditionalStylesBetween(sourceModel, targetModel)
     targetRoot.children.each { it.delete() }
-    URI sourcePathWithNodeId = new URI(sourceFile.toURI().toString() + '#' + sourceNode.id)
     if (config.getProperty('links') == 'relative') {
-        def linkController = LinkController.controller
-        targetRoot.link.uri = linkController.createRelativeURI(targetFile.toURI(), sourcePathWithNodeId)
-        sourceNode.link.uri = linkController.createRelativeURI(sourceFile.toURI(), targetFile.toURI())
+        targetRoot.link.uri = "${makeUri(targetFile.parentFile.relativePath(sourceFile))}#${sourceNode.id}".toURI()
+        sourceNode.link.uri = makeUri(sourceFile.parentFile.relativePath(targetFile))
     } else {
-        targetRoot.link.uri = sourcePathWithNodeId
+        targetRoot.link.uri = new URI(sourceFile.toURI().toString() + '#' + sourceNode.id)
         sourceNode.link.uri = targetFile.toURI()
     }
     targetMindMap.save(true)
@@ -109,4 +106,26 @@ static copyFormatAndIconsBetween(NodeModel source, NodeModel target) {
     modeController.undoableRemoveExtensions(MIconController.Keys.ICONS, target, target)
     modeController.undoableCopyExtensions(MIconController.Keys.ICONS, source, target)
     //}
+}
+
+/**
+ * File#toURI() converts fsPaths to absolute paths
+ * This method works around it to allow relative fsPaths
+ * @param fsPath relative or absolute
+ * @return URI
+ */
+static URI makeUri(String fsPath) {
+    return makeUri(new File(fsPath))
+}
+
+static URI makeUri(File file) {
+    if (file.absolute) {
+        return file.toURI()
+    } else {
+        def prefixPath = file.absolutePath[0..<-file.path.size()]
+        def prefixUriStr = new File(prefixPath).toURI().toString()
+        def absoluteUriStr = file.toURI().toString()
+        def relativeUriStr = absoluteUriStr[prefixUriStr.size()..-1]
+        return relativeUriStr.toURI()
+    }
 }
