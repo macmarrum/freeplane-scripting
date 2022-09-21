@@ -1,10 +1,12 @@
 import org.freeplane.api.*
+import org.freeplane.api.Node as FN
 import org.freeplane.core.extension.IExtension
 import org.freeplane.features.edge.EdgeController
 import org.freeplane.features.edge.mindmapmode.MEdgeController
 import org.freeplane.features.filter.FilterController
 import org.freeplane.features.map.*
 import org.freeplane.features.mode.Controller
+import org.freeplane.features.nodelocation.LocationModel
 import org.freeplane.features.nodestyle.NodeBorderModel
 import org.freeplane.features.styles.ConditionalStyleModel
 import org.freeplane.features.styles.LogicalStyleController
@@ -23,10 +25,14 @@ class MacmarrumChangeListenerUtils {
      * Note: config is read only at start-up. If changed afterwards, the Listener needs to be restarted.
      */
 
+    static debug(String... args) {
+        println(args.collect { it.replaceAll('\n', ' | ') }.join(' '))
+    }
+
     static int toggleChangeListeners(Node root) {
         int n = toggleNodeChangeListener(root)
         int m = toggleMapChangeListener(root)
-//        updateNode(root, n + m)
+//        updateInformationNode(root, n + m)
         return n + m
     }
 
@@ -36,13 +42,13 @@ class MacmarrumChangeListenerUtils {
         }
         if (macmarrumListeners.size() == 0) {
             root.mindMap.addListener(new MacmarrumNodeChangeListener())
-            println(":: toggleNodeChangeListener => ON")
+            debug(":: toggleNodeChangeListener => ON")
             return 1
         } else {
             macmarrumListeners.each {
                 root.mindMap.removeListener(it)
             }
-            println(":: toggleNodeChangeListener => OFF")
+            debug(":: toggleNodeChangeListener => OFF")
             return 0
         }
     }
@@ -56,9 +62,10 @@ class MacmarrumChangeListenerUtils {
         def macmarrumMapChangeListenerEnablerForMap = MacmarrumMapChangeListenerEnablerForMap.getExtensionOf(rootModel)
         if (macmarrumMapChangeListenerEnablerForMap === null) {
             rootModel.addExtension(new MacmarrumMapChangeListenerEnablerForMap(root))
-            println(":: toggleMapChangeListener for ${root.mindMap.file.name} => ON")
+            debug(":: toggleMapChangeListener for ${root.mindMap.file.name} => ON")
             Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
-            root.findAll().drop(1).each { Node it -> Utils.setHorizontalShift(it) }
+            Utils.setHorizontalShiftForBranch(root)
+            CompactLeaves.forBranch(root)
             enableMapChangeListenerIfNotYetEnabled(macmarrumListeners, mapController)
             return 1
         } else {
@@ -66,7 +73,7 @@ class MacmarrumChangeListenerUtils {
             extensions.collect().each {
                 if (it.class.name == MacmarrumMapChangeListenerEnablerForMap.class.name && it.root == root) {
                     extensions.remove(it)
-                    println(":: toggleMapChangeListener for ${root.mindMap.file.name} => OFF")
+                    debug(":: toggleMapChangeListener for ${root.mindMap.file.name} => OFF")
                 }
             }
             return 0
@@ -76,10 +83,10 @@ class MacmarrumChangeListenerUtils {
     static boolean enableMapChangeListenerIfNotYetEnabled(Collection<IMapChangeListener> macmarrumListeners, MapController mapController) {
         if (macmarrumListeners.size() == 0) {
             mapController.addMapChangeListener(new MacmarrumMapChangeListener())
-            println(":: enableMapChangeListenerIfNotYetEnabled => ON")
+            debug(":: enableMapChangeListenerIfNotYetEnabled => ON")
             return true
         } else {
-            println(":: enableMapChangeListenerIfNotYetEnabled => already enabled")
+            debug(":: enableMapChangeListenerIfNotYetEnabled => already enabled")
             return false
         }
     }
@@ -90,13 +97,13 @@ class MacmarrumChangeListenerUtils {
         }
     }
 
-    static updateNode(Node root, int listnersCount) {
+    static updateInformationNode(Node root, int listnersCount) {
         String alias = 'macmarrumChangeListeners'
         List<Node> foundlings = root.find { Node it -> it.isGlobal && it.alias == alias }
         Node target = foundlings.size() == 1 ? foundlings[0] : null
         if (!target) {
             target = root.createChild(alias.replaceAll(/_/, ' '))
-            target.left = true
+            target.sideAtRoot = 'LEFT'
             target.isGlobal = true
             target.alias = alias
         }
@@ -130,10 +137,15 @@ class MacmarrumChangeListenerUtils {
         }
 
         static setHorizontalShift(Node node) {
-            if (horizontalShift != 'none' && node.visible && node.horizontalShiftAsLength != hGap) {
-//            println(">> setHorizontalShift")
+            return // DISABLED
+            if (horizontalShift != 'none' && node.horizontalShiftAsLength != hGap && node.visible && !node.free) {
+//            debug(">> setHorizontalShift")
                 node.horizontalShift = hGap
             }
+        }
+
+        static setHorizontalShiftForBranch(Node root) {
+            root.findAll().drop(1).each { Node it -> setHorizontalShift(it) }
         }
 
         static int getGrandchildVisiblePosition(Node leaf) {
@@ -160,6 +172,7 @@ class MacmarrumChangeListenerUtils {
         }
 
         static applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(Node root) {
+            return // DISABLED
             int colorCounter
             Color edgeColor
             Color bgColor
@@ -209,14 +222,88 @@ class MacmarrumChangeListenerUtils {
         static String calculateStyle(Node node) {
             return null
         }
+    }
 
-        static addNodeConditionalStyle(Node node, String styleName) {
+
+    static class CompactLeaves {
+        static final LEAF_CHILDREN_STYLE_NAME = 'Leaf children'
+        static final VERTICAL_SHIFT = Quantity.fromString('-17', LengthUnit.pt)
+        static final VERTICAL_SHIFT_NONE = LocationModel.NULL_LOCATION.shiftY
+
+        static debug(String... args) {
+            ''
+//        println(args.join(' '))
+        }
+
+        static forBranch(FN root) {
+            def m = createNodeToVisibleNonFreeChildren(root)
+            m.each { entry ->
+                def node = entry.key
+                def children = entry.value
+                if (children.size() > 0) {
+                    if (!node.folded) {
+                        if (children.every { isDisplayLeaf(it, m[it]) }) {
+                            addNodeConditionalStyleIfNotPresent(node, LEAF_CHILDREN_STYLE_NAME)
+                            children.each {
+                                debug(":1: ${it.id} ${it.text} -> ${VERTICAL_SHIFT_NONE}")
+                                if (it.visible) // ignore summary nodes
+                                    it.verticalShift = VERTICAL_SHIFT_NONE
+                            }
+                        } else {
+                            removeNodeConditionalStyleIfPresent(node, LEAF_CHILDREN_STYLE_NAME)
+                            children.eachWithIndex { FN child, int i ->
+                                if (i > 0 && child.visible) {  // ignore summary nodes
+                                    def prevChild = getPreviousNonSummaryNode(i, children)
+                                    if (prevChild) {
+                                        if (isDisplayLeaf(child, m[child]) && isDisplayLeaf(prevChild, m[prevChild])) {
+                                            debug(":2: ${child.id} ${child.text} -> ${VERTICAL_SHIFT}")
+                                            child.verticalShift = VERTICAL_SHIFT
+                                        } else if (child.verticalShift != VERTICAL_SHIFT_NONE) {
+                                            debug(":2: ${child.id} ${child.text} -> ${VERTICAL_SHIFT_NONE}")
+                                            child.verticalShift = VERTICAL_SHIFT_NONE
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    removeNodeConditionalStyleIfPresent(node, LEAF_CHILDREN_STYLE_NAME)
+                }
+            }
+        }
+
+        static isDisplayLeaf(FN node, List<FN> children) {
+            return children.size() == 0 || node.folded || SummaryNode.isSummaryNode(node.delegate)
+        }
+
+        static getPreviousNonSummaryNode(int index, List<FN> children) {
+            def i = index - 1
+            while (i >= 0) {
+                if (children[i].visible) // ignore summary nodes
+                    return children[i]
+            }
+        }
+
+        static java.util.Map<FN, List<FN>> createNodeToVisibleNonFreeChildren(FN node, java.util.Map<FN, List<FN>> m = null) {
+            if (m === null)
+                m = new HashMap<FN, List<FN>>()
+            m[node] = node.children.findAll { FN child -> (child.visible || SummaryNode.isSummaryNode(child.delegate)) && !child.free }
+            m[node].each { FN child ->
+                createNodeToVisibleNonFreeChildren(child, m)
+            }
+            return m
+        }
+
+        static addNodeConditionalStyleIfNotPresent(FN node, String styleName) {
             NodeModel nodeModel = node.delegate
             MapModel mapModel = nodeModel.map
             def condiStyleModel = getOrCreateConditionalStyleModelOf(nodeModel)
-            def logicalStyleController = LogicalStyleController.controller as MLogicalStyleController
             def iStyle = StyleFactory.create(styleName)
-            logicalStyleController.addConditionalStyle(mapModel, condiStyleModel, true, null, iStyle, false)
+            if (!condiStyleModel.styles.any { it.style == iStyle }) {
+                def logicalStyleController = LogicalStyleController.controller as MLogicalStyleController
+                logicalStyleController.addConditionalStyle(mapModel, condiStyleModel, true, null, iStyle, false)
+            }
         }
 
         static ConditionalStyleModel getOrCreateConditionalStyleModelOf(NodeModel node) {
@@ -228,7 +315,21 @@ class MacmarrumChangeListenerUtils {
             return conditionalStyleModel
         }
 
+        static removeNodeConditionalStyleIfPresent(FN node, String styleName) {
+            NodeModel nodeModel = node.delegate
+            MapModel mapModel = nodeModel.map
+            def condiStyleModel = nodeModel.getExtension(ConditionalStyleModel.class) as ConditionalStyleModel
+            if (condiStyleModel !== null) {
+                def logicalStyleController = LogicalStyleController.controller as MLogicalStyleController
+                def iStyle = StyleFactory.create(styleName)
+                condiStyleModel.styles.eachWithIndex { it, i ->
+                    if (it.style == iStyle)
+                        logicalStyleController.removeConditionalStyle(mapModel, condiStyleModel, i)
+                }
+            }
+        }
     }
+
 
     static class MacmarrumMapChangeListenerEnablerForMap implements IExtension {
         public Node root
@@ -239,12 +340,13 @@ class MacmarrumChangeListenerUtils {
 
         static IExtension getExtensionOf(NodeModel nodeModel) {
             def extensions = nodeModel.sharedExtensions.values()
-//            println(extensions.collect{it.class.simpleName})
+//            debug(extensions.collect{it.class.simpleName})
             def ext = extensions.find { it.class.name == this.name }
-//            println("== MacmarrumMapChangeListenerEnablerForMap is ${ext ? 'not ' : ''}null")
+//            debug("== MacmarrumMapChangeListenerEnablerForMap is ${ext ? 'not ' : ''}null")
             return ext
         }
     }
+
 
     static class MacmarrumMapChangeListener implements IMapChangeListener {
 
@@ -264,83 +366,42 @@ class MacmarrumChangeListenerUtils {
             Node root = getRootIfListenerIsEnabled(child.map)
             if (root && isRegularMap(root, child)) {
                 def id = child.createID() // gets id or generates it
-//                println("++ ${id}")
+//                debug("++ ${id}")
                 def node = root.mindMap.node(id)
+                MacmarrumNodeChangeListener.canReact = false
                 Utils.setHorizontalShift(node)
+                def parentNode = root.mindMap.node(parent.ID)
+                CompactLeaves.forBranch(parentNode.parent ?: parentNode) // grandparent if exists, else parent - to cover `0 -> 1` children
                 Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
+                MacmarrumNodeChangeListener.canReact = true
             }
         }
 
         void onNodeMoved(NodeMoveEvent nodeMoveEvent) {
             Node root = getRootIfListenerIsEnabled(nodeMoveEvent.child.map)
             if (root && isRegularMap(root, nodeMoveEvent.child)) {
-//                println("-> ${nodeMoveEvent.child.id}")
+//                debug("-> ${nodeMoveEvent.child.id}")
+                MacmarrumNodeChangeListener.canReact = false
+                CompactLeaves.forBranch(root.mindMap.node(nodeMoveEvent.oldParent.ID))
+                CompactLeaves.forBranch(root.mindMap.node(nodeMoveEvent.newParent.ID))
                 Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
-                CompactLeaves.onNodeMoved(nodeMoveEvent, root)
+                MacmarrumNodeChangeListener.canReact = true
             }
         }
 
         void onNodeDeleted(NodeDeletionEvent nodeDeletionEvent) {
             Node root = getRootIfListenerIsEnabled(nodeDeletionEvent.node.map)
             if (root && isRegularMap(root, nodeDeletionEvent.node)) {
-//                println("-- ${nodeDeletionEvent.node.id}")
+//                debug("-- ${nodeDeletionEvent.node.id}")
+                MacmarrumNodeChangeListener.canReact = false
+                def parent = root.mindMap.node(nodeDeletionEvent.parent.ID)
+                CompactLeaves.forBranch(parent.parent ?: parent) // grandparent if exists, else parent - to cover `1 -> 0` children
                 Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
+                MacmarrumNodeChangeListener.canReact = true
             }
         }
     }
 
-    static class CompactLeaves {
-        static final VERTICAL_SHIFT = -17
-
-        static onNodeInserted(NodeModel parent, int index, Node root) {
-            if (index > 0) {
-                def parentNode = root.mindMap.node(parent.ID)
-                def siblings = parentNode.children
-                if (siblings.size() >= 3 && siblings[index - 1].leaf) {
-                    siblings[index].verticalShift = VERTICAL_SHIFT
-                }
-            }
-        }
-
-        static onNodeMoved(NodeMoveEvent nodeMoveEvent, Node root) {
-            def index = nodeMoveEvent.newIndex
-            if (index > 0) {
-                def parent = nodeMoveEvent.newParent
-                def oldParent = nodeMoveEvent.oldParent
-                def parentNode = root.mindMap.node(parent.id)
-                def siblings = parentNode.children
-                if (parent != oldParent && siblings.size() >= 3 && siblings[index - 1].leaf) {
-                    siblings[index].verticalShift = VERTICAL_SHIFT
-                }
-            }
-        }
-
-        static onNodeDeleted(NodeDeletionEvent nodeDeletionEvent, Node root) {
-            def index = nodeDeletionEvent.index
-            def parent = root.mindMap.node(nodeDeletionEvent.parent.ID)
-            def siblings = parent.children
-            if (siblings.size() >= 2)
-                true
-        }
-
-        static hasOneOrMoreOtherLeavesAndBranches(Node parent, int index) {
-            def children = parent.children
-            if (children.size() >= 3) {
-                def isLeafFound = false
-                def isBranchFound = false
-                children.eachWithIndex { Node node, int i ->
-                    if (!isLeafFound && !isBranchFound && i != index) {
-                        if (node.leaf)
-                            isLeafFound = true
-                        else
-                            isBranchFound = true
-                    }
-                }
-                return isLeafFound && isBranchFound
-            }
-            return false
-        }
-    }
 
     static class MacmarrumNodeChangeListener implements NodeChangeListener {
         static boolean canReact = true
@@ -350,17 +411,18 @@ class MacmarrumChangeListenerUtils {
             /* enum ChangedElement {TEXT, DETAILS, NOTE, ICON, ATTRIBUTE, FORMULA_RESULT, UNKNOWN} */
             if (!canReact)
                 return
-//        println(":: ${df.format(new Date())} ${event.node.id} ${event.changedElement} ${event.node.transformedText}")
+//        debug(":: ${df.format(new Date())} ${event.node.id} ${event.changedElement} ${event.node.transformedText}")
             canReact = false
             switch (event.changedElement) {
                 case NodeChanged.ChangedElement.TEXT:
                     Utils.minimizeNodeIfTextIsLonger(event.node)
                     break
                 case NodeChanged.ChangedElement.UNKNOWN:
-                    Utils.applyStyleBasedOnOtherNodesStyle(event.node)
+//                    debug("<> UNKNOWN on ${event.node.id} ${event.node.text}")
+//                    CompactLeaves.forBranch(event.node.parent) // folded/unfolded
+                    break
             }
             canReact = true
         }
     }
-
 }
