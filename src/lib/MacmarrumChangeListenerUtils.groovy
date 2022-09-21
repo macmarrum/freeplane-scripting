@@ -6,6 +6,10 @@ import org.freeplane.features.filter.FilterController
 import org.freeplane.features.map.*
 import org.freeplane.features.mode.Controller
 import org.freeplane.features.nodestyle.NodeBorderModel
+import org.freeplane.features.styles.ConditionalStyleModel
+import org.freeplane.features.styles.LogicalStyleController
+import org.freeplane.features.styles.StyleFactory
+import org.freeplane.features.styles.mindmapmode.MLogicalStyleController
 import org.freeplane.plugin.script.FreeplaneScriptBaseClass
 
 import java.awt.*
@@ -190,6 +194,40 @@ class MacmarrumChangeListenerUtils {
                 node.minimized = node.to.plain.size() > max_shortened_text_length
             }
         }
+
+        static applyStyleBasedOnOtherNodesStyle(Node node) {
+            node.mindMap.root.findAll().drop(1).each {
+                if (it.visible) {
+                    def newStyle = calculateStyle(it)
+                    if (newStyle !== null && node.style.name != newStyle) {
+                        node.style.name = newStyle
+                    }
+                }
+            }
+        }
+
+        static String calculateStyle(Node node) {
+            return null
+        }
+
+        static addNodeConditionalStyle(Node node, String styleName) {
+            NodeModel nodeModel = node.delegate
+            MapModel mapModel = nodeModel.map
+            def condiStyleModel = getOrCreateConditionalStyleModelOf(nodeModel)
+            def logicalStyleController = LogicalStyleController.controller as MLogicalStyleController
+            def iStyle = StyleFactory.create(styleName)
+            logicalStyleController.addConditionalStyle(mapModel, condiStyleModel, true, null, iStyle, false)
+        }
+
+        static ConditionalStyleModel getOrCreateConditionalStyleModelOf(NodeModel node) {
+            def conditionalStyleModel = node.getExtension(ConditionalStyleModel.class) as ConditionalStyleModel
+            if (conditionalStyleModel == null) {
+                conditionalStyleModel = new ConditionalStyleModel()
+                node.addExtension(conditionalStyleModel)
+            }
+            return conditionalStyleModel
+        }
+
     }
 
     static class MacmarrumMapChangeListenerEnablerForMap implements IExtension {
@@ -238,6 +276,7 @@ class MacmarrumChangeListenerUtils {
             if (root && isRegularMap(root, nodeMoveEvent.child)) {
 //                println("-> ${nodeMoveEvent.child.id}")
                 Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
+                CompactLeaves.onNodeMoved(nodeMoveEvent, root)
             }
         }
 
@@ -247,6 +286,59 @@ class MacmarrumChangeListenerUtils {
 //                println("-- ${nodeDeletionEvent.node.id}")
                 Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
             }
+        }
+    }
+
+    static class CompactLeaves {
+        static final VERTICAL_SHIFT = -17
+
+        static onNodeInserted(NodeModel parent, int index, Node root) {
+            if (index > 0) {
+                def parentNode = root.mindMap.node(parent.ID)
+                def siblings = parentNode.children
+                if (siblings.size() >= 3 && siblings[index - 1].leaf) {
+                    siblings[index].verticalShift = VERTICAL_SHIFT
+                }
+            }
+        }
+
+        static onNodeMoved(NodeMoveEvent nodeMoveEvent, Node root) {
+            def index = nodeMoveEvent.newIndex
+            if (index > 0) {
+                def parent = nodeMoveEvent.newParent
+                def oldParent = nodeMoveEvent.oldParent
+                def parentNode = root.mindMap.node(parent.id)
+                def siblings = parentNode.children
+                if (parent != oldParent && siblings.size() >= 3 && siblings[index - 1].leaf) {
+                    siblings[index].verticalShift = VERTICAL_SHIFT
+                }
+            }
+        }
+
+        static onNodeDeleted(NodeDeletionEvent nodeDeletionEvent, Node root) {
+            def index = nodeDeletionEvent.index
+            def parent = root.mindMap.node(nodeDeletionEvent.parent.ID)
+            def siblings = parent.children
+            if (siblings.size() >= 2)
+                true
+        }
+
+        static hasOneOrMoreOtherLeavesAndBranches(Node parent, int index) {
+            def children = parent.children
+            if (children.size() >= 3) {
+                def isLeafFound = false
+                def isBranchFound = false
+                children.eachWithIndex { Node node, int i ->
+                    if (!isLeafFound && !isBranchFound && i != index) {
+                        if (node.leaf)
+                            isLeafFound = true
+                        else
+                            isBranchFound = true
+                    }
+                }
+                return isLeafFound && isBranchFound
+            }
+            return false
         }
     }
 
@@ -264,8 +356,11 @@ class MacmarrumChangeListenerUtils {
                 case NodeChanged.ChangedElement.TEXT:
                     Utils.minimizeNodeIfTextIsLonger(event.node)
                     break
+                case NodeChanged.ChangedElement.UNKNOWN:
+                    Utils.applyStyleBasedOnOtherNodesStyle(event.node)
             }
             canReact = true
         }
     }
+
 }

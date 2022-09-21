@@ -619,7 +619,8 @@ class ConfluenceStorage {
             else {
                 def firstChildChain = yesentryPatternChildren.collect { getFirstChildChain(it) }.flatten()
                 def contentList = firstChildChain.collect { getContent(it) }
-                return MessageFormat.format(patternNode.transformedText, *contentList)
+                def pattern = patternNode.details?.text ?: patternNode.note?.text ?: patternNode.transformedText
+                return MessageFormat.format(pattern, *contentList)
             }
         }
     }
