@@ -68,7 +68,7 @@ class MacmarrumChangeListenerUtils {
             debug(":: toggleMapChangeListener for ${root.mindMap.file.name} => ON")
             Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
             Utils.setHorizontalShiftForBranch(root)
-            CompactLeaves.forBranch(root)
+            BranchVGap.forBranch(root)
             enableMapChangeListenerIfNotYetEnabled(macmarrumListeners, mapController)
             return 1
         } else {
@@ -126,7 +126,7 @@ class MacmarrumChangeListenerUtils {
     }
 
     static enum Feature {
-        MINI_NODES, BRANCH_COLORS, H_GAP, COMPACT_LEAVES
+        MINI_NODES, BRANCH_COLORS, HGAP, BRANCH_VGAP
     }
 
     static final FEATURES_ATTR_NAME = 'MacmarrumFeatures'
@@ -138,24 +138,22 @@ class MacmarrumChangeListenerUtils {
     }
 
     static class Utils {
-        static String horizontalShift = '1 cm'
-        static Quantity<LengthUnit> hGap = Quantity.fromString(horizontalShift, LengthUnit.px)
+        static final HGAP_ATTR_NAME = 'HGap'
         static final controller = EdgeController.controller as MEdgeController
 
-        static pullAndUpdateHGapIfNotNull(FN root) {
-            def horizontalShift = root['h.shift']?.text
-            if (horizontalShift != null) {
-                this.horizontalShift = horizontalShift
-                if (horizontalShift != 'none')
-                    hGap = Quantity.fromString(horizontalShift, LengthUnit.px)
-            }
+        static getHGap(FN root) {
+            def value = root[HGAP_ATTR_NAME]?.text ?: '30'
+            return Quantity.fromString(value, LengthUnit.pt)
         }
 
         static setHorizontalShift(FN node) {
-//            return // DISABLED
-            if (isEnabled(Feature.H_GAP, node.mindMap.root) && horizontalShift != 'none' && node.horizontalShiftAsLength != hGap && node.visible && !node.free) {
+            def root = node.mindMap.root
+            if (isEnabled(Feature.HGAP, root)) {
+                def hGap = getHGap(root)
+                if (node.horizontalShiftAsLength != hGap && node.visible && !node.free) {
 //            debug(">> setHorizontalShift")
-                node.horizontalShift = hGap
+                    node.horizontalShift = hGap
+                }
             }
         }
 
@@ -241,8 +239,8 @@ class MacmarrumChangeListenerUtils {
     }
 
 
-    static class CompactLeaves {
-        static final VERTICAL_SHIFT_SPACIOUS_ATTR_NAME = 'MacmarrumSpaciousVGap'
+    static class BranchVGap {
+        static final BRANCH_VGAP_ATTR_NAME = 'BranchVGap'
         static final VERTICAL_SHIFT_NONE = LocationModel.NULL_LOCATION.shiftY
 
         static debug(String... args) {
@@ -251,9 +249,9 @@ class MacmarrumChangeListenerUtils {
         }
 
         static forBranch(FN root) {
-            if (!isEnabled(Feature.COMPACT_LEAVES, root))
+            if (!isEnabled(Feature.BRANCH_VGAP, root))
                 return
-            final VERTICAL_SHIFT_SPACIOUS = getVerticalShiftSpacious(root)
+            final VERTICAL_SHIFT_LEAF_SURROUND = getBranchVGap(root)
             def m = createNodeToVisibleNonFreeChildren(root)
             m.each { entry ->
                 def node = entry.key
@@ -277,7 +275,7 @@ class MacmarrumChangeListenerUtils {
                                             if (isDisplayLeaf(child, m[child]) && isDisplayLeaf(prevChild, m[prevChild]))
                                                 setVerticalShiftIfDifferent(child, VERTICAL_SHIFT_NONE, ':2:')
                                             else
-                                                setVerticalShiftIfDifferent(child, VERTICAL_SHIFT_SPACIOUS, ':2:')
+                                                setVerticalShiftIfDifferent(child, VERTICAL_SHIFT_LEAF_SURROUND, ':2:')
                                         }
                                     }
                                 }
@@ -293,8 +291,8 @@ class MacmarrumChangeListenerUtils {
             }
         }
 
-        static getVerticalShiftSpacious(FN root) {
-            def value = root[VERTICAL_SHIFT_SPACIOUS_ATTR_NAME]?.num as String ?: '10'
+        static getBranchVGap(FN root) {
+            def value = root[BRANCH_VGAP_ATTR_NAME]?.text ?: '20'
             return Quantity.fromString(value, LengthUnit.pt)
         }
 
@@ -311,7 +309,7 @@ class MacmarrumChangeListenerUtils {
         }
 
         static setVerticalShiftIfDifferent(FN child, Quantity<LengthUnit> verticalShift, String debugPrefix = '') {
-            if (child.verticalShift != verticalShift) {
+            if (child.verticalShiftAsLength != verticalShift) {
                 def indicator = verticalShift == VERTICAL_SHIFT_NONE ? '||' : '<>'
                 debug(debugPrefix, indicator, child.text, child.id, '->', verticalShift.toString())
                 child.verticalShift = verticalShift
@@ -404,7 +402,7 @@ class MacmarrumChangeListenerUtils {
                 MacmarrumNodeChangeListener.canReact = false
                 Utils.setHorizontalShift(node)
                 def parentNode = root.mindMap.node(parent.ID)
-                CompactLeaves.forBranch(parentNode.parent ?: parentNode) // grandparent if exists, else parent - to cover `0 -> 1` children
+                BranchVGap.forBranch(parentNode.parent ?: parentNode) // grandparent if exists, else parent - to cover `0 -> 1` children
                 Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
                 MacmarrumNodeChangeListener.canReact = true
             }
@@ -415,8 +413,8 @@ class MacmarrumChangeListenerUtils {
             if (root && isRegularMap(root, nodeMoveEvent.child)) {
 //                debug("-> ${nodeMoveEvent.child.id}")
                 MacmarrumNodeChangeListener.canReact = false
-                CompactLeaves.forBranch(root.mindMap.node(nodeMoveEvent.oldParent.ID))
-                CompactLeaves.forBranch(root.mindMap.node(nodeMoveEvent.newParent.ID))
+                BranchVGap.forBranch(root.mindMap.node(nodeMoveEvent.oldParent.ID))
+                BranchVGap.forBranch(root.mindMap.node(nodeMoveEvent.newParent.ID))
                 Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
                 MacmarrumNodeChangeListener.canReact = true
             }
@@ -428,7 +426,7 @@ class MacmarrumChangeListenerUtils {
 //                debug("-- ${nodeDeletionEvent.node.id}")
                 MacmarrumNodeChangeListener.canReact = false
                 def parent = root.mindMap.node(nodeDeletionEvent.parent.ID)
-                CompactLeaves.forBranch(parent.parent ?: parent) // grandparent if exists, else parent - to cover `1 -> 0` children
+                BranchVGap.forBranch(parent.parent ?: parent) // grandparent if exists, else parent - to cover `1 -> 0` children
                 Utils.applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(root)
                 MacmarrumNodeChangeListener.canReact = true
             }
@@ -450,9 +448,9 @@ class MacmarrumChangeListenerUtils {
                 case NodeChanged.ChangedElement.TEXT:
                     Utils.minimizeNodeIfTextIsLonger(event.node)
                     break
-                case NodeChanged.ChangedElement.UNKNOWN:
+                case NodeChanged.ChangedElement.UNKNOWN: // folded/unfolded not covered here
 //                    debug("<> UNKNOWN on ${event.node.id} ${event.node.text}")
-//                    CompactLeaves.forBranch(event.node.parent) // folded/unfolded
+//                    BranchVGap.forBranch(event.node.parent) // folded/unfolded
                     break
             }
             canReact = true
