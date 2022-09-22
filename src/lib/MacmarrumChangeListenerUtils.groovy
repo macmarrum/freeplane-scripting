@@ -1,7 +1,6 @@
 import org.freeplane.api.*
 import org.freeplane.api.Node as FN
 import org.freeplane.core.extension.IExtension
-import org.freeplane.features.attribute.NodeAttributeTableModel
 import org.freeplane.features.edge.EdgeController
 import org.freeplane.features.edge.mindmapmode.MEdgeController
 import org.freeplane.features.filter.FilterController
@@ -236,7 +235,7 @@ class MacmarrumChangeListenerUtils {
         }
 
         static forBranch(FN root) {
-            final VERTICAL_SHIFT_SPACIOUS = getVerticalShiftSpacious()
+            final VERTICAL_SHIFT_SPACIOUS = getVerticalShiftSpacious(root)
             def m = createNodeToVisibleNonFreeChildren(root)
             m.each { entry ->
                 def node = entry.key
@@ -276,17 +275,8 @@ class MacmarrumChangeListenerUtils {
             }
         }
 
-        static getVerticalShiftSpacious() {
-            def value = '10'
-            def rootModel = Controller.currentController.map.rootNode
-            def attrTable = NodeAttributeTableModel.getModel(rootModel)
-            if (attrTable) {
-                def attr = attrTable.attributes.find { it.name == VERTICAL_SHIFT_SPACIOUS_ATTR_NAME }
-                if (attr && attr.value !== null) {
-                    value = (attr.value as Integer).toString()
-                    debug('::', VERTICAL_SHIFT_SPACIOUS_ATTR_NAME, value)
-                }
-            }
+        static getVerticalShiftSpacious(FN root) {
+            def value = root[VERTICAL_SHIFT_SPACIOUS_ATTR_NAME]?.num as String ?: '10'
             return Quantity.fromString(value, LengthUnit.pt)
         }
 
