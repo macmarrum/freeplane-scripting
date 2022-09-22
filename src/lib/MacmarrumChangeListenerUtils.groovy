@@ -1,5 +1,8 @@
-import org.freeplane.api.*
+import org.freeplane.api.LengthUnit
 import org.freeplane.api.Node as FN
+import org.freeplane.api.NodeChangeListener
+import org.freeplane.api.NodeChanged
+import org.freeplane.api.Quantity
 import org.freeplane.core.extension.IExtension
 import org.freeplane.features.edge.EdgeController
 import org.freeplane.features.edge.mindmapmode.MEdgeController
@@ -122,6 +125,18 @@ class MacmarrumChangeListenerUtils {
         }
     }
 
+    static enum Feature {
+        MINI_NODES, BRANCH_COLORS, H_GAP, COMPACT_LEAVES
+    }
+
+    static final FEATURES_ATTR_NAME = 'MacmarrumFeatures'
+
+    static isEnabled(Feature feature, FN root) {
+        return root[FEATURES_ATTR_NAME]?.text?.find("\\b${feature}\\b")
+//            def features = root[FEATURES_ATTR_NAME]?.text?.findAll(/[^,\s]+/)
+//            return feature.toString() in features
+    }
+
     static class Utils {
         static String horizontalShift = '1 cm'
         static Quantity<LengthUnit> hGap = Quantity.fromString(horizontalShift, LengthUnit.px)
@@ -136,13 +151,9 @@ class MacmarrumChangeListenerUtils {
             }
         }
 
-        static isEnabled(FN root) {
-
-        }
-
         static setHorizontalShift(FN node) {
-            return // DISABLED
-            if (horizontalShift != 'none' && node.horizontalShiftAsLength != hGap && node.visible && !node.free) {
+//            return // DISABLED
+            if (isEnabled(Feature.H_GAP, node.mindMap.root) && horizontalShift != 'none' && node.horizontalShiftAsLength != hGap && node.visible && !node.free) {
 //            debug(">> setHorizontalShift")
                 node.horizontalShift = hGap
             }
@@ -176,7 +187,8 @@ class MacmarrumChangeListenerUtils {
         }
 
         static applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(FN root) {
-            return // DISABLED
+            if (!isEnabled(Feature.BRANCH_COLORS, root))
+                return
             int colorCounter
             Color edgeColor
             Color bgColor
@@ -205,7 +217,7 @@ class MacmarrumChangeListenerUtils {
         static final max_shortened_text_length = config.getIntProperty("max_shortened_text_length")
 
         static minimizeNodeIfTextIsLonger(FN node) {
-            if (node.visible) {
+            if (isEnabled(Feature.MINI_NODES, node.mindMap.root) && node.visible) {
                 // use node.to to get the size of the resulting value, not the underlying formula
                 // NB. node.to triggers formula evaluation if core is not IFormattedObject, Number or Date
                 node.minimized = node.to.plain.size() > max_shortened_text_length
@@ -239,6 +251,8 @@ class MacmarrumChangeListenerUtils {
         }
 
         static forBranch(FN root) {
+            if (!isEnabled(Feature.COMPACT_LEAVES, root))
+                return
             final VERTICAL_SHIFT_SPACIOUS = getVerticalShiftSpacious(root)
             def m = createNodeToVisibleNonFreeChildren(root)
             m.each { entry ->
