@@ -29,14 +29,14 @@ class MacmarrumChangeListenerUtils {
         println(args.collect { it.replaceAll('\n', ' | ') }.join(' '))
     }
 
-    static int toggleChangeListeners(Node root) {
+    static int toggleChangeListeners(FN root) {
         int n = toggleNodeChangeListener(root)
         int m = toggleMapChangeListener(root)
 //        updateInformationNode(root, n + m)
         return n + m
     }
 
-    static int toggleNodeChangeListener(Node root) {
+    static int toggleNodeChangeListener(FN root) {
         def macmarrumListeners = root.mindMap.listeners.findAll {
             it.class.simpleName == MacmarrumNodeChangeListener.class.simpleName
         }
@@ -53,7 +53,7 @@ class MacmarrumChangeListenerUtils {
         }
     }
 
-    static int toggleMapChangeListener(Node root) {
+    static int toggleMapChangeListener(FN root) {
         def mapController = Controller.currentModeController.mapController
         def macmarrumListeners = mapController.mapChangeListeners.findAll {
             it.class.simpleName == MacmarrumMapChangeListener.class.simpleName
@@ -97,10 +97,10 @@ class MacmarrumChangeListenerUtils {
         }
     }
 
-    static updateInformationNode(Node root, int listnersCount) {
+    static updateInformationNode(FN root, int listnersCount) {
         String alias = 'macmarrumChangeListeners'
-        List<Node> foundlings = root.find { Node it -> it.isGlobal && it.alias == alias }
-        Node target = foundlings.size() == 1 ? foundlings[0] : null
+        List<FN> foundlings = root.find { FN it -> it.isGlobal && it.alias == alias }
+        FN target = foundlings.size() == 1 ? foundlings[0] : null
         if (!target) {
             target = root.createChild(alias.replaceAll(/_/, ' '))
             target.sideAtRoot = 'LEFT'
@@ -127,7 +127,7 @@ class MacmarrumChangeListenerUtils {
         static Quantity<LengthUnit> hGap = Quantity.fromString(horizontalShift, LengthUnit.px)
         static final controller = EdgeController.controller as MEdgeController
 
-        static pullAndUpdateHGapIfNotNull(Node root) {
+        static pullAndUpdateHGapIfNotNull(FN root) {
             def horizontalShift = root['h.shift']?.text
             if (horizontalShift != null) {
                 this.horizontalShift = horizontalShift
@@ -136,7 +136,11 @@ class MacmarrumChangeListenerUtils {
             }
         }
 
-        static setHorizontalShift(Node node) {
+        static isEnabled(FN root) {
+
+        }
+
+        static setHorizontalShift(FN node) {
             return // DISABLED
             if (horizontalShift != 'none' && node.horizontalShiftAsLength != hGap && node.visible && !node.free) {
 //            debug(">> setHorizontalShift")
@@ -144,11 +148,11 @@ class MacmarrumChangeListenerUtils {
             }
         }
 
-        static setHorizontalShiftForBranch(Node root) {
-            root.findAll().drop(1).each { Node it -> setHorizontalShift(it) }
+        static setHorizontalShiftForBranch(FN root) {
+            root.findAll().drop(1).each { FN it -> setHorizontalShift(it) }
         }
 
-        static int getGrandchildVisiblePosition(Node leaf) {
+        static int getGrandchildVisiblePosition(FN leaf) {
             def parent = leaf.parent
             if (parent == null) // root node
                 return 0
@@ -163,7 +167,7 @@ class MacmarrumChangeListenerUtils {
                     }
                 }
             }
-            for (Node child : parent.children) {
+            for (FN child : parent.children) {
                 if (child.id == leaf.id)
                     return leafCount
                 if (child.visible)
@@ -171,7 +175,7 @@ class MacmarrumChangeListenerUtils {
             }
         }
 
-        static applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(Node root) {
+        static applyEdgeColorsToBranchesAndAlteringColorsToLeafsInMap(FN root) {
             return // DISABLED
             int colorCounter
             Color edgeColor
@@ -180,7 +184,7 @@ class MacmarrumChangeListenerUtils {
             root.children.eachWithIndex { level1, i ->
                 colorCounter = i + 1
                 edgeColor = controller.getEdgeColor(mapModel, colorCounter)
-                level1.find { it.visible }.each { Node it ->
+                level1.find { it.visible }.each { FN it ->
                     NodeModel nodeModel = it.delegate
                     def nodeBorderModel = NodeBorderModel.createNodeBorderModel(nodeModel)
                     if (it.leaf && it.getNodeLevel(false) > 1) {
@@ -200,7 +204,7 @@ class MacmarrumChangeListenerUtils {
         static final config = new FreeplaneScriptBaseClass.ConfigProperties()
         static final max_shortened_text_length = config.getIntProperty("max_shortened_text_length")
 
-        static minimizeNodeIfTextIsLonger(Node node) {
+        static minimizeNodeIfTextIsLonger(FN node) {
             if (node.visible) {
                 // use node.to to get the size of the resulting value, not the underlying formula
                 // NB. node.to triggers formula evaluation if core is not IFormattedObject, Number or Date
@@ -208,7 +212,7 @@ class MacmarrumChangeListenerUtils {
             }
         }
 
-        static applyStyleBasedOnOtherNodesStyle(Node node) {
+        static applyStyleBasedOnOtherNodesStyle(FN node) {
             node.mindMap.root.findAll().drop(1).each {
                 if (it.visible) {
                     def newStyle = calculateStyle(it)
@@ -219,7 +223,7 @@ class MacmarrumChangeListenerUtils {
             }
         }
 
-        static String calculateStyle(Node node) {
+        static String calculateStyle(FN node) {
             return null
         }
     }
@@ -347,9 +351,9 @@ class MacmarrumChangeListenerUtils {
 
 
     static class MacmarrumMapChangeListenerEnablerForMap implements IExtension {
-        public Node root
+        public FN root
 
-        MacmarrumMapChangeListenerEnablerForMap(Node root) {
+        MacmarrumMapChangeListenerEnablerForMap(FN root) {
             this.root = root
         }
 
@@ -365,11 +369,11 @@ class MacmarrumChangeListenerUtils {
 
     static class MacmarrumMapChangeListener implements IMapChangeListener {
 
-        static Node getRootIfListenerIsEnabled(MapModel mapModel) {
+        static FN getRootIfListenerIsEnabled(MapModel mapModel) {
             return MacmarrumMapChangeListenerEnablerForMap.getExtensionOf(mapModel.rootNode)?.root
         }
 
-        static boolean isRegularMap(Node root, NodeModel changedNode) {
+        static boolean isRegularMap(FN root, NodeModel changedNode) {
             return root.id == changedNode.map.rootNode.id
         }
 
@@ -378,7 +382,7 @@ class MacmarrumChangeListenerUtils {
         }
 
         void onNodeInserted(NodeModel parent, NodeModel child, int newIndex) {
-            Node root = getRootIfListenerIsEnabled(child.map)
+            FN root = getRootIfListenerIsEnabled(child.map)
             if (root && isRegularMap(root, child)) {
                 def id = child.createID() // gets id or generates it
 //                debug("++ ${id}")
@@ -393,7 +397,7 @@ class MacmarrumChangeListenerUtils {
         }
 
         void onNodeMoved(NodeMoveEvent nodeMoveEvent) {
-            Node root = getRootIfListenerIsEnabled(nodeMoveEvent.child.map)
+            FN root = getRootIfListenerIsEnabled(nodeMoveEvent.child.map)
             if (root && isRegularMap(root, nodeMoveEvent.child)) {
 //                debug("-> ${nodeMoveEvent.child.id}")
                 MacmarrumNodeChangeListener.canReact = false
@@ -405,7 +409,7 @@ class MacmarrumChangeListenerUtils {
         }
 
         void onNodeDeleted(NodeDeletionEvent nodeDeletionEvent) {
-            Node root = getRootIfListenerIsEnabled(nodeDeletionEvent.node.map)
+            FN root = getRootIfListenerIsEnabled(nodeDeletionEvent.node.map)
             if (root && isRegularMap(root, nodeDeletionEvent.node)) {
 //                debug("-- ${nodeDeletionEvent.node.id}")
                 MacmarrumNodeChangeListener.canReact = false
