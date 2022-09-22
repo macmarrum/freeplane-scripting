@@ -11,10 +11,6 @@ import org.freeplane.features.map.*
 import org.freeplane.features.mode.Controller
 import org.freeplane.features.nodelocation.LocationModel
 import org.freeplane.features.nodestyle.NodeBorderModel
-import org.freeplane.features.styles.ConditionalStyleModel
-import org.freeplane.features.styles.LogicalStyleController
-import org.freeplane.features.styles.StyleFactory
-import org.freeplane.features.styles.mindmapmode.MLogicalStyleController
 import org.freeplane.plugin.script.FreeplaneScriptBaseClass
 
 import java.awt.*
@@ -133,8 +129,6 @@ class MacmarrumChangeListenerUtils {
 
     static isEnabled(Feature feature, FN root) {
         return root[FEATURES_ATTR_NAME]?.text?.find("\\b${feature}\\b")
-//            def features = root[FEATURES_ATTR_NAME]?.text?.findAll(/[^,\s]+/)
-//            return feature.toString() in features
     }
 
     static class Utils {
@@ -151,7 +145,7 @@ class MacmarrumChangeListenerUtils {
             if (isEnabled(Feature.HGAP, root)) {
                 def hGap = getHGap(root)
                 if (node.horizontalShiftAsLength != hGap && node.visible && !node.free) {
-//            debug(">> setHorizontalShift")
+//                    debug(">> setHorizontalShift")
                     node.horizontalShift = hGap
                 }
             }
@@ -244,8 +238,7 @@ class MacmarrumChangeListenerUtils {
         static final VERTICAL_SHIFT_NONE = LocationModel.NULL_LOCATION.shiftY
 
         static debug(String... args) {
-//            return // DISABLE
-            println(args.join(' '))
+//            println(args.join(' '))
         }
 
         static forBranch(FN root) {
@@ -316,7 +309,7 @@ class MacmarrumChangeListenerUtils {
             }
         }
 
-        static java.util.Map<FN, List<FN>> createNodeToVisibleNonFreeChildren(FN node, java.util.Map<FN, List<FN>> m = null) {
+        static Map<FN, List<FN>> createNodeToVisibleNonFreeChildren(FN node, Map<FN, List<FN>> m = null) {
             if (m === null)
                 m = new HashMap<FN, List<FN>>()
             m[node] = node.children.findAll { FN child -> (child.visible || SummaryNode.isSummaryNode(child.delegate)) && !child.free }
@@ -324,40 +317,6 @@ class MacmarrumChangeListenerUtils {
                 createNodeToVisibleNonFreeChildren(child, m)
             }
             return m
-        }
-
-        static addNodeConditionalStyleIfNotPresent(FN node, String styleName) {
-            NodeModel nodeModel = node.delegate
-            MapModel mapModel = nodeModel.map
-            def condiStyleModel = getOrCreateConditionalStyleModelOf(nodeModel)
-            def iStyle = StyleFactory.create(styleName)
-            if (!condiStyleModel.styles.any { it.style == iStyle }) {
-                def logicalStyleController = LogicalStyleController.controller as MLogicalStyleController
-                logicalStyleController.addConditionalStyle(mapModel, condiStyleModel, true, null, iStyle, false)
-            }
-        }
-
-        static ConditionalStyleModel getOrCreateConditionalStyleModelOf(NodeModel node) {
-            def conditionalStyleModel = node.getExtension(ConditionalStyleModel.class) as ConditionalStyleModel
-            if (conditionalStyleModel == null) {
-                conditionalStyleModel = new ConditionalStyleModel()
-                node.addExtension(conditionalStyleModel)
-            }
-            return conditionalStyleModel
-        }
-
-        static removeNodeConditionalStyleIfPresent(FN node, String styleName) {
-            NodeModel nodeModel = node.delegate
-            MapModel mapModel = nodeModel.map
-            def condiStyleModel = nodeModel.getExtension(ConditionalStyleModel.class) as ConditionalStyleModel
-            if (condiStyleModel !== null) {
-                def logicalStyleController = LogicalStyleController.controller as MLogicalStyleController
-                def iStyle = StyleFactory.create(styleName)
-                condiStyleModel.styles.eachWithIndex { it, i ->
-                    if (it.style == iStyle)
-                        logicalStyleController.removeConditionalStyle(mapModel, condiStyleModel, i)
-                }
-            }
         }
     }
 
