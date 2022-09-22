@@ -19,6 +19,8 @@ import java.util.List
 
 class MacmarrumChangeListenerUtils {
     static dfLong = new SimpleDateFormat('yyyy-MM-dd,E HH:mm:ss')
+    static final DEFAULT_HGAP = '30'
+    static final DEFAULT_BRANCH_VGAP = '10'
 
     /*
      * Note: config is read only at start-up. If changed afterwards, the Listener needs to be restarted.
@@ -136,7 +138,7 @@ class MacmarrumChangeListenerUtils {
         static final controller = EdgeController.controller as MEdgeController
 
         static getHGap(FN root) {
-            def value = root[HGAP_ATTR_NAME]?.text ?: '30'
+            def value = root[HGAP_ATTR_NAME]?.text ?: DEFAULT_HGAP
             return Quantity.fromString(value, LengthUnit.pt)
         }
 
@@ -285,7 +287,7 @@ class MacmarrumChangeListenerUtils {
         }
 
         static getBranchVGap(FN root) {
-            def value = root[BRANCH_VGAP_ATTR_NAME]?.text ?: '20'
+            def value = root[BRANCH_VGAP_ATTR_NAME]?.text ?: DEFAULT_BRANCH_VGAP
             return Quantity.fromString(value, LengthUnit.pt)
         }
 
