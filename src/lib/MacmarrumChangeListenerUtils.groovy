@@ -1,6 +1,7 @@
 import org.freeplane.api.*
 import org.freeplane.api.Node as FN
 import org.freeplane.core.extension.IExtension
+import org.freeplane.features.attribute.NodeAttributeTableModel
 import org.freeplane.features.edge.EdgeController
 import org.freeplane.features.edge.mindmapmode.MEdgeController
 import org.freeplane.features.filter.FilterController
@@ -226,16 +227,16 @@ class MacmarrumChangeListenerUtils {
 
 
     static class CompactLeaves {
-        static final LEAF_CHILDREN_STYLE_NAME = 'Leaf children'
-        static final VERTICAL_SHIFT = Quantity.fromString('-17', LengthUnit.pt)
+        static final VERTICAL_SHIFT_SPACIOUS_ATTR_NAME = 'MacmarrumSpaciousVGap'
         static final VERTICAL_SHIFT_NONE = LocationModel.NULL_LOCATION.shiftY
 
         static debug(String... args) {
-            ''
-//        println(args.join(' '))
+//            return // DISABLE
+            println(args.join(' '))
         }
 
         static forBranch(FN root) {
+            final VERTICAL_SHIFT_SPACIOUS = getVerticalShiftSpacious()
             def m = createNodeToVisibleNonFreeChildren(root)
             m.each { entry ->
                 def node = entry.key
@@ -243,24 +244,23 @@ class MacmarrumChangeListenerUtils {
                 if (children.size() > 0) {
                     if (!node.folded) {
                         if (children.every { isDisplayLeaf(it, m[it]) }) {
-                            addNodeConditionalStyleIfNotPresent(node, LEAF_CHILDREN_STYLE_NAME)
-                            children.each {
-                                debug(":1: ${it.id} ${it.text} -> ${VERTICAL_SHIFT_NONE}")
-                                if (it.visible) // ignore summary nodes
-                                    it.verticalShift = VERTICAL_SHIFT_NONE
+                            children.each { FN child ->
+                                if (child.visible) {// ignore summary nodes
+                                    setVerticalShiftIfDifferent(child, VERTICAL_SHIFT_NONE, ':1:')
+                                }
                             }
                         } else {
-                            removeNodeConditionalStyleIfPresent(node, LEAF_CHILDREN_STYLE_NAME)
                             children.eachWithIndex { FN child, int i ->
-                                if (i > 0 && child.visible) {  // ignore summary nodes
-                                    def prevChild = getPreviousNonSummaryNode(i, children)
-                                    if (prevChild) {
-                                        if (isDisplayLeaf(child, m[child]) && isDisplayLeaf(prevChild, m[prevChild])) {
-                                            debug(":2: ${child.id} ${child.text} -> ${VERTICAL_SHIFT}")
-                                            child.verticalShift = VERTICAL_SHIFT
-                                        } else if (child.verticalShift != VERTICAL_SHIFT_NONE) {
-                                            debug(":2: ${child.id} ${child.text} -> ${VERTICAL_SHIFT_NONE}")
-                                            child.verticalShift = VERTICAL_SHIFT_NONE
+                                if (child.visible) { // ignore summary nodes
+                                    if (i == 0) {
+                                        setVerticalShiftIfDifferent(child, VERTICAL_SHIFT_NONE, ':0:')
+                                    } else {
+                                        def prevChild = getPreviousVisible(i, children)
+                                        if (prevChild) {
+                                            if (isDisplayLeaf(child, m[child]) && isDisplayLeaf(prevChild, m[prevChild]))
+                                                setVerticalShiftIfDifferent(child, VERTICAL_SHIFT_NONE, ':2:')
+                                            else
+                                                setVerticalShiftIfDifferent(child, VERTICAL_SHIFT_SPACIOUS, ':2:')
                                         }
                                     }
                                 }
@@ -268,20 +268,45 @@ class MacmarrumChangeListenerUtils {
                         }
                     }
                 } else {
-                    removeNodeConditionalStyleIfPresent(node, LEAF_CHILDREN_STYLE_NAME)
+                    children.each { FN child ->
+                        if (child.visible)
+                            setVerticalShiftIfDifferent(child, VERTICAL_SHIFT_NONE, ':3:')
+                    }
                 }
             }
+        }
+
+        static getVerticalShiftSpacious() {
+            def value = '10'
+            def rootModel = Controller.currentController.map.rootNode
+            def attrTable = NodeAttributeTableModel.getModel(rootModel)
+            if (attrTable) {
+                def attr = attrTable.attributes.find { it.name == VERTICAL_SHIFT_SPACIOUS_ATTR_NAME }
+                if (attr && attr.value !== null) {
+                    value = (attr.value as Integer).toString()
+                    debug('::', VERTICAL_SHIFT_SPACIOUS_ATTR_NAME, value)
+                }
+            }
+            return Quantity.fromString(value, LengthUnit.pt)
         }
 
         static isDisplayLeaf(FN node, List<FN> children) {
             return children.size() == 0 || node.folded || SummaryNode.isSummaryNode(node.delegate)
         }
 
-        static getPreviousNonSummaryNode(int index, List<FN> children) {
+        static getPreviousVisible(int index, List<FN> children) {
             def i = index - 1
             while (i >= 0) {
                 if (children[i].visible) // ignore summary nodes
                     return children[i]
+            }
+        }
+
+        static setVerticalShiftIfDifferent(FN child, Quantity<LengthUnit> verticalShift, String debugPrefix = '') {
+            if (child.verticalShift != verticalShift) {
+                def indicator = verticalShift == VERTICAL_SHIFT_NONE ? '||' : '<>'
+                debug(debugPrefix, indicator, child.text, child.id, '->', verticalShift.toString())
+                child.verticalShift = verticalShift
             }
         }
 
