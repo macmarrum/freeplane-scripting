@@ -61,7 +61,7 @@ class ConfluenceStorage {
      * and replace each space with nbsp, if gemini present
      */
     static String getContent(FPN n) {
-        String content = isMarkupMaker(n) ? makeMarkup(n) : n.noteText ? n.note.text : n.transformedText
+        String content = isMarkupMaker(n) ? makeMarkup(n) : n.note?.text ?: n.transformedText
         if (hasIcon(n, icon.xmlEscape_broom)) content = XmlUtil.escapeXml(content)
         if (hasIcon(n, icon.pReplacements_doubleCurlyLoop)) content = _applyReplacements(n, content)
         return hasIcon(n, icon.nbsp_gemini) ? content.replaceAll(/ /, '&nbsp;') : content
@@ -619,7 +619,7 @@ class ConfluenceStorage {
             else {
                 def firstChildChain = yesentryPatternChildren.collect { getFirstChildChain(it) }.flatten()
                 def contentList = firstChildChain.collect { getContent(it) }
-                def pattern = patternNode.details?.text ?: patternNode.note?.text ?: patternNode.transformedText
+                def pattern = patternNode.details?.text ?: patternNode.note?.text ?: getContent(patternNode)
                 return MessageFormat.format(pattern, *contentList)
             }
         }
