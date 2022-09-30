@@ -1,17 +1,13 @@
 // @ExecutionModes({ON_SINGLE_NODE})
 
+
 import org.freeplane.api.Connector
 import org.freeplane.api.Node
 import org.freeplane.api.Node as FN
-import org.freeplane.features.attribute.Attribute
-import org.freeplane.features.attribute.AttributeController
 import org.freeplane.features.attribute.NodeAttributeTableModel
-import org.freeplane.features.attribute.mindmapmode.MAttributeController
-import org.freeplane.features.format.FormattedObject
 import org.freeplane.features.format.IFormattedObject
 import org.freeplane.features.map.NodeModel
 import org.freeplane.features.mode.Controller
-import org.freeplane.plugin.script.proxy.ProxyUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 import org.freeplane.view.swing.features.filepreview.ExternalResource
 import org.freeplane.view.swing.features.filepreview.ViewerController
@@ -20,12 +16,13 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 def node = ScriptUtils.node()
+final allowInteraction = true
+node.mindMap.save(allowInteraction)
 def file = node.mindMap.file
 def obfuscatedFile = new File(file.parentFile, 'obfuscated~' + file.name)
 Files.copy(file.toPath(), obfuscatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
 def loader = ScriptUtils.c().mapLoader(obfuscatedFile)
 loader.withView()
-def mAttrCtrl = AttributeController.controller as MAttributeController
 for (FN n in loader.mindMap.root.findAll()) {
     obfuscateCore(n)
     obfuscateDetails(n)
@@ -40,13 +37,6 @@ static x(CharSequence msg) {
     return msg.replaceAll(/\w/, 'x')
 }
 
-static xc(Connector c) {
-    for (propertyName in ['sourceLabel', 'middleLabel', 'targetLabel']) {
-        String label = c."$propertyName"
-        if (label !== null)
-            c.sourceLabel = x(label)
-    }
-}
 
 static obfuscateCore(Node n) {
     if (n.text.startsWith('<html>'))
@@ -70,28 +60,24 @@ static obfuscateNote(Node n) {
 static obfuscateAttributes(NodeModel m) {
     NodeAttributeTableModel attributeTable = m.getExtension(NodeAttributeTableModel.class)
     if (attributeTable !== null) {
-        def i = 0
         for (attr in attributeTable.attributes) {
             def value = attr.value
-            if (value instanceof IFormattedObject) {
-                if (value instanceof FormattedObject) {
-                    def foValue = value as FormattedObject
-                    def newFormattedObject = new FormattedObject(x(foValue.object as String), foValue.pattern)
-                    attr.value = newFormattedObject
-                }
-            } else if (!(value instanceof Number || value instanceof Date)) {
+            if (!(value instanceof IFormattedObject || value instanceof Number || value instanceof Date)) {
                 def stringValue = value as String
                 if (!stringValue.startsWith('='))
                     attr.value = x(stringValue)
             }
-            i++
         }
     }
 }
 
 static obfuscateConnectors(Node n) {
     for (conn in n.connectorsOut) {
-        xc(conn)
+        for (propertyName in ['sourceLabel', 'middleLabel', 'targetLabel']) {
+            String label = conn."$propertyName"
+            if (label !== null)
+                conn.sourceLabel = x(label)
+        }
     }
 }
 
