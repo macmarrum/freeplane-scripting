@@ -1,22 +1,19 @@
-import org.freeplane.api.LengthUnit
-import org.freeplane.api.Node
+import org.freeplane.api.*
 import org.freeplane.api.Node as FN
-import org.freeplane.api.NodeChangeListener
-import org.freeplane.api.NodeChanged
-import org.freeplane.api.Quantity
 import org.freeplane.core.extension.IExtension
 import org.freeplane.features.edge.EdgeController
 import org.freeplane.features.edge.mindmapmode.MEdgeController
-import org.freeplane.features.filter.FilterController
 import org.freeplane.features.map.*
 import org.freeplane.features.mode.Controller
 import org.freeplane.features.nodelocation.LocationModel
 import org.freeplane.features.nodestyle.NodeBorderModel
 import org.freeplane.plugin.script.FreeplaneScriptBaseClass
+import org.freeplane.plugin.script.proxy.NodeProxy
 
 import java.awt.*
 import java.text.SimpleDateFormat
 import java.util.List
+import java.util.Map
 
 class MacmarrumChangeListenerUtils {
     static dfLong = new SimpleDateFormat('yyyy-MM-dd,E HH:mm:ss')
@@ -46,9 +43,27 @@ class MacmarrumChangeListenerUtils {
         return n + m
     }
 
+    static int toggleNodeChangeListener2(FN root) {
+        def mapController = Controller.currentModeController.mapController
+        def macmarrumListeners = mapController.nodeChangeListeners.findAll {
+            it.class.name == MacmarrumNodeChangeListener2.class.name
+        }
+        if (macmarrumListeners.size() == 0) {
+            mapController.addNodeChangeListener(new MacmarrumNodeChangeListener2())
+            debug(">> toggleNodeChangeListener => ON")
+            return 1
+        } else {
+            for (nodeChangeListener in macmarrumListeners) {
+                mapController.removeNodeChangeListener(nodeChangeListener)
+            }
+            debug(">> toggleNodeChangeListener => OFF")
+            return 0
+        }
+    }
+
     static int toggleNodeChangeListener(FN root) {
         def macmarrumListeners = root.mindMap.listeners.findAll {
-            it.class.simpleName == MacmarrumNodeChangeListener.class.simpleName
+            it.class.name == MacmarrumNodeChangeListener.class.name
         }
         if (macmarrumListeners.size() == 0) {
             root.mindMap.addListener(new MacmarrumNodeChangeListener())
@@ -216,7 +231,9 @@ class MacmarrumChangeListenerUtils {
             if (isEnabled(Feature.MINI_NODES, node.mindMap.root) && node.visible) {
                 // use node.to to get the size of the resulting value, not the underlying formula
                 // NB. node.to triggers formula evaluation if core is not IFormattedObject, Number or Date
-                node.minimized = node.to.plain.size() > max_shortened_text_length
+                def desiredMinimizedState = node.to.plain.size() > max_shortened_text_length
+                if (node.minimized != desiredMinimizedState)
+                    node.minimized = desiredMinimizedState
             }
         }
 
@@ -356,7 +373,7 @@ class MacmarrumChangeListenerUtils {
     static class MacmarrumMapChangeListener implements IMapChangeListener {
 
         static debug(String msg) {
-            println(msg)
+//            println(msg)
         }
 
         static FN getRootIfListenerIsEnabled(MapModel mapModel) {
@@ -367,15 +384,11 @@ class MacmarrumChangeListenerUtils {
             return root.id == changedNode.map.rootNode.id
         }
 
-        static boolean isVisible(NodeModel node) {
-            return node.hasVisibleContent(FilterController.getFilter(node.map))
-        }
-
         void onNodeInserted(NodeModel parent, NodeModel child, int newIndex) {
             FN root = getRootIfListenerIsEnabled(child.map)
             if (root && isRegularMap(root, child)) {
                 def id = child.createID() // gets id or generates it
-//                debug("++ ${id}")
+                debug("++ ${id}")
                 def node = root.mindMap.node(id)
                 MacmarrumNodeChangeListener.canReact = false
                 Utils.setHorizontalShift(node)
@@ -390,7 +403,7 @@ class MacmarrumChangeListenerUtils {
         void onNodeMoved(NodeMoveEvent nodeMoveEvent) {
             FN root = getRootIfListenerIsEnabled(nodeMoveEvent.child.map)
             if (root && isRegularMap(root, nodeMoveEvent.child)) {
-//                debug("-> ${nodeMoveEvent.child.id}")
+                debug("-> ${nodeMoveEvent.child.id}")
                 MacmarrumNodeChangeListener.canReact = false
                 CousinVGap.forBranch(root.mindMap.node(nodeMoveEvent.oldParent.ID))
                 if (nodeMoveEvent.oldParent.ID != nodeMoveEvent.newParent.ID)
@@ -403,7 +416,7 @@ class MacmarrumChangeListenerUtils {
         void onNodeDeleted(NodeDeletionEvent nodeDeletionEvent) {
             FN root = getRootIfListenerIsEnabled(nodeDeletionEvent.node.map)
             if (root && isRegularMap(root, nodeDeletionEvent.node)) {
-//                debug("-- ${nodeDeletionEvent.node.id}")
+                debug("-- ${nodeDeletionEvent.node.id}")
                 MacmarrumNodeChangeListener.canReact = false
                 def parent = root.mindMap.node(nodeDeletionEvent.parent.ID)
                 CousinVGap.forBranch(parent.parent ?: parent) // grandparent if exists, else parent - to cover `1 -> 0` children
@@ -428,9 +441,36 @@ class MacmarrumChangeListenerUtils {
                 case NodeChanged.ChangedElement.TEXT:
                     Utils.minimizeNodeIfTextIsLonger(event.node)
                     break
-                case NodeChanged.ChangedElement.UNKNOWN: // folded/unfolded not covered here
+//                case NodeChanged.ChangedElement.UNKNOWN: // folded/unfolded not covered here
 //                    debug("<> UNKNOWN on ${event.node.id} ${event.node.text}")
 //                    CousinVGap.forBranch(event.node.parent) // folded/unfolded
+//                    break
+            }
+            canReact = true
+        }
+    }
+
+    static class MacmarrumNodeChangeListener2 implements INodeChangeListener {
+        static canReact = true
+
+        void debug(String... args) {
+//            println(args.join(' '))
+        }
+
+        @Override
+        void nodeChanged(NodeChangeEvent event) {
+            debug(">> MacmarrumNodeChangeListener2.nodeChanged canReact:$canReact ${event.property} ${event.node.text} ${event.node.createID()}")
+            if (!canReact)
+                return
+            canReact = false
+            def node = new NodeProxy(event.node, null) as FN
+            switch (event.property) {
+                case NodeModel.NODE_TEXT:
+                    Utils.minimizeNodeIfTextIsLonger(node)
+                    break
+                case NodeModel.NodeChangeType.FOLDING:
+                    if (!node.root)
+                        CousinVGap.forBranch(node.parent)
                     break
             }
             canReact = true
