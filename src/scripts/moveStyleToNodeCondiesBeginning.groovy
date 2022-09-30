@@ -31,7 +31,7 @@ for (FPN node in c.selecteds) {
     NodeModel nodeModel = node.delegate
     MapModel map = node.mindMap.delegate
     ConditionalStyleModel condiStyleModel = getConditionalStyleModel(nodeModel)
-    ((MLogicalStyleController) LogicalStyleController.getController()).addConditionalStyle(map, condiStyleModel, true, null, iStyle, false)
+    (LogicalStyleController.controller as MLogicalStyleController).insertConditionalStyle(map, condiStyleModel, 0, true, null, iStyle, false)
 //    toBeSelected_nodesWithStyleAddedToCondies.add(node)
 }
 //c.select(toBeSelected_nodesWithStyleAddedToCondies)
