@@ -1,29 +1,42 @@
 // @ExecutionModes({ON_SINGLE_NODE})
 
 
-import org.freeplane.api.Connector
 import org.freeplane.api.Node
 import org.freeplane.api.Node as FN
+import org.freeplane.core.ui.components.UITools
 import org.freeplane.features.attribute.NodeAttributeTableModel
 import org.freeplane.features.format.IFormattedObject
 import org.freeplane.features.map.NodeModel
 import org.freeplane.features.mode.Controller
+import org.freeplane.plugin.script.FreeplaneScriptBaseClass
 import org.freeplane.plugin.script.proxy.ScriptUtils
 import org.freeplane.view.swing.features.filepreview.ExternalResource
 import org.freeplane.view.swing.features.filepreview.ViewerController
 
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
+import javax.swing.*
 
+def c = ScriptUtils.c()
 def node = ScriptUtils.node()
-final allowInteraction = true
-node.mindMap.save(allowInteraction)
+def config = new FreeplaneScriptBaseClass.ConfigProperties()
+
+final hasWritePermission = config.getBooleanProperty('execute_scripts_without_write_restriction')
+final saveTitle = 'Save operation aborted'
+final saveMessage = '''
+The mindmap needs to be saved to disk manually, because the write permission for scripts is missing
+You can enable "Preferences…->Plugins->Scripting->Permit file/write operations (NOT recommended)" and the script will save mindmaps automatically
+'''
+if (!node.mindMap.saved) {
+    if (!hasWritePermission) {
+        UITools.informationMessage(UITools.currentFrame, 'You need to save your mindmap before running the script' + saveMessage, saveTitle, JOptionPane.WARNING_MESSAGE)
+        return
+    }
+    final allowInteraction = true
+    node.mindMap.save(allowInteraction)
+}
+
 def file = node.mindMap.file
-def obfuscatedFile = new File(file.parentFile, 'obfuscated~' + file.name)
-Files.copy(file.toPath(), obfuscatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-def loader = ScriptUtils.c().mapLoader(obfuscatedFile)
-loader.withView()
-for (FN n in loader.mindMap.root.findAll()) {
+def mindMap = c.mapLoader(file).withView().unsetMapLocation().mindMap
+mindMap.root.findAll().each { FN n ->
     obfuscateCore(n)
     obfuscateDetails(n)
     obfuscateNote(n)
@@ -33,10 +46,25 @@ for (FN n in loader.mindMap.root.findAll()) {
     obfuscateImagePath(m)
 }
 
+def newName = 'obfuscated~' + file.name
+def newStem = newName.replaceAll(/\.mm$/, '')
+mindMap.name = newStem
+mindMap.root.text = newStem
+def targetFile = new File(file.parentFile, newName)
+if (!hasWritePermission) {
+    UITools.informationMessage(UITools.currentFrame, newName + saveMessage, saveTitle, JOptionPane.WARNING_MESSAGE)
+} else {
+    def isOkToSave = !file.exists()
+    if (!isOkToSave && confirmOverwrite(targetFile, node.delegate))
+        isOkToSave = true
+    if (isOkToSave)
+        mindMap.saveAs(targetFile)
+}
+
+
 static x(CharSequence msg) {
     return msg.replaceAll(/\w/, 'x')
 }
-
 
 static obfuscateCore(Node n) {
     if (n.text.startsWith('<html>'))
@@ -97,4 +125,11 @@ static obfuscateImagePath(NodeModel m) {
         vc.undoableDeactivateHook(m)
         vc.undoableActivateHook(m, newExtResource)
     }
+}
+
+static boolean confirmOverwrite(File targetFile, NodeModel sourceModel) {
+    def title = 'Confirm overwrite'
+    def msg = "The file already exists:\n${targetFile.name}\nOverwire it?"
+    def decision = UITools.showConfirmDialog(sourceModel, msg, title, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)
+    return decision == 0
 }
