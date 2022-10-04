@@ -7,12 +7,14 @@ import org.freeplane.api.Node as FPN
 import org.freeplane.features.map.NodeModel
 import org.freeplane.features.styles.ConditionalStyleModel
 import org.freeplane.features.styles.LogicalStyleController
+import org.freeplane.features.styles.mindmapmode.MLogicalStyleController
 
+def controller = LogicalStyleController.controller as MLogicalStyleController
 c.selecteds.each {FPN selected ->
     NodeModel selectedModel = selected.delegate
     ConditionalStyleModel selectedConditionalStyleModel = selectedModel.getExtension(ConditionalStyleModel.class)
     if (selectedConditionalStyleModel && selectedConditionalStyleModel.styles.size() > 0) {
-        def item = LogicalStyleController.controller.removeConditionalStyle(selectedConditionalStyleModel, 0)
+        def item = controller.removeConditionalStyle(selectedConditionalStyleModel, 0)
         selected.style.name = item.style.toString()
     }
 }
