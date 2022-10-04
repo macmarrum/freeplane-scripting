@@ -3,8 +3,8 @@
  * Appends the current style to Node Conditional Styles
  */
 
+
 import org.freeplane.api.Node as FPN
-import org.freeplane.features.map.MapModel
 import org.freeplane.features.map.NodeModel
 import org.freeplane.features.styles.ConditionalStyleModel
 import org.freeplane.features.styles.IStyle
@@ -23,15 +23,15 @@ static ConditionalStyleModel getConditionalStyleModel(NodeModel node) {
     return conditionalStyleModel
 }
 
+def controller = LogicalStyleController.controller as MLogicalStyleController
 //ArrayList<FPN> toBeSelected_nodesWithStyleAddedToCondies = new ArrayList<>()
 for (FPN node in c.selecteds) {
     IStyle iStyle = node.style.style
     if (iStyle === null)
         continue
     NodeModel nodeModel = node.delegate
-    MapModel map = node.mindMap.delegate
     ConditionalStyleModel condiStyleModel = getConditionalStyleModel(nodeModel)
-    (LogicalStyleController.controller as MLogicalStyleController).insertConditionalStyle(map, condiStyleModel, 0, true, null, iStyle, false)
+    controller.insertConditionalStyle(condiStyleModel, 0, true, null, iStyle, false)
 //    toBeSelected_nodesWithStyleAddedToCondies.add(node)
 }
 //c.select(toBeSelected_nodesWithStyleAddedToCondies)

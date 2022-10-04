@@ -23,6 +23,7 @@ static ConditionalStyleModel getConditionalStyleModel(NodeModel node) {
     return conditionalStyleModel
 }
 
+def controller = LogicalStyleController.controller as MLogicalStyleController
 //ArrayList<FPN> toBeSelected_nodesWithStyleAddedToCondies = new ArrayList<>()
 for (FPN node in c.selecteds) {
     IStyle iStyle = node.style.style
@@ -31,7 +32,7 @@ for (FPN node in c.selecteds) {
     NodeModel nodeModel = node.delegate
     MapModel map = node.mindMap.delegate
     ConditionalStyleModel condiStyleModel = getConditionalStyleModel(nodeModel)
-    (LogicalStyleController.controller as MLogicalStyleController).addConditionalStyle(map, condiStyleModel, true, null, iStyle, false)
+    controller.addConditionalStyle(map, condiStyleModel, true, null, iStyle, false)
 //    toBeSelected_nodesWithStyleAddedToCondies.add(node)
 }
 //c.select(toBeSelected_nodesWithStyleAddedToCondies)
