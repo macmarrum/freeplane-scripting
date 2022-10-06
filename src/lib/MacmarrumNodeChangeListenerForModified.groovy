@@ -11,9 +11,10 @@ import static org.freeplane.api.NodeChanged.ChangedElement
 class MacmarrumNodeChangeListenerForModified implements NodeChangeListener {
     public static canReact = true
     private static dateTimeFormat = new ConfigProperties().getProperty('datetime_format')
+    private static ATTR_NAME = 'Modified'
 
-    private static void updateAttrModified(Node n) {
-        n['Modified'] = LocalDateTime.now().format(dateTimeFormat)
+    static void updateAttrModified(Node n) {
+        n[ATTR_NAME] = LocalDateTime.now().format(dateTimeFormat)
     }
 
     void nodeChanged(NodeChanged event) {
