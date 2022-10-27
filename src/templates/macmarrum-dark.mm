@@ -46,7 +46,7 @@ return CS.canApply(node, cs[1], cond)</script>
 <stylenode LOCALIZED_TEXT="styles.root_node" ID="ID_680156716" STYLE="oval" UNIFORM_SHAPE="true" VGAP_QUANTITY="24 pt">
 <font SIZE="24"/>
 <stylenode LOCALIZED_TEXT="styles.predefined" POSITION="right" STYLE="bubble">
-<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="16 px" FORMAT_AS_HYPERLINK="false" COLOR="#a9b7c6" BACKGROUND_COLOR="#333333" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="1 px" BORDER_COLOR_LIKE_EDGE="true" BORDER_COLOR="#808080" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" VERTICAL_ALIGNMENT="AS_PARENT" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm">
+<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="16 px" FORMAT_AS_HYPERLINK="false" COLOR="#a9b7c6" BACKGROUND_COLOR="#333333" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="1 px" BORDER_COLOR_LIKE_EDGE="true" BORDER_COLOR="#808080" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
 <arrowlink SHAPE="CUBIC_CURVE" COLOR="#a89984" WIDTH="2" TRANSPARENCY="255" DASH="" FONT_SIZE="9" FONT_FAMILY="SansSerif" DESTINATION="ID_602083445" STARTINCLINATION="102.75 pt;0 pt;" ENDINCLINATION="102.75 pt;3 pt;" STARTARROW="NONE" ENDARROW="DEFAULT"/>
 <font NAME="Lato" SIZE="12" BOLD="false" STRIKETHROUGH="false" ITALIC="false"/>
 <edge STYLE="bezier" COLOR="#808080" WIDTH="1" DASH="SOLID"/>
@@ -438,17 +438,21 @@ ol {
 <node TEXT="=style.name" STYLE_REF="cStorageMarkupRoot" ID="ID_1544493752"/>
 <node TEXT="=style.name" STYLE_REF="cStorageMarkupMaker" ID="ID_1910107600"/>
 <node TEXT="Icons" ID="ID_849269891">
+<node TEXT="eol (mkNode)" ID="ID_1731024471">
+<icon BUILTIN="emoji-1F3C1"/>
+<node TEXT="=parent.delegate.icons*.translatedDescription.join(&apos; | &apos;)" STYLE_REF="=Table.cell" ID="ID_1316151685"/>
+</node>
 <node TEXT="new line within" ID="ID_1488552511">
 <icon BUILTIN="emoji-2935"/>
-<node TEXT="=parent.delegate.icons*.translatedDescription.join(&apos; | &apos;)" STYLE_REF="=Table.cell" ID="ID_602893462"/>
+<node ID="ID_602893462" CONTENT_ID="ID_1316151685"/>
 </node>
 <node TEXT="&lt;h1&gt; (mkNode)" ID="ID_528647596">
 <icon BUILTIN="full-1"/>
-<node ID="ID_1980373475" CONTENT_ID="ID_602893462"/>
+<node ID="ID_1980373475" CONTENT_ID="ID_1316151685"/>
 </node>
 <node TEXT="&lt;p&gt; + pReplacements (mkNode)" ID="ID_1665667454">
 <icon BUILTIN="emoji-1F17F"/>
-<node ID="ID_1082561284" CONTENT_ID="ID_602893462"/>
+<node ID="ID_1082561284" CONTENT_ID="ID_1316151685"/>
 </node>
 <node TEXT="pReplacements (mkNode, mkTableCell, _mkHeading, mkZipList)" ID="ID_115525689">
 <icon BUILTIN="emoji-27BF"/>
@@ -463,24 +467,24 @@ ol {
     </p>
   </body>
 </html></richcontent>
-<node ID="ID_1130543427" CONTENT_ID="ID_602893462"/>
+<node ID="ID_1130543427" CONTENT_ID="ID_1316151685"/>
 </node>
 <node TEXT="s/ /&amp;nbsp;/g (mkNode, mkTableCell)" ID="ID_1176339246">
 <icon BUILTIN="emoji-264A"/>
-<node ID="ID_1146814755" CONTENT_ID="ID_602893462"/>
+<node ID="ID_1146814755" CONTENT_ID="ID_1316151685"/>
 </node>
 <node TEXT="escapeXml (mkNode, mkTableCell)" ID="ID_1750916384">
 <icon BUILTIN="emoji-1F9F9"/>
-<node ID="ID_713564453" CONTENT_ID="ID_602893462"/>
+<node ID="ID_713564453" CONTENT_ID="ID_1316151685"/>
 </node>
 <node TEXT="no trailing sep (mkNode)" ID="ID_624013854">
 <icon BUILTIN="emoji-1F317"/>
 <icon BUILTIN="emoji-264B"/>
-<node ID="ID_1623346704" CONTENT_ID="ID_602893462"/>
+<node ID="ID_1623346704" CONTENT_ID="ID_1316151685"/>
 </node>
 <node TEXT="no entry (mkNode, mkTableCell, mkTable)" ID="ID_1617878429">
 <icon BUILTIN="emoji-26D4"/>
-<node ID="ID_837428798" CONTENT_ID="ID_602893462"/>
+<node ID="ID_837428798" CONTENT_ID="ID_1316151685"/>
 </node>
 <node TEXT="stop at this (mkTable, also: mkZipList, mkCsv)" ID="ID_750477354">
 <icon BUILTIN="emoji-1F6D1"/>
@@ -498,19 +502,19 @@ ol {
     </p>
   </body>
 </html></richcontent>
-<node ID="ID_1903483171" CONTENT_ID="ID_602893462"/>
+<node ID="ID_1903483171" CONTENT_ID="ID_1316151685"/>
 </node>
 <node TEXT="&lt;ol&gt; (mkList)" ID="ID_1762666438">
 <icon BUILTIN="emoji-0023-20E3"/>
-<node ID="ID_1044722284" CONTENT_ID="ID_602893462"/>
+<node ID="ID_1044722284" CONTENT_ID="ID_1316151685"/>
 </node>
 <node TEXT="collapse (mkCode)" ID="ID_1621722269">
 <icon BUILTIN="emoji-23EB"/>
-<node ID="ID_967168174" CONTENT_ID="ID_602893462"/>
+<node ID="ID_967168174" CONTENT_ID="ID_1316151685"/>
 </node>
 <node TEXT="line numbers (mkCode)" ID="ID_192571165">
 <icon BUILTIN="emoji-1F522"/>
-<node ID="ID_1926239337" CONTENT_ID="ID_602893462"/>
+<node ID="ID_1926239337" CONTENT_ID="ID_1316151685"/>
 </node>
 <node TEXT="border (mkImage, mkSection)" ID="ID_1937131038">
 <icon BUILTIN="unchecked"/>
@@ -525,7 +529,7 @@ ol {
     </p>
   </body>
 </html></richcontent>
-<node ID="ID_1238023406" CONTENT_ID="ID_602893462"/>
+<node ID="ID_1238023406" CONTENT_ID="ID_1316151685"/>
 </node>
 </node>
 </node>
