@@ -90,6 +90,7 @@ class ConfluenceStorage {
             case 'section' -> mkSection(n)
             case 'column' -> mkColumn(n)
             case 'template' -> mkTemplate(n)
+            case 'format' -> mkFormat(n)
             default -> "<!-- mk function by that name not found: ${n.text} -->"
         }
     }
@@ -607,7 +608,19 @@ class ConfluenceStorage {
         })
     }
 
+    enum TemplateType {
+        MESSAGE, STRING;
+    }
+
     static String mkTemplate(FPN n) {
+        return _mkTemplate(n, TemplateType.MESSAGE)
+    }
+
+    static String mkFormat(FPN n) {
+        return _mkTemplate(n, TemplateType.STRING)
+    }
+
+    static String _mkTemplate(FPN n, TemplateType templateType) {
         def yesentryChildren = n.children.findAll { !hasIcon(it, icon.noEntry) }
         if (yesentryChildren.size() == 0)
             return '<!-- a child (pattern) is missing -->'
@@ -620,7 +633,10 @@ class ConfluenceStorage {
                 def firstChildChain = yesentryPatternChildren.collect { getFirstChildChain(it) }.flatten()
                 def contentList = firstChildChain.collect { getContent(it) }
                 def pattern = patternNode.details?.text ?: patternNode.note?.text ?: getContent(patternNode)
-                return MessageFormat.format(pattern, *contentList)
+                if (templateType == TemplateType.MESSAGE)
+                    return MessageFormat.format(pattern, *contentList)
+                else if (templateType == TemplateType.STRING)
+                    return String.format(pattern, *contentList)
             }
         }
     }
