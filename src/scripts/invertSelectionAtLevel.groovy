@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/InvertSelection"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Select"})
 
 import org.freeplane.api.Node as FPN
 
