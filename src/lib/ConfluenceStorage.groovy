@@ -87,6 +87,7 @@ class ConfluenceStorage {
             case 'image' -> mkImage(n)
             case 'csv' -> mkCsv(n)
             case 'wiki' -> mkWiki(n)
+            case 'markdown' -> mkMarkdown(n)
             case 'section' -> mkSection(n)
             case 'column' -> mkColumn(n)
             case 'template' -> mkTemplate(n)
@@ -605,6 +606,12 @@ class ConfluenceStorage {
     static String mkWiki(FPN n) {
         return _execIfChildren(n, {
             return _mkMacroPlain(n, 'unmigrated-wiki-markup', _mkParent(n))
+        })
+    }
+
+    static String mkMarkdown(FPN n) {
+        return _execIfChildren(n, {
+            return _mkMacroPlain(n, 'markdown', _mkParent(n))
         })
     }
 
