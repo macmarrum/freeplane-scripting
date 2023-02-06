@@ -180,8 +180,7 @@ class ConfluenceStorage {
                         pContent = getContent(n)
                     if (isP)
                         result << '<p>'
-                    result << pContent << sep
-                    result << eol
+                    result << pContent << sep  << eol
                     if (!hasIcon(n, icon.stopAtThis_stopSign))
                         n.children.each { result << mkNode(it) }
                     if (isP)
