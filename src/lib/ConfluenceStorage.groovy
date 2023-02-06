@@ -181,11 +181,11 @@ class ConfluenceStorage {
                     if (isP)
                         result << '<p>'
                     result << pContent << sep
+                    result << eol
                     if (!hasIcon(n, icon.stopAtThis_stopSign))
                         n.children.each { result << mkNode(it) }
                     if (isP)
                         result << '</p>'
-                    result << eol
                     return result
                 }
             }
