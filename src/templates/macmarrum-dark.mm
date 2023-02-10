@@ -11,6 +11,12 @@
 // every() returns true for empty iterator/list</script>
             </script_condition>
         </conditional_style>
+        <conditional_style ACTIVE="false" STYLE_REF="?child:center" LAST="false">
+            <script_condition>
+                <script>import static org.freeplane.features.map.SummaryNode.isSummaryNode
+return (!node.root &amp;&amp; isSummaryNode(node.parent.delegate))</script>
+            </script_condition>
+        </conditional_style>
         <conditional_style ACTIVE="false" STYLE_REF="?=Table.row.accent" LAST="false">
             <script_condition>
                 <script>def cs=[&apos;?=Table&apos;,&apos;?=Table.row.accent&apos;]
@@ -40,7 +46,7 @@ return CS.canApply(node, cs[1], cond)</script>
             </script_condition>
         </conditional_style>
     </conditional_styles>
-    <properties show_icon_for_attributes="false" fit_to_viewport="false" show_note_icons="true" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff"/>
+    <properties show_icon_for_attributes="false" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff" show_note_icons="true" fit_to_viewport="false"/>
 
 <map_styles>
 <stylenode LOCALIZED_TEXT="styles.root_node" ID="ID_680156716" STYLE="oval" UNIFORM_SHAPE="true" VGAP_QUANTITY="24 pt">
@@ -134,6 +140,7 @@ ol {
 <stylenode LOCALIZED_TEXT="styles.user-defined" POSITION="right" STYLE="bubble">
 <stylenode TEXT="?bg" ID="ID_1783059692" BACKGROUND_COLOR="#333333" BORDER_COLOR="#808080" BORDER_DASH="SOLID"/>
 <stylenode TEXT="?gap" ID="ID_21091341" VGAP_QUANTITY="3 pt"/>
+<stylenode TEXT="?child:center" ID="ID_1263040632" CHILD_NODES_ALIGNMENT="BY_CENTER"/>
 <stylenode LOCALIZED_TEXT="styles.important" ID="ID_749235638" BORDER_WIDTH="3 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#cc241d">
 <icon BUILTIN="yes"/>
 <arrowlink COLOR="#cc241d" TRANSPARENCY="255" DESTINATION="ID_749235638"/>
