@@ -224,10 +224,6 @@ class ConfluenceStorage {
             return cnt
     }
 
-    enum HiLite1st {
-        ROW, COLUMN, NONE
-    }
-
     static StringBuilder mkTable(FPN n) {
         def tableAnnotateText = getTableAnnotateText(n)
         def canAnnotate = tableAnnotateText == annotate
@@ -249,13 +245,19 @@ class ConfluenceStorage {
         // the first column in each row is technical, therefore it's skipped
         n.children.each { FPN row ->
             if (!hasIcon(row, icon.noEntry)) {  // not ignoreNode
-                final firstChildChainSize = _tbl_countFirstChildChain(row)
-                if (canAnnotate)
-                    row.details = (new StringBuilder() << tbl.rowCnt << firstChildChainSize).toString()
-                if (firstChildChainSize > 0) {
+                if (row.children.size() > 1) {  // each child (with descendants) is a column (vertical layout)
                     tableWiki << '<tr>' << nl
-                    mkTableCellAndAppendTo(tableWiki, row.children[0], rowNum, colNum, hiLite1st, nl, canAnnotate)
+                    makeTableCellOfEachChildWithDescendantsAndAppendTo(tableWiki, row.children, rowNum, colNum, hiLite1st, nl, canAnnotate)
                     tableWiki << '</tr>' << nl // close the row
+                } else {  // each first-child is a column (horizontal layout)
+                    final firstChildChainSize = _tbl_countFirstChildChain(row)
+                    if (canAnnotate)
+                        row.details = (new StringBuilder() << tbl.rowCnt << firstChildChainSize).toString()
+                    if (firstChildChainSize > 0) {
+                        tableWiki << '<tr>' << nl
+                        mkTableCellOfEachFirstChildInChainAndAppendTo(tableWiki, row.children[0], rowNum, colNum, hiLite1st, nl, canAnnotate)
+                        tableWiki << '</tr>' << nl // close the row
+                    }
                 }
                 rowNum++
             }
@@ -264,7 +266,31 @@ class ConfluenceStorage {
         return tableWiki
     }
 
-    static StringBuilder mkTableCellAndAppendTo(StringBuilder result, FPN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
+    enum HiLite1st {
+        ROW, COLUMN, NONE
+    }
+
+    static void makeTableCellOfEachChildWithDescendantsAndAppendTo(StringBuilder tableWiki, List<FPN> children, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
+        children.each { FPN child ->
+            if (!hasIcon(child, icon.noEntry)) {
+                tableWiki << makeTableCell(this::mkNode, child, rowNum, colNum, hiLite1st, nl, canAnnotate)
+                colNum++
+            }
+        }
+    }
+
+    static void mkTableCellOfEachFirstChildInChainAndAppendTo(StringBuilder tableWiki, FPN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
+        tableWiki << makeTableCell(this::getContent, n, rowNum, colNum, hiLite1st, nl, canAnnotate)
+        // canExcludeMarkupMaker=false because each cell is basically a top-level node, i.e. can be a cStorageMarkupMaker
+        FPN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, false)
+        if (firstChildIfNotIgnoreNode) {
+            colNum++
+            mkTableCellOfEachFirstChildInChainAndAppendTo(tableWiki, firstChildIfNotIgnoreNode, rowNum, colNum, hiLite1st, nl, canAnnotate)
+        }
+    }
+
+    static StringBuilder makeTableCell(Closure method, FPN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
+        def result = new StringBuilder()
         if (canAnnotate)
             n.details = (new StringBuilder() << tbl.rowNum << colNum).toString()
         def tag
@@ -279,13 +305,8 @@ class ConfluenceStorage {
                 tag = '<td>'
         }
         result << tag
-        result << getContent(n)
+        result << method(n)  // e.g. getContent or mkNode
         result << '</' << tag[1..-1] << nl
-        // canExcludeMarkupMaker=false because each cell is basically a top-level node, i.e. can be a cStorageMarkupMaker
-        FPN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, false)
-        if (firstChildIfNotIgnoreNode) {
-            mkTableCellAndAppendTo(result, firstChildIfNotIgnoreNode, rowNum, ++colNum, hiLite1st, nl, canAnnotate)
-        }
         return result
     }
 
