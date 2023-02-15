@@ -482,7 +482,11 @@ class ConfluenceStorage {
             if (hasIcon(child, icon.collapse_fastUpButton)) params.collapse = 'true'
             if (hasIcon(child, icon.numbers_inputNumbers)) params.linenumbers = 'true'
             if (child.link.text) params.theme = child.link.text
-            String cdata = child.plainNote  // no formula evaluation (unexposed method)
+            String cdata  // get cdata from children or from note
+            if (child.children.size() > 0)
+                cdata = mkParent(child)
+            else
+                cdata = child.plainNote  // no formula evaluation (unexposed method)
             return _mkMacroPlain(n, 'code', cdata, params)
         }
         return '<!-- a child with a note is missing -->'
