@@ -138,11 +138,11 @@ class ConfluenceStorage {
             /([^-])?---([^-])?/               : '$1&mdash;$2',
             /([^-])?--([^-])?/                : '$1&ndash;$2',
             /\{\{([^{]+)\}\}/                 : '<code>$1</code>',
-            /(?<!\*)\*\*\*([^*]+)\*\*\*(?!\*)/: '<b><i>$1</i></b>',
-            /(?<!\*)\*\*([^*]+)\*\*(?!\*)/    : '<b>$1</b>',
-            /(?<!\*)\*([^*]+)\*(?!\*)/        : '<i>$1</i>',
-            /(?<!~)~~([^~]+)~~(?!~)/          : '<s>$1</s>',
-            /(?<!_)__([^_]+)__(?!_)/          : '<u>$1</u>',
+            /(?<!\*)\*_([^*]+)_\*(?!\*)/      : '<b><i>$1</i></b>',
+            /(?<!\*)\*([^*]+)\*(?!\*)/        : '<b>$1</b>',
+            /(?<!_)_([^_]+)_(?!_)/            : '<i>$1</i>',
+            /(?<!-)-([^-]+)-(?!-)/            : '<s>$1</s>',
+            /(?<!\+)\+([^+]+)\+(?!\+)/        : '<u>$1</u>',
     ]
 
     static String _applyReplacements(FPN n, String content) {
@@ -180,7 +180,7 @@ class ConfluenceStorage {
                         pContent = getContent(n)
                     if (isP)
                         result << '<p>'
-                    result << pContent << sep  << eol
+                    result << pContent << sep << eol
                     if (!hasIcon(n, icon.stopAtThis_stopSign))
                         n.children.each { result << mkNode(it) }
                     if (isP)
