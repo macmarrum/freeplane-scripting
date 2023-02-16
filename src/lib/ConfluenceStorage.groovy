@@ -475,7 +475,7 @@ class ConfluenceStorage {
     }
 
     static String mkCode(FPN n) {
-        for (child in n.children.find { FPN it -> it.noteText !== null }) {
+        for (child in n.children.find { FPN it -> it.children.size() > 0 || it.noteText !== null }) {
             String lang = child.text ?: 'none'
             def params = [language: lang]
             if (child.detailsText) params.title = child.details.text
@@ -489,7 +489,7 @@ class ConfluenceStorage {
                 cdata = child.plainNote  // no formula evaluation (unexposed method)
             return _mkMacroPlain(n, 'code', cdata, params)
         }
-        return '<!-- a child with a note is missing -->'
+        return '<!-- a child with children or a note is missing -->'
     }
 
     static String mkPageInfo(FPN n) {
