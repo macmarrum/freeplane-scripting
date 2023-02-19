@@ -3,18 +3,13 @@
  * Removes the last style from Node Conditional Styles and sets it as the current style
  */
 
-import org.freeplane.api.Node as FPN
-import org.freeplane.features.map.NodeModel
-import org.freeplane.features.styles.ConditionalStyleModel
-import org.freeplane.features.styles.LogicalStyleController
-import org.freeplane.features.styles.mindmapmode.MLogicalStyleController
 
-def controller = LogicalStyleController.controller as MLogicalStyleController
-c.selecteds.each {FPN selected ->
-    NodeModel selectedModel = selected.delegate
-    ConditionalStyleModel selectedConditionalStyleModel = selectedModel.getExtension(ConditionalStyleModel.class)
-    if (selectedConditionalStyleModel && selectedConditionalStyleModel.styles.size() > 0) {
-        def item = controller.removeConditionalStyle(selectedConditionalStyleModel, 0)
-        selected.style.name = item.style.toString()
+import org.freeplane.api.Node as FPN
+
+c.selecteds.each { FPN selected ->
+    def conditionalStylesSize = selected.conditionalStyles.collect().size()
+    if (conditionalStylesSize > 0) {
+        def item = selected.conditionalStyles.remove(0)
+        selected.style.name = item.styleName
     }
 }
