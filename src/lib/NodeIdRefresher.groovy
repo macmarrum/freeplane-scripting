@@ -24,12 +24,23 @@ class NodeIdRefresher {
             }
             it.delegate.setID(freshId)
         }
+        save(root, originalToFreshId)
+    }
+
+    static save(FN root, HashMap<String, String> originalToFreshId) {
         def sb = new StringBuilder('{\n')
         originalToFreshId.each { k, v -> sb << "\"$v\": \"$k\", \n" }
         sb << '}'
 
         def now = (new Date()).format(DATETIME_FORMAT)
         root["${ATTR_PREFIX}${now}"] = sb
+    }
+
+    static refresh(FN node) {
+        def mm = node.mindMap
+        String freshId = mm.delegate.generateNodeID(null) // it makes sure the generated ID is unique in the map
+        node.delegate.setID(freshId)
+        save(mm.root, [node.id: freshId])
     }
 
     static Map.Entry<String, Object> getLatestSavepoint(FN root) {
