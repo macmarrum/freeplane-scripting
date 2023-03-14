@@ -23,7 +23,7 @@ class NodeIdRefresher {
         nodeIdToFreshId.each { k, v -> sb << "$v: '$k',\n" }
         sb << ']'
 
-        def now = (new Date()).format('yyyy-MM-dd_HH:MM:SS')
+        def now = (new Date()).format('yyyy-MM-dd_HH:mm:ss')
         root["freshIdToOriginal_${now}"] = sb
     }
 }
