@@ -3,30 +3,32 @@ import org.freeplane.api.Node as FN
 
 class NodeIdRefresher {
     public static final ATTR_PREFIX = 'freshIdToOriginal_'
+    public static final DATETIME_FORMAT = 'yyyy-MM-dd_HH:mm:ss'
+    public static final RESTORED_PREFIX = 'restored_'
 
     static refreshAll(FN node) {
         def mm = node.mindMap
         def root = mm.root
-        def nodeIdToFreshId = new LinkedHashMap<String, String>()
-        String nodeId
+        def originalToFreshId = new LinkedHashMap<String, String>()
+        String originalId
         String freshId
         root.findAll().each {
-            nodeId = it.id
-            freshId = nodeIdToFreshId.get(nodeId)
+            originalId = it.id
+            freshId = originalToFreshId.get(originalId)
             if (freshId === null) { // not yet re-generated
                 freshId = mm.delegate.generateNodeID(null) // it makes sure the generated ID is unique in the map
                 // guard against using an ID which was used in the original node set, but is now re-generated, so no longer part of the map
-                while (nodeIdToFreshId.containsKey(freshId))
+                while (originalToFreshId.containsKey(freshId))
                     freshId = mm.delegate.generateNodeID(null)
-                nodeIdToFreshId[nodeId] = freshId
+                originalToFreshId[originalId] = freshId
             }
             it.delegate.setID(freshId)
         }
         def sb = new StringBuilder('{\n')
-        nodeIdToFreshId.each { k, v -> sb << "\"$v\": \"$k\",\n" }
+        originalToFreshId.each { k, v -> sb << "\"$v\": \"$k\", \n" }
         sb << '}'
 
-        def now = (new Date()).format('yyyy-MM-dd_HH:mm:ss')
+        def now = (new Date()).format(DATETIME_FORMAT)
         root["${ATTR_PREFIX}${now}"] = sb
     }
 
@@ -48,7 +50,7 @@ class NodeIdRefresher {
                 if (originalId)
                     it.delegate.setID(originalId)
             }
-            root['restored_' + savepoint.key] = savepoint.value
+            root[RESTORED_PREFIX + savepoint.key] = savepoint.value
             root.attributes.removeAll(savepoint.key)
         }
     }
