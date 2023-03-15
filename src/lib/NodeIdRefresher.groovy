@@ -24,10 +24,10 @@ class NodeIdRefresher {
             }
             it.delegate.setID(freshId)
         }
-        save(root, originalToFreshId)
+        persistSavepointData(root, originalToFreshId)
     }
 
-    static save(FN root, HashMap<String, String> originalToFreshId) {
+    static persistSavepointData(FN root, HashMap<String, String> originalToFreshId) {
         def sb = new StringBuilder('{\n')
         originalToFreshId.each { k, v -> sb << "\"$v\": \"$k\", \n" }
         sb << '}'
@@ -38,9 +38,10 @@ class NodeIdRefresher {
 
     static refresh(FN node) {
         def mm = node.mindMap
+        def originalId = node.id
         String freshId = mm.delegate.generateNodeID(null) // it makes sure the generated ID is unique in the map
         node.delegate.setID(freshId)
-        save(mm.root, [node.id: freshId])
+        persistSavepointData(mm.root, ["$originalId": freshId])
     }
 
     static Map.Entry<String, Object> getLatestSavepoint(FN root) {
@@ -49,7 +50,7 @@ class NodeIdRefresher {
             return savepoints.sort().last()
     }
 
-    static restoreAll(FN node) {
+    static restoreLatestSavepoint(FN node) {
         def root = node.mindMap.root
         def savepoint = getLatestSavepoint(root)
         if (savepoint) {
