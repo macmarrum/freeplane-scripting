@@ -1,6 +1,6 @@
 <map version="freeplane 1.9.13">
 <!--To view this file, download free mind mapping software Freeplane from https://www.freeplane.org -->
-<node TEXT="macmarrum-dark" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1939172785" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES"><hook NAME="MapStyle" background="#2b2b2b">
+<node TEXT="macmarrum-dark" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1939172785" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES" CHILD_NODES_ALIGNMENT="BY_FIRST_NODE"><hook NAME="MapStyle" background="#2b2b2b">
     <conditional_styles>
         <conditional_style ACTIVE="false" STYLE_REF="?bg" LAST="false"/>
         <conditional_style ACTIVE="false" STYLE_REF="?gap" LAST="false">
@@ -10,10 +10,11 @@
 // every() returns true for empty iterator/list</script>
             </script_condition>
         </conditional_style>
-        <conditional_style ACTIVE="false" STYLE_REF="?child:center" LAST="false">
+        <conditional_style ACTIVE="false" STYLE_REF="?alignChildren:center" LAST="false">
             <script_condition>
                 <script>import static org.freeplane.features.map.SummaryNode.isSummaryNode
-return (!node.root &amp;&amp; isSummaryNode(node.parent.delegate))</script>
+
+!node.root &amp;&amp; isSummaryNode(node.parent.delegate)</script>
             </script_condition>
         </conditional_style>
         <conditional_style ACTIVE="false" STYLE_REF="?=Table.row.accent" LAST="false">
@@ -45,7 +46,7 @@ return CS.canApply(node, cs[1], cond)</script>
             </script_condition>
         </conditional_style>
     </conditional_styles>
-    <properties show_icon_for_attributes="false" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff" show_note_icons="true" fit_to_viewport="false"/>
+    <properties show_icon_for_attributes="true" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff" show_note_icons="true" fit_to_viewport="false"/>
 
 <map_styles>
 <stylenode LOCALIZED_TEXT="styles.root_node" ID="ID_680156716" STYLE="oval" UNIFORM_SHAPE="true" VGAP_QUANTITY="24 pt">
@@ -139,7 +140,7 @@ ol {
 <stylenode LOCALIZED_TEXT="styles.user-defined" POSITION="right" STYLE="bubble">
 <stylenode TEXT="?bg" ID="ID_1783059692" BACKGROUND_COLOR="#333333" BORDER_COLOR="#808080" BORDER_DASH="SOLID"/>
 <stylenode TEXT="?gap" ID="ID_21091341" VGAP_QUANTITY="3 pt"/>
-<stylenode TEXT="?child:center" ID="ID_1263040632" CHILD_NODES_ALIGNMENT="BY_CENTER"/>
+<stylenode TEXT="?alignChildren:center" ID="ID_645894707" CHILD_NODES_ALIGNMENT="BY_CENTER"/>
 <stylenode LOCALIZED_TEXT="styles.important" ID="ID_749235638" BORDER_WIDTH="3 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#cc241d">
 <icon BUILTIN="yes"/>
 <arrowlink COLOR="#cc241d" TRANSPARENCY="255" DESTINATION="ID_749235638"/>
@@ -262,6 +263,9 @@ ol {
 </stylenode>
 <stylenode TEXT="=Plus" BACKGROUND_COLOR="#878787">
 <icon BUILTIN="emoji-2795"/>
+</stylenode>
+<stylenode TEXT="=Pin" ID="ID_225003551" COLOR="#e5c453" BORDER_COLOR_LIKE_EDGE="false">
+<icon BUILTIN="emoji-1F4CC"/>
 </stylenode>
 <stylenode TEXT="^Table" BACKGROUND_COLOR="#323232" BACKGROUND_ALPHA="0" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="0 pt" SHAPE_VERTICAL_MARGIN="0 pt" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#323232" BORDER_COLOR_ALPHA="0" VGAP_QUANTITY="0 pt">
 <edge STYLE="hide_edge"/>
