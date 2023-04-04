@@ -373,6 +373,7 @@ ol {
 <stylenode TEXT="=Code" MAX_WIDTH="25 cm">
 <font NAME="JetBrains Mono" SIZE="11"/>
 </stylenode>
+<stylenode TEXT="=DateISO" FORMAT="yyyy-MM-dd"/>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="right" STYLE="bubble">
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level.root" ID="ID_1659178249" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="10 pt" VGAP_QUANTITY="20 pt">
