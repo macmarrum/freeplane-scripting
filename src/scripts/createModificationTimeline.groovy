@@ -7,17 +7,18 @@ import org.freeplane.api.Node as FN
 
 // date format should be sortable, if the nodes on the timeline are to be sorted
 def DATE_FMT = 'yyyy-MM-dd'
+def TIMELINE = 'Modification Timeline'
 
 def mindMap = ScriptUtils.node().mindMap
 def c = ScriptUtils.c()
 
 FN timelineNode
-timelineNode = mindMap.root.children.find { it.text == 'Timeline' }
+timelineNode = mindMap.root.children.find { it.text == TIMELINE }
 if (timelineNode) {
     c.select(timelineNode)
-    UITools.showMessage('Timeline node already exists\nDelete it or rename it first', 2)
+    UITools.showMessage("$TIMELINE node already exists\nDelete it or rename it first", 2)
 } else {
-    timelineNode = mindMap.root.createChild('Timeline')
+    timelineNode = mindMap.root.createChild(TIMELINE)
     def dateToNode = new LinkedHashMap<String, FN>()
     for (FN n in mindMap.root.findAll()) {
         if (n.root || n == timelineNode)
