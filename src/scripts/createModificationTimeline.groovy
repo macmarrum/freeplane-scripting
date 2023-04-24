@@ -9,11 +9,12 @@ import org.freeplane.api.Node as FN
 def DATE_FMT = 'yyyy-MM-dd'
 
 def mindMap = ScriptUtils.node().mindMap
+def c = ScriptUtils.c()
 
 FN timelineNode
 timelineNode = mindMap.root.children.find { it.text == 'Timeline' }
 if (timelineNode) {
-    ScriptUtils.c().select(timelineNode)
+    c.select(timelineNode)
     UITools.showMessage('Timeline node already exists\nDelete it or rename it first', 2)
 } else {
     timelineNode = mindMap.root.createChild('Timeline')
@@ -40,5 +41,7 @@ if (timelineNode) {
             """.stripIndent()
         }
     }
+    c.centerOnNode(timelineNode)
+    c.select(timelineNode)
     timelineNode.sortChildrenBy { it.text }
 }
