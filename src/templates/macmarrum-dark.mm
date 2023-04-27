@@ -378,7 +378,7 @@ ol {
 <arrowlink DESTINATION="ID_829143478"/>
 <edge COLOR="#808080" ALPHA="0"/>
 </stylenode>
-<stylenode TEXT="=SimulEdge" ID="ID_966983516" BORDER_COLOR_LIKE_EDGE="false">
+<stylenode TEXT="=SimuEdge" ID="ID_966983516" BORDER_COLOR_LIKE_EDGE="false">
 <arrowlink SHAPE="EDGE_LIKE" COLOR="#808080" WIDTH="1" FONT_SIZE="-1" DESTINATION="ID_966983516"/>
 <edge COLOR="#808080" ALPHA="0"/>
 </stylenode>
