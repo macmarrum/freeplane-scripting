@@ -379,8 +379,11 @@ ol {
 <edge COLOR="#808080" ALPHA="0"/>
 </stylenode>
 <stylenode TEXT="=SimuEdge" ID="ID_966983516" BORDER_COLOR_LIKE_EDGE="false">
-<arrowlink SHAPE="EDGE_LIKE" COLOR="#808080" WIDTH="1" FONT_SIZE="-1" DESTINATION="ID_966983516"/>
+<arrowlink SHAPE="EDGE_LIKE" COLOR="#808080" WIDTH="1" TRANSPARENCY="255" FONT_SIZE="-1" DESTINATION="ID_966983516"/>
 <edge COLOR="#808080" ALPHA="0"/>
+</stylenode>
+<stylenode TEXT="=Seamless" ID="ID_218573881" BACKGROUND_COLOR="#2b2b2b" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0">
+<arrowlink DESTINATION="ID_218573881"/>
 </stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="right" STYLE="bubble">
