@@ -1,6 +1,9 @@
 // @ExecutionModes({ON_SINGLE_NODE})
 // https://github.com/freeplane/freeplane/discussions/662
-
+// Like `File->Move branch to new map…` but keeps the source node intact,
+// also it links back to the node instead of the map
+// and retains sideAtRoot in the new map.
+// By default, transfers only the node without its children -> _shouldPreserveChildren = false
 
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
@@ -18,12 +21,14 @@ import javax.swing.*
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
+def _shouldPreserveChildren = true
+
 Node sourceNode = node
 NodeModel sourceModel = sourceNode.delegate
 def sourceFile = sourceNode.mindMap.file
 def targetFile = chooseTargetFile(sourceNode, sourceModel, sourceFile)
 if (targetFile)
-    createNewMapFromNode(sourceNode, sourceModel, sourceFile, targetFile)
+    createNewMapFromNode(sourceNode, sourceModel, sourceFile, targetFile, _shouldPreserveChildren)
 
 // based on org.freeplane.features.url.mindmapmode.ExportBranchAction
 static File chooseTargetFile(Node sourceNode, NodeModel sourceModel, File sourceFile) {
@@ -35,12 +40,12 @@ static File chooseTargetFile(Node sourceNode, NodeModel sourceModel, File source
     if (fileManager.fileFilter !== null)
         chooser.setFileFilter(fileManager.fileFilter)
     def returnVal = chooser.showSaveDialog(Controller.currentController.viewController.currentRootComponent)
-    def canAct = false
+    def shouldAct = false
     if (returnVal == JFileChooser.APPROVE_OPTION) {
         targetFile_ = addMmExtensionIfMissing(chooser.selectedFile)
-        canAct = targetFile_.exists() ? confirmOverwrite(targetFile_, sourceModel) : true
+        shouldAct = targetFile_.exists() ? confirmOverwrite(targetFile_, sourceModel) : true
     }
-    return canAct ? targetFile_ : null
+    return shouldAct ? targetFile_ : null
 }
 
 static File addMmExtensionIfMissing(File target) {
@@ -58,13 +63,19 @@ static boolean confirmOverwrite(File targetFile, NodeModel sourceModel) {
     return decision == 0
 }
 
-def createNewMapFromNode(Node sourceNode, NodeModel sourceModel, File sourceFile, File targetFile) {
+def createNewMapFromNode(Node sourceNode, NodeModel sourceModel, File sourceFile, File targetFile, boolean shouldPreserveChildren = false) {
     sourceNode.mindMap.save(true)
     Files.copy(sourceNode.mindMap.file.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-    def mapLoader = c.mapLoader(targetFile)
-    mapLoader.withView()
-    def targetMindMap = mapLoader.mindMap
+    def targetMindMap = c.mapLoader(targetFile).withView().mindMap
     def targetRoot = targetMindMap.root
+    if (shouldPreserveChildren) {
+        def sourceNodeInTargetMap = targetMindMap.node(sourceNode.id)
+        sourceNodeInTargetMap.moveTo(targetRoot, 0)
+        targetRoot.children.each { Node it -> if (it != sourceNodeInTargetMap) it.delete() }
+        sourceNodeInTargetMap.children.each { it.moveTo(targetRoot) }
+        sourceNodeInTargetMap.delete()
+    }
+    // transfer sourceNode to root
     NodeModel targetModel = targetRoot.delegate
     targetRoot.text = sourceNode.text
     targetRoot.detailsText = sourceNode.detailsText
@@ -73,7 +84,8 @@ def createNewMapFromNode(Node sourceNode, NodeModel sourceModel, File sourceFile
     MAttributeController.controller.copyAttributesToNode(sourceModel, targetModel)
     copyFormatAndIconsBetween(sourceModel, targetModel)
     copyNodeConditionalStylesBetween(sourceModel, targetModel)
-    targetRoot.children.each { it.delete() }
+    if (!shouldPreserveChildren) // delete children
+        targetRoot.children.each { it.delete() }
     if (config.getProperty('links') == 'relative') {
         targetRoot.link.uri = "${makeUri(targetFile.parentFile.relativePath(sourceFile))}#${sourceNode.id}".toURI()
         sourceNode.link.uri = makeUri(sourceFile.parentFile.relativePath(targetFile))
