@@ -421,7 +421,7 @@ class ConfluenceStorage {
         def nl = getNewLine(n)
         for (child in n.children.find { it.link }) {
             def result = new StringBuilder()
-            result << '<a href="' << XmlUtil.escapeXml(child.link.text) << '">' << nl << child.text << nl << '</a>'
+            result << '<a href="' << XmlUtil.escapeXml(child.link.text) << '">' << nl << getContent(child) << nl << '</a>'
             return result.toString()
         }
         return '<!-- a child with a link is missing -->'
