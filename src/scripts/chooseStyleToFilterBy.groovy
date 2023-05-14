@@ -7,7 +7,7 @@ import org.freeplane.features.styles.MapStyleModel
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 // <configuration>
-def shouldConsiderConditionalStyles = true
+def shouldConsiderConditionalStyles = false
 def shouldShowAncestors = false
 def shouldShowDescendants = false
 def shouldSelectFilteredNodes = false
