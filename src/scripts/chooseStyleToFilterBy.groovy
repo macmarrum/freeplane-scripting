@@ -7,20 +7,34 @@ import org.freeplane.features.styles.MapStyleModel
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 // <configuration>
-def shouldConsiderConditionalStyles = false
+def shouldConsiderConditionalStyles = true
 def shouldShowAncestors = false
 def shouldShowDescendants = false
 def shouldSelectFilteredNodes = false
 // </configuration>
 
-def STYLE_FILTER_CHOOSER_NODE_TEXT = '__styleFilterChooserNode-860a4be8-182e-4274-adf1-0c58550d100b__'
-FN styleFilterChooserNode
+def STYLE_FILTER_CHOOSER_NODE_TEXT = ':style-filter chooser:'
 def n = ScriptUtils.node()
 def c = ScriptUtils.c()
-if (n.root || n.parent.text != STYLE_FILTER_CHOOSER_NODE_TEXT) {
-    styleFilterChooserNode = n.children.find { it.text == STYLE_FILTER_CHOOSER_NODE_TEXT }
+
+if (!n.root && n.parent.text == STYLE_FILTER_CHOOSER_NODE_TEXT) {
+    def styleName = n.style.name
+    def detailsText = n.details.text
+    def isConditionalStyleAssignmentCount = detailsText.contains('+') && !detailsText.endsWith('+ 0')
+    n.mindMap.filter(shouldShowAncestors, shouldShowDescendants, {
+        if (shouldConsiderConditionalStyles && isConditionalStyleAssignmentCount)
+            it.hasStyle(styleName)
+        else
+            it.style.name == styleName
+    })
+    if (shouldSelectFilteredNodes)
+        menuUtils.executeMenuItems(['SelectFilteredNodesAction'])
+} else {
+    def styleFilterChooserNode = n.mindMap.root.children.find { it.text == STYLE_FILTER_CHOOSER_NODE_TEXT }
     if (styleFilterChooserNode) {
-        styleFilterChooserNode.delete()
+        c.select(styleFilterChooserNode)
+        n.mindMap.filter = null
+        styleFilterChooserNode.folded = false
     } else {
         def styleToCountDirect = [:]
         def styleToCountAll = [:]
@@ -32,8 +46,9 @@ if (n.root || n.parent.text != STYLE_FILTER_CHOOSER_NODE_TEXT) {
                 it.style.allActiveStyles.each { s -> styleToCountAll[s] = styleToCountAll.getOrDefault(s, 0) + 1 }
         }
 
-        styleFilterChooserNode = n.createChild(STYLE_FILTER_CHOOSER_NODE_TEXT)
-        styleFilterChooserNode.style.maxNodeWidth = 0
+        styleFilterChooserNode = n.mindMap.root.createChild(STYLE_FILTER_CHOOSER_NODE_TEXT)
+        println(styleFilterChooserNode.id)
+        styleFilterChooserNode.style.name = null
         styleFilterChooserNode.cloud.colorCode = '#f0f0f050'
         if (c.freeplaneVersion >= FreeplaneVersion.getVersion('1.11.1'))
             styleFilterChooserNode.childNodesLayout = 'TOPTOBOTTOM_BOTHSIDES_CENTERED'
@@ -55,17 +70,6 @@ if (n.root || n.parent.text != STYLE_FILTER_CHOOSER_NODE_TEXT) {
             }
             styleNode.details = detailsText
         }
+        c.select(styleFilterChooserNode)
     }
-} else {
-    def styleName = n.style.name
-    styleFilterChooserNode = n.parent
-    styleFilterChooserNode.delete()
-    n.mindMap.filter(shouldShowAncestors, shouldShowDescendants, {
-        if (shouldConsiderConditionalStyles)
-            it.hasStyle(styleName)
-        else
-            it.style.name == styleName
-    })
-    if (shouldSelectFilteredNodes)
-        menuUtils.executeMenuItems(['SelectFilteredNodesAction'])
 }
