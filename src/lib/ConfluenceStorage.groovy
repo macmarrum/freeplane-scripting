@@ -694,7 +694,7 @@ class ConfluenceStorage {
         return maker
     }
 
-    static createCode(FN node, String language = 'sql', String title = null, boolean showLineNumbers = true, String theme = 'Eclipse', boolean collapse = false) {
+    static createCode(FN node, String language = 'sql', String title = null, boolean showLineNumbers = true, String theme = 'Eclipse', boolean collapse = false, String styleName = '=Code') {
         def n = createMarkupMaker(node, 'code')
         if (title)
             n.details = title
@@ -706,6 +706,10 @@ class ConfluenceStorage {
         if (collapse)
             code.icons.add(icon.collapse_fastUpButton)
         code.link.text = theme
+        try {
+            code.style.name = styleName
+        } catch (IllegalArgumentException ignored) {
+        }
         c.select(code)
     }
 
