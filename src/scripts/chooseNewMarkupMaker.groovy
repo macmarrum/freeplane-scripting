@@ -7,13 +7,13 @@ import javax.swing.*
 final c = ScriptUtils.c()
 final action = [
         'list': ConfluenceStorage::createList,
+        'link': ConfluenceStorage::createLink,
         'table': ConfluenceStorage::createTable,
         'code': ConfluenceStorage::createCode,
-        'link': ConfluenceStorage::createLink,
+        'csv': ConfluenceStorage::createCsv,
         'div-expand+code': ConfluenceStorage::createDivExpandCode,
         'format': ConfluenceStorage::createFormat,
         'parent': ConfluenceStorage::createParent,
-        'csv': ConfluenceStorage::createCsv,
 ]
 String input = JOptionPane.showInputDialog(null, null, "Go to alias",
         JOptionPane.QUESTION_MESSAGE, null, action.keySet().toArray(), null)
