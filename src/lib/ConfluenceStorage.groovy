@@ -6,10 +6,13 @@
 import groovy.xml.XmlUtil
 import org.freeplane.api.Node
 import org.freeplane.api.Node as FN
+import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.text.MessageFormat
 
 class ConfluenceStorage {
+
+    static c = ScriptUtils.c()
 
     static style = [
             cStorageMarkupRoot : 'cStorageMarkupRoot',
@@ -474,18 +477,31 @@ class ConfluenceStorage {
     }
 
     static String mkCode(FN n) {
-        for (child in n.children.find { FN it -> it.children.size() > 0 || it.noteText !== null }) {
-            String lang = child.text ?: 'none'
+        // https://confluence.atlassian.com/doc/code-block-macro-139390.html
+        // final LANGUAGES = ['ActionScript', 'AppleScript', 'Bash', 'C#', 'C++', 'CSS', 'ColdFusion', 'Delphi', 'Diff', 'Erlang', 'Groovy', 'HTML and XML', 'Java', 'Java FX', 'JavaScript', 'PHP', 'Plain Text', 'PowerShell', 'Python', 'Ruby', 'SQL', 'Sass', 'Scala', 'Visual Basic', 'YAML']
+        final MAX_LANG_SIZE = 12
+        for (child in n.children.find { FN it -> it.children.size() > 0 || it.noteText !== null || it.detailsText !== null }) {
+            String lang
+            String cdata  // get cdata from text, alternatively from children or from note
+            String text = child.text
+            String title
+            if (text.size() > MAX_LANG_SIZE) { // text is not a language name
+                lang = child.details?.text ?: 'none'
+                cdata = text
+                if (n.detailsText) title = n.details.text
+            } else {
+                lang = child.text ?: 'none'
+                if (child.children.size() > 0)
+                    cdata = mkParent(child)
+                else
+                    cdata = child.plainNote  // no formula evaluation (unexposed method)
+            if (child.detailsText) title = child.details.text
+            }
             def params = [language: lang]
-            if (child.detailsText) params.title = child.details.text
+            if (title) params.title = title
             if (hasIcon(child, icon.collapse_fastUpButton)) params.collapse = 'true'
             if (hasIcon(child, icon.numbers_inputNumbers)) params.linenumbers = 'true'
             if (child.link.text) params.theme = child.link.text
-            String cdata  // get cdata from children or from note
-            if (child.children.size() > 0)
-                cdata = mkParent(child)
-            else
-                cdata = child.plainNote  // no formula evaluation (unexposed method)
             return _mkMacroPlain(n, 'code', cdata, params)
         }
         return '<!-- a child with children or a note is missing -->'
@@ -669,5 +685,66 @@ class ConfluenceStorage {
                     return String.format(pattern, *contentList)
             }
         }
+    }
+
+    static FN createMarkupMaker(FN node, String name) {
+        def maker = node.createChild(name)
+        maker.style.name = style.cStorageMarkupMaker
+        c.select(maker)
+        return maker
+    }
+
+    static createCode(FN node, String language = 'sql', String title = null, boolean showLineNumbers = true, String theme = 'Eclipse', boolean collapse = false) {
+        def n = createMarkupMaker(node, 'code')
+        if (title)
+            n.details = title
+        n.icons.add(icon.nl_rightArrowCurvingDown)
+        def code = n.createChild('SELECT *\nFROM DUAL\nWHERE 1=1')
+        code.details = language
+        if (showLineNumbers)
+            code.icons.add(icon.numbers_inputNumbers)
+        if (collapse)
+            code.icons.add(icon.collapse_fastUpButton)
+        code.link.text = theme
+        c.select(code)
+    }
+
+    static createDivExpandCode(FN node, String details = 'Expand: SQL Statement', String cssClassName = 'macmarrum-expand', String language ='sql', boolean showLineNumbers = true, String theme = 'Eclipse') {
+        def n = createMarkupMaker(node, 'div-expand')
+        n.details = details
+        n.link.text = cssClassName
+        n.icons.add(icon.nl_rightArrowCurvingDown)
+        createCode(n, language, null, showLineNumbers, theme)
+    }
+
+    static createList(FN node) {
+        def n = createMarkupMaker(node, 'list')
+        n.icons.add(icon.nl_rightArrowCurvingDown)
+    }
+
+    static createLink(FN node) {
+        createMarkupMaker(node, 'link')
+    }
+
+    static createFormat(FN node, String pattern = '%s') {
+        def n = createMarkupMaker(node, 'format')
+        def p = n.createChild(pattern)
+        c.select(p)
+    }
+
+    static createTable(FN node, String styleName = '=Numbering#') {
+        def n = createMarkupMaker(node, 'table')
+        n.icons.add(icon.nl_rightArrowCurvingDown)
+        def elem = n.createChild()
+        elem.style.name = styleName
+        c.select(elem)
+    }
+
+    static createParent(FN node) {
+        createMarkupMaker(node, 'parent')
+    }
+
+    static createCsv(FN node) {
+        createMarkupMaker(node, 'csv')
     }
 }
