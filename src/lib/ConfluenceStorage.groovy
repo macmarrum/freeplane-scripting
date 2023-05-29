@@ -145,6 +145,7 @@ class ConfluenceStorage {
             /(?<=^|[^a-zA-Z0-9])_(?! )(.+?)(?<! )_(?=[^a-zA-Z0-9]|$)/  : '<i>$1</i>',
             /(?<=^|[^a-zA-Z0-9])-(?! )(.+?)(?<! )-(?=[^a-zA-Z0-9]|$)/  : '<s>$1</s>',
             /(?<=^|[^a-zA-Z0-9])\+(?! )(.+?)(?<! )\+(?=[^a-zA-Z0-9]|$)/: '<u>$1</u>',
+            /(?<=^|[^a-zA-Z0-9])\(([a-z]+)\)(?! )(.+?)(?<! )\(\/\1\)(?=[^a-zA-Z0-9]|$)/: '<span style="color: $1">$2</span>',
     ]
 
     static String _applyReplacements(FN n, String content) {
