@@ -8,10 +8,17 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
 
 Node node = ScriptUtils.node()
 Controller c = ScriptUtils.c()
-if (node.style.name in ConfluenceStorage.style) { // ['cStorageMarkupRoot', 'cStorageMarkupMaker'])
-    String markup = ConfluenceStorage.makeMarkup(node)
+
+Node target
+if (node.style.name in ConfluenceStorage.style) // ['cStorageMarkupRoot', 'cStorageMarkupMaker'])
+    target = node
+else
+    target = node.pathToRoot.reverse().find { it.style.name == 'cStorageMarkupRoot' }
+
+if (target) {
+    String markup = ConfluenceStorage.makeMarkup(target)
     TextUtils.copyToClipboard(markup)
-    openInEditorIfDefined(c, node, markup)
+    openInEditorIfDefined(c, target, markup)
 } else {
     c.statusInfo = "cannot copy ConfluenceStorage Markup because the node style is not in ${ConfluenceStorage.style*.value}"
 }
