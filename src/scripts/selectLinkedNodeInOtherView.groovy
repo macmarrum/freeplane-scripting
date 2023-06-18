@@ -21,7 +21,7 @@ if (!targetNode) {
             def targetFile = new File(nodeAndMapReference.mapReference)
             if (!targetFile.absolute)
                 targetFile = new File(node.mindMap.file.parent, nodeAndMapReference.mapReference)
-            if (node.mindMap.file != targetFile) {
+            if (node.mindMap.file.canonicalFile <=> targetFile.canonicalFile) {
                 // a different map - simply follow the link
                 MenuUtils.executeMenuItems(['FollowLinkAction'])
                 return
