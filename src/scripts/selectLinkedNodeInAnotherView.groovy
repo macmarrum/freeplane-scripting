@@ -8,7 +8,7 @@ import org.freeplane.features.url.NodeAndMapReference
 import org.freeplane.plugin.script.proxy.ScriptUtils
 import org.freeplane.view.swing.map.MapViewController
 
-def scriptName = 'selectLinkedNodeInOtherView'
+def scriptName = 'selectLinkedNodeInAnotherView'
 
 def c = ScriptUtils.c()
 def node = ScriptUtils.node()
@@ -29,6 +29,9 @@ if (!targetNode && linkText) {
             targetNode = node.mindMap.node(nodeAndMapReference.nodeReference)
         }
     }
+} else { // synchronize views by switching to the same node in another view
+    targetNode = node // comment out this line to disable view sync
+    linkText = "#${node.id} (in another view)"
 }
 if (targetNode) {
     // based on org.freeplane.plugin.script.proxy.ControllerProxy#getMapViewManager
@@ -44,7 +47,7 @@ if (targetNode) {
         Controller.getCurrentController().getSelection().selectAsTheOnlyOneSelected(nodeModel)
         c.statusInfo = "$scriptName:  $linkText "
     } else {
-        c.statusInfo = "$scriptName:  no other view found! "
+        c.statusInfo = "$scriptName:  no other views found! "
     }
 } else {
     c.statusInfo = "$scriptName:  no link found! "
