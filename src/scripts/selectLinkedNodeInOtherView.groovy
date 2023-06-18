@@ -2,6 +2,7 @@
 // https://github.com/freeplane/freeplane/issues/316
 
 
+import org.freeplane.core.util.MenuUtils
 import org.freeplane.features.mode.Controller
 import org.freeplane.features.url.NodeAndMapReference
 import org.freeplane.plugin.script.proxy.ScriptUtils
@@ -22,7 +23,8 @@ if (!targetNode) {
                 targetFile = new File(node.mindMap.file.parent, nodeAndMapReference.mapReference)
             if (node.mindMap.file != targetFile) {
                 // a different map - simply follow the link
-                menuUtils.executeMenuItems(['FollowLinkAction'])
+                MenuUtils.executeMenuItems(['FollowLinkAction'])
+                return
             } else {
                 targetNode = node.mindMap.node(nodeAndMapReference.nodeReference)
             }
