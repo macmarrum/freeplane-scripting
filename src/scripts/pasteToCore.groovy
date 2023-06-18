@@ -19,14 +19,14 @@ import java.awt.datatransfer.Transferable
  */
 def t = Toolkit.defaultToolkit.systemClipboard.getContents(null)
 def node = ScriptUtils.node()
-def isTargetMarkdownOrText = node.noteContentType in ['markdown', 'html'] //[TextController.CONTENT_TYPE_HTML, MarkdownRenderer.MARKDOWN_CONTENT_TYPE])
+def isTargetMarkdownOrText = node.format in ['markdownPatternFormat', 'NO_FORMAT'] // [MarkdownRenderer.MARKDOWN_FORMAT, PatternFormat.IDENTITY_PATTERN]
 def shouldOutcomeContainTagsHtmlBody = !isTargetMarkdownOrText
 //def shouldOutcomeContainHtmlBody = true
 def text = getString(t, shouldOutcomeContainTagsHtmlBody)
 if (text) {
     if (shouldOutcomeContainTagsHtmlBody && isTargetMarkdownOrText && HtmlUtils.isHtml(text))
         text = (FreeplaneVersion.version.isOlderThan(FreeplaneVersion.getVersion('1.11.1')) ? /'/ : ' ') + text
-    node.noteText = text
+    node.text = text
 }
 
 private static String getString(Transferable t, shouldOutcomeContainHtmlBody = false) {
@@ -62,7 +62,7 @@ private static String getString(Transferable t, shouldOutcomeContainHtmlBody = f
         }
     }
 //    println(t.transferDataFlavors.collect(new HashSet<String>()) { it.mimeType.split(';')[0] })
-    c.statusInfo = 'pasteToNote: error getting clipboard contents'
+    c.statusInfo = 'pasteToCore: error getting clipboard contents'
     return null
 }
 
