@@ -13,7 +13,7 @@ if (!showAncestors) {
     def node = ScriptUtils.node()
     def showDescendants = filterController.showDescendants.selected
     // for each selected node, find its next invisible ancestor
-    def expandedFilterHash = c.selecteds..collect(new HashSet<Node>()) { it.pathToRoot.reverse().find { !it.visible } }
+    def expandedFilterHash = c.selecteds.collect(new HashSet<Node>()) { it.pathToRoot.reverse().find { !it.visible } }
     // add all nodes that are already visible
     expandedFilterHash.addAll(node.mindMap.root.find { it.visible })
     node.mindMap.filter(showAncestors, showDescendants, { it in expandedFilterHash })
