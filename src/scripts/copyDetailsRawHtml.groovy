@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Copy"})
 import org.freeplane.core.util.TextUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
@@ -9,8 +9,9 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
  */
 def node = ScriptUtils.node()
 def c = ScriptUtils.c()
-if (node.details)
-    TextUtils.copyToClipboard(node.detailsText)
-else {
+def text = node.detailsText
+if (text) {
+    TextUtils.copyToClipboard(text)
+} else {
     c.statusInfo = "cannot copy details because it's missing"
 }

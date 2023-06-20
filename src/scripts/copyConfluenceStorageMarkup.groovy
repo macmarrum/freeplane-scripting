@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Copy"})
 import ConfluenceStorage
 import org.freeplane.api.Controller
 import org.freeplane.api.Node

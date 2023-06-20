@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Copy"})
 import org.freeplane.core.util.TextUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
@@ -9,8 +9,8 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
  */
 def node = ScriptUtils.node()
 def c = ScriptUtils.c()
-if (node.note)
+if (node.note) {
     TextUtils.copyToClipboard(node.note.text)  // equivalent to HtmlUtils.htmlToPlain(node.note.string | node.note.html)), i.e. with formula evaluation
-else {
+} else {
     c.statusInfo = "cannot copy note because it's missing"
 }
