@@ -41,15 +41,16 @@ private static String getString(Transferable t, shouldOutcomeContainHtmlBody = f
     } else if (t.isDataFlavorSupported(DataFlavor.allHtmlFlavor)) {
         try {
             def html = t.getTransferData(DataFlavor.allHtmlFlavor).toString()
+            html = html.replaceFirst($/(?i)^<!DOCTYPE html>\n*/$, '')
             if (shouldOutcomeContainHtmlBody) {
                 if (HtmlUtils.isHtml(html)) {
-                    return html.replaceAll($/<head>.*</head>/$, '')
+                    return html.replaceAll($/(?s)<head>.*</head>/$, '')
                 } else {
                     return "<html><body>$html</body></html>"
                 }
             } else {
                 if (HtmlUtils.isHtml(html))
-                    return html.replaceAll($/<head>.*</head>/$, '').replaceAll($/(<html>|<body>|</body>|</html>)/$, '')
+                    return html.replaceAll($/(?s)<head>.*</head>\n*/$, '').replaceAll($/(<html>|<body>|</body>|</html>)/$, '')
                 else
                     return html
             }
