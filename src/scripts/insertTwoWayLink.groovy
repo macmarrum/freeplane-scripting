@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2/Insert"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Insert"})
 // https://github.com/freeplane/freeplane/discussions/1255
 
 def nodes = c.selecteds.collect()
