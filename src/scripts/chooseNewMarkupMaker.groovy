@@ -5,6 +5,7 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
 import javax.swing.*
 
 final c = ScriptUtils.c()
+final title = 'Insert markup maker'
 final action = [
         'list': ConfluenceStorage::createList,
         'link': ConfluenceStorage::createLink,
@@ -15,7 +16,7 @@ final action = [
         'format': ConfluenceStorage::createFormat,
         'parent': ConfluenceStorage::createParent,
 ]
-String input = JOptionPane.showInputDialog(null, null, "Go to alias",
+String input = JOptionPane.showInputDialog(null, null, title,
         JOptionPane.QUESTION_MESSAGE, null, action.keySet().toArray(), null)
 if (input == null || input == '') {
     c.statusInfo = 'input is null or blank'
