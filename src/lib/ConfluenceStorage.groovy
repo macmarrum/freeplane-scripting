@@ -14,6 +14,8 @@ class ConfluenceStorage {
 
     static c = ScriptUtils.c()
 
+    static final HILITE1ST = 'hiLite1st'
+
     static style = [
             cStorageMarkupRoot : 'cStorageMarkupRoot',
             cStorageMarkupMaker: 'cStorageMarkupMaker',
@@ -125,32 +127,40 @@ class ConfluenceStorage {
     }
 
     static String _mkParent(FN n) {
+        def nl = getNewLine(n)
         def sb = new StringBuilder()
-        n.children.each { sb << mkNode(it) }
+        n.children.each { sb << mkNode(it) << nl }
+        sb << getEol(n)
         return sb.toString()
     }
 
     static LinkedHashMap<String, String> pReplacements = [
-            /(\n| )-> /                                    : '$1→ ',
-            /(\n| )=> /                                    : '$1&rArr; ',
-            /(\n| )>> /                                    : '\n&#8611; ', // >->
-            /\n=- /                                        : '\n→ ',
-            /\n== /                                        : '\n&#8611; ', // >->
-            /\n-- /                                        : '\n&ndash; ',
-            /\n--- /                                       : '\n&mdash; ',
-            /([^-])?---([^-])?/                            : '$1&mdash;$2',
-            /([^-])?--([^-])?/                             : '$1&ndash;$2',
+            /(?m)(?<=^| )-> /                              : '→ ',
+            /(?m)(?<=^| )=> /                              : '&rArr; ',
+            /(?m)(?<=^| )>> /                              : '&#8611; ', // >->
+            /(?m)(?<=^| )=- /                              : '→ ',
+            /(?m)(?<=^| )== /                              : '&#8611; ', // >->
+            /(?m)(?<=^|[^-])---(?=[^-]|$)/                 : '&mdash;',
+            /(?m)(?<=^|[^-])--(?=[^-]|$)/                  : '&ndash;',
             /\{\{([^{]+)\}\}/                              : '<code>$1</code>',
+            /`([^`]+)`/                                    : '<code>$1</code>',
             /(?<=^|[^a-zA-Z0-9])\*(?! )(.+?)(?<! )\*(?=[^a-zA-Z0-9]|$)/: '<b>$1</b>',
             /(?<=^|[^a-zA-Z0-9])_(?! )(.+?)(?<! )_(?=[^a-zA-Z0-9]|$)/  : '<i>$1</i>',
-            /(?<=^|[^a-zA-Z0-9])-(?! )(.+?)(?<! )-(?=[^a-zA-Z0-9]|$)/  : '<s>$1</s>',
-            /(?<=^|[^a-zA-Z0-9])\+(?! )(.+?)(?<! )\+(?=[^a-zA-Z0-9]|$)/: '<u>$1</u>',
+            /(?<=^|[^a-zA-Z0-9])-(?! )(.+?)(?<! )-(?=[^a-zA-Z0-9]|$)/  : '<del>$1</del>',
+            /(?<=^|[^a-zA-Z0-9])\+(?! )(.+?)(?<! )\+(?=[^a-zA-Z0-9]|$)/: '<ins>$1</ins>',
             /(?<=^|[^a-zA-Z0-9])\(([a-z]+)\)(?! )(.+?)(?<! )\(\/\1\)(?=[^a-zA-Z0-9]|$)/: '<span style="color: $1">$2</span>',
     ]
 
     static String _applyReplacements(FN n, String content) {
         content = content.replaceAll(/\n\+ /, "\n${getSimBullet(n)} ")
-        pReplacements.each { content = content.replaceAll(it.key, it.value) }
+        pReplacements.each {
+            try {
+                content = content.replaceAll(it.key, it.value)
+            } catch (IndexOutOfBoundsException e) {
+                println("** replaceAll(/${it.key}/, /${it.value}/) for '$content'")
+                throw e
+            }
+        }
         return content.replaceAll(/\n/, "<br />${getNewLine(n)}")
     }
 
@@ -233,8 +243,8 @@ class ConfluenceStorage {
         def canClearAnnotations = tableAnnotateText == clear
         def nl = getNewLine(n)
         HiLite1st hiLite1st
-        if (n['hiLite1st']) {
-            hiLite1st = HiLite1st.valueOf(n['hiLite1st'].text.toUpperCase())
+        if (n[HILITE1ST]) {
+            hiLite1st = HiLite1st.valueOf(n[HILITE1ST].text.toUpperCase())
         } else {
             hiLite1st = HiLite1st.NONE
         }
@@ -380,7 +390,7 @@ class ConfluenceStorage {
     }
 
     static String getSimBullet(Node n) {
-        return n['simBullet'] ? n['simBullet'].text : '●'
+        return n['simBullet'].text ?: '●'
     }
 
     /**
@@ -616,6 +626,8 @@ class ConfluenceStorage {
         // for table cells (details start with №), the default sep is used
         def sb = new StringBuilder()
         if (n.children.size() > 0) {
+            def eol = getEol(n)
+            def nl = getNewLine(n)
             String sep
             final defaultSep = ', '
             final csvSep = 'csvSep'
@@ -633,10 +645,12 @@ class ConfluenceStorage {
                 sb << getContent(it)
                 if (++i < cellsSize) { // not the last element
                     if (!hasIcon(it, noSepIcons)) // noSepAfter is missing
-                        sb << sep
+                        sb << sep << nl
                 } else // last item – space if noSepAfter is missing
                     sb << getSpaceSep(it)
+                sb << getEol(it)
             }
+            sb << eol
             // NB. getContent->makeMarkup->mk***->mkNode adds a trailing space (unless noSepAfter)
             return sb
         } else
@@ -740,6 +754,7 @@ class ConfluenceStorage {
     static createTable(FN node, String styleName = '=Numbering#') {
         def n = createMarkupMaker(node, 'table')
         n.icons.add(icon.nl_rightArrowCurvingDown)
+        n[HILITE1ST] = HiLite1st.COLUMN
         def elem = n.createChild()
         elem.style.name = styleName
         c.select(elem)
