@@ -53,7 +53,7 @@ class Import {
                 value.each { attrName, attrValue -> node[attrName as String] = attrValue }
             } else if (key == NOTE && value !instanceof Map && value !instanceof List) {
                 node.note = value
-            }else if (value instanceof Map) {
+            } else if (value instanceof Map) {
                 def n = node.createChild(key)
                 importMapRecursively(value as Map, n)
             } else if (value instanceof List) {
@@ -74,13 +74,13 @@ class Import {
     }
 
     static void importList(List list, Node node) {
-            list.each {
-                if (it instanceof Map) {
-                    importMapRecursively(it, node)
-                } else {
-                    def child = node.createChild()
-                    child.text = it
-                }
+        list.each {
+            if (it instanceof Map) {
+                importMapRecursively(it, node)
+            } else {
+                def child = node.createChild()
+                child.text = it
             }
+        }
     }
 }
