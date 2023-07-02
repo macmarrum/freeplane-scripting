@@ -14,11 +14,11 @@ class Import {
         return new String(base64.decodeBase64())
     }
 
-    static Node importJsonBase64(String base64, Node parent = null, boolean shouldFold = true) {
+    static Node importJsonBase64(String base64, Node parent = null, boolean shouldFold = false) {
         return importJson(decodeBase64(base64), parent, shouldFold)
     }
 
-    static Node importJson(String content, Node parent = null, boolean shouldFold = true) {
+    static Node importJson(String content, Node parent = null, boolean shouldFold = false) {
         if (!parent)
             parent = ScriptUtils.node().mindMap.root.createChild('JSON')
         fold(shouldFold, parent)
