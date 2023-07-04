@@ -5,13 +5,20 @@ import groovy.json.JsonSlurper
 import org.freeplane.api.Node
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
+import java.nio.charset.StandardCharsets
+
 class Import {
     private static String DETAILS = '@details'
     private static String ATTRIBUTES = '@attributes'
     private static String NOTE = '@note'
+    private static String UTF8 = StandardCharsets.UTF_8.name()
 
     static String decodeBase64(String base64) {
         return new String(base64.decodeBase64())
+    }
+
+    static Node importJson(File file, Node parent = null, boolean shouldFold = false) {
+        importJson(file.getText(UTF8), parent, shouldFold)
     }
 
     static Node importJsonBase64(String base64, Node parent = null, boolean shouldFold = false) {
