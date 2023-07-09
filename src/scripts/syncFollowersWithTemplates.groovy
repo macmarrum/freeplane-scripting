@@ -1,35 +1,41 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 // https://github.com/freeplane/freeplane/discussions/1297
 
+
 import org.freeplane.api.Node
+import org.freeplane.core.util.LogUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
-def node = ScriptUtils.node()
-final root = node.mindMap.root
+def mindMap = ScriptUtils.node().mindMap
 final TEMPLATE = 'template'
 
-root.findAll().each { n ->
+mindMap.root.findAll().each { n ->
     println(">> testing node ${n.id}")
-    n.attributes.getAll(TEMPLATE).each { templateId ->
+    n.attributes.getAll(TEMPLATE).each { templateAsValue ->
         def follower = n
-        def template = n.mindMap.node(templateId.toString())
-        syncFollowerWithTemplateRecursively(follower, template)
+        def templateId = templateAsValue.toString()
+        if (templateId.startsWith('#ID')) // from Hyperlink
+            templateId = templateId.drop(1)
+        def template = mindMap.node(templateId)
+        if (template)
+            syncFollowerWithTemplateRecursively(follower, follower, template)
+        else
+            LogUtils.info("syncFollowersWIthTemplates - template ${templateId} doesn't exist (any more)")
     }
 }
 
-static syncFollowerWithTemplateRecursively(Node follower, Node template) {
-    def followerChildren = follower.children.collect()
+static syncFollowerWithTemplateRecursively(Node followerRoot, Node follower, Node template) {
     Node followerChildAsClone
     template.children.eachWithIndex { templateChild, templateChildPosition ->
         def templateChildClones = templateChild.nodesSharingContent
-        if (!followerChildren) {
+        followerChildAsClone = followerRoot.findAll().find { it in templateChildClones }
+        if (followerChildAsClone) { // found it
+            if (followerChildAsClone.parent != follower)  // wrong location
+                followerChildAsClone.moveTo(follower, templateChildPosition)
+        } else { // not found - append a clone
             followerChildAsClone = follower.appendAsCloneWithoutSubtree(templateChild)
-        } else {
-            followerChildAsClone = followerChildren.find { followerChild -> followerChild in templateChildClones }
-            if (!followerChildAsClone) {
-                followerChildAsClone = follower.appendAsCloneWithoutSubtree(templateChild)
-            }
+            followerChildAsClone.moveTo(follower, templateChildPosition)
         }
-        syncFollowerWithTemplateRecursively(followerChildAsClone, templateChild)
+        syncFollowerWithTemplateRecursively(followerRoot, followerChildAsClone, templateChild)
     }
 }
