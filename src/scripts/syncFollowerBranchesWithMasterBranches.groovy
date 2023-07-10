@@ -20,13 +20,15 @@ FlexibleBranchSyncer.sync()
  * 1. Select the node
  * 2. In the Filter toolbar, choose "Clones of selection", then `Filter->Select all matching nodes`
  * 3. Delete
- * Each node on the master branch is given the attribute '' so that it can be easily identified (e.g. in conditional styles).
+ * If shouldSetRoleAttributes is true, each node on the master branch is given the attribute 'role: follower/master',
+ * so that it can be easily identified (e.g. in conditional styles), and the root of master branch is given the attribute 'role: master.root'.
  */
 class FlexibleBranchSyncer {
     public static masterBranchKey = 'master.branch'
-    public static shouldSetFollowerMasterAttribute = false
-    public static followerMasterKey = 'follower/master'
-    public static followerMasterValue = ''
+    public static shouldSetRoleAttributes = false
+    public static roleKey = 'role'
+    public static masterRootValue = 'master.root'
+    public static followerMasterValue = 'follower/master'
 
     static sync() {
         def mindMap = ScriptUtils.node().mindMap
@@ -38,9 +40,10 @@ class FlexibleBranchSyncer {
                 if (masterBranchRootId.startsWith('#ID')) // from Hyperlink
                     masterBranchRootId = masterBranchRootId.drop(1)
                 def masterBranchRoot = mindMap.node(masterBranchRootId)
-                if (masterBranchRoot)
+                if (masterBranchRoot) {
+                    if (shouldSetRoleAttributes) masterBranchRoot[roleKey] = masterRootValue
                     syncFollowerWithMasterRecursively(followerBranchRoot, followerBranchRoot, masterBranchRoot)
-                else {
+                } else {
                     def message = "syncFollowersWIthTemplates - master ${masterBranchRootId} doesn't exist (any more)"
                     ScriptUtils.c().statusInfo = message
                     LogUtils.info(message)
@@ -52,7 +55,7 @@ class FlexibleBranchSyncer {
     static syncFollowerWithMasterRecursively(Node followerBranchRoot, Node follower, Node master) {
         Node followerChildAsClone
         master.children.eachWithIndex { masterChild, masterChildPosition ->
-            if (shouldSetFollowerMasterAttribute) masterChild[followerMasterKey] = followerMasterValue
+            if (shouldSetRoleAttributes) masterChild[roleKey] = followerMasterValue
             def masterChildClones = masterChild.nodesSharingContent
             followerChildAsClone = followerBranchRoot.findAll().find { it in masterChildClones }
             if (followerChildAsClone) { // found it
