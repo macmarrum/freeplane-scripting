@@ -45,4 +45,25 @@ class Export {
         }
         return sb.toString()
     }
+
+    static void exportCsv(File file, Node node, String sep = ',', String eol = '\n') {
+        def text = createCsv(node)
+        file.setText(text, UTF8)
+    }
+
+    static String createCsv(Node node, String sep = ',', String eol = '\n') {
+        def rows = node.find { it.leaf }.collect {
+            def ntr = it.pathToRoot
+            def i = ntr.findIndexOf { it == node }
+            ntr[i..-1]
+        }
+        def maxRowSize = rows.collect { it.size() }.max()
+        rows.each { row ->
+            def delta = maxRowSize - row.size()
+            (0..<delta).each {
+                row << ''
+            }
+        }
+        return rows.collect { it.join(sep) }.join(eol)
+    }
 }
