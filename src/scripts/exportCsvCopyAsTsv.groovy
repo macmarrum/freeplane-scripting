@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Paste"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Export"})
 
 
 import io.github.macmarrum.freeplane.Export
