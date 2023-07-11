@@ -53,9 +53,9 @@ class Export {
 
     static String createCsv(Node node, String sep = ',', String eol = '\n') {
         def rows = node.find { it.leaf && it.visible }.collect {
-            def ntr = it.pathToRoot
-            def i = ntr.findIndexOf { it == node }
-            ntr[i..-1]
+            def ptr = it.pathToRoot
+            def i = ptr.findIndexOf { it == node }
+            ptr[i..-1]
         }
         def maxRowSize = rows.collect { it.size() }.max()
         rows.each { row ->
@@ -64,6 +64,15 @@ class Export {
                 row << ''
             }
         }
-        return rows.collect { row -> row.collect { it.transformedText }.join(sep) }.join(eol)
+        return rows.collect { row ->
+            row.collect {
+                try {
+                    it.transformedText
+                } catch (Exception ex) {
+                    println("** error while processing `${it}`")
+                    throw ex
+                }
+            }.join(sep)
+        }.join(eol)
     }
 }
