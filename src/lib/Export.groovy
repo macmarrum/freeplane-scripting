@@ -64,6 +64,6 @@ class Export {
                 row << ''
             }
         }
-        return rows.collect { it.join(sep) }.join(eol)
+        return rows.collect { row -> row.collect { it.transformedText }.join(sep) }.join(eol)
     }
 }
