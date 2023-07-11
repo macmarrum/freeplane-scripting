@@ -2,11 +2,12 @@
 // https://github.com/freeplane/freeplane/discussions/1297
 package io.github.macmarrum.freeplane
 
+import org.freeplane.api.MindMap
 import org.freeplane.api.Node
 import org.freeplane.core.util.LogUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
-FlexibleBranchSyncer.sync()
+FlexibleBranchSyncer.sync(ScriptUtils.node().mindMap)
 
 /**
  * The script supports the concept of flexible branch clones, as contrasted with full branch clones (node and subtree).
@@ -29,8 +30,7 @@ class FlexibleBranchSyncer {
     public static role = 'role'
     public static followerMaster = 'follower/master'
 
-    static sync() {
-        def mindMap = ScriptUtils.node().mindMap
+    static sync(MindMap mindMap) {
         mindMap.root.findAll().each { n ->
             n.attributes.getAll(masterRoot).each { masterBranchValue ->
                 def followerBranchRoot = n
