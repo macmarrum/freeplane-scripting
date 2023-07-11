@@ -11,9 +11,9 @@ FlexibleBranchSyncer.sync()
 /**
  * The script supports the concept of flexible branch clones, as contrasted with full branch clones (node and subtree).
  * In each follower branch, the script creates single-node clones for each node in the master branch.
- * A follower branch is such whose root node has the attribute 'master.branch'  pointing to the root of the master branch,
+ * A follower branch is such whose root node has the attribute 'master.root' pointing to the root of the master branch,
  * e.g. ID_123456 or #ID_123456 or a hyperlink to the node.
- * A follower branch can follow more than one master branch, by having more 'master.branch' attributes.
+ * A follower branch can follow more than one master branch, by having more 'master.root' attributes.
  * The script supports the addition of new nodes on the master branch(es) and the relocation of existing nodes.
  * Follower branches can add their stand-alone nodes, which will be kept intact.
  * The deletion of nodes on the master branch needs to be done in sync with the follower branches, e.g.
@@ -24,24 +24,22 @@ FlexibleBranchSyncer.sync()
  * so that it can be easily identified (e.g. in conditional styles), and the root of master branch is given the attribute 'role: master.root'.
  */
 class FlexibleBranchSyncer {
-    public static masterBranchKey = 'master.branch'
+    public static masterRoot = 'master.root'
     public static shouldSetRoleAttributes = false
-    public static roleKey = 'role'
-    public static masterRootValue = 'master.root'
-    public static followerMasterValue = 'follower/master'
+    public static role = 'role'
+    public static followerMaster = 'follower/master'
 
     static sync() {
         def mindMap = ScriptUtils.node().mindMap
         mindMap.root.findAll().each { n ->
-            println(">> testing node ${n.id}")
-            n.attributes.getAll(masterBranchKey).each { masterBranchValue ->
+            n.attributes.getAll(masterRoot).each { masterBranchValue ->
                 def followerBranchRoot = n
                 def masterBranchRootId = masterBranchValue.toString()
                 if (masterBranchRootId.startsWith('#ID')) // from Hyperlink
                     masterBranchRootId = masterBranchRootId.drop(1)
                 def masterBranchRoot = mindMap.node(masterBranchRootId)
                 if (masterBranchRoot) {
-                    if (shouldSetRoleAttributes) masterBranchRoot[roleKey] = masterRootValue
+                    if (shouldSetRoleAttributes) masterBranchRoot[role] = masterRoot
                     syncFollowerWithMasterRecursively(followerBranchRoot, followerBranchRoot, masterBranchRoot)
                 } else {
                     def message = "syncFollowersWIthTemplates - master ${masterBranchRootId} doesn't exist (any more)"
@@ -55,7 +53,7 @@ class FlexibleBranchSyncer {
     static syncFollowerWithMasterRecursively(Node followerBranchRoot, Node follower, Node master) {
         Node followerChildAsClone
         master.children.eachWithIndex { masterChild, masterChildPosition ->
-            if (shouldSetRoleAttributes) masterChild[roleKey] = followerMasterValue
+            if (shouldSetRoleAttributes) masterChild[role] = followerMaster
             def masterChildClones = masterChild.nodesSharingContent
             followerChildAsClone = followerBranchRoot.findAll().find { it in masterChildClones }
             if (followerChildAsClone) { // found it
