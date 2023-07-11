@@ -27,7 +27,7 @@ class Export {
         ]
         def levelStyles = map.keySet()
         def sb = new StringBuilder()
-        parent.findAll().each {
+        parent.find { it.visible }.each {
             boolean isHeading = false
             for (String styleName in it.style.allActiveStyles) {
                 if (styleName in levelStyles) {
@@ -52,7 +52,7 @@ class Export {
     }
 
     static String createCsv(Node node, String sep = ',', String eol = '\n') {
-        def rows = node.find { it.leaf }.collect {
+        def rows = node.find { it.leaf && it.visible }.collect {
             def ntr = it.pathToRoot
             def i = ntr.findIndexOf { it == node }
             ntr[i..-1]
