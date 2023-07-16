@@ -7,7 +7,7 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
 class Export {
-    private static Charset UTF8 = StandardCharsets.UTF_8
+    public static Charset charset = StandardCharsets.UTF_8
     public static final String COMMA = ','
     public static final String TAB = '\t'
     public static final String NL = '\n'
@@ -20,7 +20,7 @@ class Export {
 
     static void exportMarkdownLevelStyles(File file, Node parent) {
         def text = createMarkdownLevelStyles(parent)
-        file.setText(text, UTF8.name())
+        file.setText(text, charset.name())
     }
 
     /**
@@ -73,11 +73,11 @@ class Export {
     static String createCsv(Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
         def outputStream = new ByteArrayOutputStream()
         exportCsvToOutputStream(outputStream, node, sep, eol, newlineReplacement, nodePart)
-        return outputStream.toString(UTF8)
+        return outputStream.toString(charset)
     }
 
     static void exportCsvToOutputStream(OutputStream outputStream, Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
-        def sepAsBytes = sep.getBytes(UTF8)
+        def sepAsBytes = sep.getBytes(charset)
         def rows = createListOfRows(node)
         def rowSizes = rows.collect { it.size() }
         def maxRowSize = rowSizes.max()
@@ -94,14 +94,14 @@ class Export {
                     text = /"$text"/
                 if (newlineReplacement !== null)
                     text = text.replace(NL, newlineReplacement)
-                outputStream.write(text.getBytes(UTF8))
+                outputStream.write(text.getBytes(charset))
                 def isLastRow = j == rowSize - 1
                 if (!isLastRow)
                     outputStream.write(sepAsBytes)
             }
             def delta = maxRowSize - rowSize
             (0..<delta).each { outputStream.write(sepAsBytes) }
-            outputStream.write(eol.getBytes(UTF8))
+            outputStream.write(eol.getBytes(charset))
         }
     }
 }
