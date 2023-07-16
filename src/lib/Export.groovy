@@ -103,5 +103,6 @@ class Export {
             (0..<delta).each { outputStream.write(sepAsBytes) }
             outputStream.write(eol.getBytes(charset))
         }
+        outputStream.close()
     }
 }
