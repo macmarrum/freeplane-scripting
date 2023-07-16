@@ -7,8 +7,9 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 
 class Export {
-    private static String UTF8 = StandardCharsets.UTF_8.name()
-    public static final COMMA = ','
+    private static Charset UTF8 = StandardCharsets.UTF_8
+    public static final String COMMA = ','
+    public static final String TAB = '\t'
     public static final String NL = '\n'
     public static final String CR = '\r'
 
@@ -19,7 +20,7 @@ class Export {
 
     static void exportMarkdownLevelStyles(File file, Node parent) {
         def text = createMarkdownLevelStyles(parent)
-        file.setText(text, UTF8)
+        file.setText(text, UTF8.name())
     }
 
     /**
@@ -64,54 +65,43 @@ class Export {
         }
     }
 
-    static void exportCsv(File file, Node node, String sep = COMMA, String eol = NL) {
-        exportCsvNodePart(NodePart.CORE, file, node, sep, eol)
+    static void exportCsv(File file, Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
+        def outputStream = new BufferedOutputStream(new FileOutputStream(file))
+        exportCsvToOutputStream(outputStream, node, sep, eol, newlineReplacement, nodePart)
     }
 
-    static void exportCsvNodePart(NodePart nodePart, File file, Node node, String sep = COMMA, String eol = NL, String newLineReplacement = null) {
+    static String createCsv(Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
+        def outputStream = new ByteArrayOutputStream()
+        exportCsvToOutputStream(outputStream, node, sep, eol, newlineReplacement, nodePart)
+        return outputStream.toString(UTF8)
+    }
+
+    static void exportCsvToOutputStream(OutputStream outputStream, Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
+        def sepAsBytes = sep.getBytes(UTF8)
         def rows = createListOfRows(node)
         def rowSizes = rows.collect { it.size() }
         def maxRowSize = rowSizes.max()
-        file.withPrintWriter(UTF8) { pw ->
-            rows.eachWithIndex { row, i ->
-                def rowSize = rowSizes[i]
-                row.eachWithIndex { Node n, int j ->
-                    def text = switch (nodePart) {
-                        case NodePart.CORE -> HtmlUtils.htmlToPlain(n.transformedText)
-                        case NodePart.DETAILS -> (n.details?.text ?: '')
-                        case NodePart.NOTE -> (n.note?.text ?: '')
-                        default -> '#ERR!'
-                    }
-                    if (text.contains(sep) && sep != '"')
-                        text = /"$text"/
-                    if (newLineReplacement !== null)
-                        text = text.replace(NL, newLineReplacement)
-                    pw.print(text)
-                    def isLastRow = j == rowSize - 1
-                    if (!isLastRow)
-                        pw.print(sep)
+        rows.eachWithIndex { row, i ->
+            def rowSize = rowSizes[i]
+            row.eachWithIndex { n, j ->
+                def text = switch (nodePart) {
+                    case NodePart.CORE -> HtmlUtils.htmlToPlain(n.transformedText)
+                    case NodePart.DETAILS -> (n.details?.text ?: '')
+                    case NodePart.NOTE -> (n.note?.text ?: '')
+                    default -> '#ERR!'
                 }
-                def delta = maxRowSize - rowSize
-                (0..<delta).each { pw.print(sep) }
-                pw.print(eol)
-            }
-        }
-    }
-
-    static String createCsv(Node node, String sep = COMMA, String eol = NL) {
-        def rows = createListOfRows(node)
-        def maxRowSize = rows.collect { it.size() }.max()
-        return rows.collect { row ->
-            def line = row.collect {
-                def text = it.transformedText
-                if (sep != '"' && text.contains(sep))
+                if (text.contains(sep) && sep != '"')
                     text = /"$text"/
-                return text
-            }.join(sep)
-            int delta = maxRowSize - row.size()
-            if (delta)
-                line += sep * delta
-            return line
-        }.join(eol)
+                if (newlineReplacement !== null)
+                    text = text.replace(NL, newlineReplacement)
+                outputStream.write(text.getBytes(UTF8))
+                def isLastRow = j == rowSize - 1
+                if (!isLastRow)
+                    outputStream.write(sepAsBytes)
+            }
+            def delta = maxRowSize - rowSize
+            (0..<delta).each { outputStream.write(sepAsBytes) }
+            outputStream.write(eol.getBytes(UTF8))
+        }
     }
 }
