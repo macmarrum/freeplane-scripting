@@ -29,6 +29,7 @@ class Export {
     static void toMarkdownLevelStylesFile(File file, Node node) {
         def outputStream = new BufferedOutputStream(new FileOutputStream(file))
         toMarkdownLevelStylesOutputStream(outputStream, node)
+        outputStream.close()
     }
 
     /**
@@ -63,7 +64,6 @@ class Export {
                 outputStream.write(nlBytes)
             }
         }
-        outputStream.close()
     }
 
     static List<List<Node>> createListOfRows(Node node) {
@@ -77,6 +77,7 @@ class Export {
     static void toCsvFile(File file, Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
         def outputStream = new BufferedOutputStream(new FileOutputStream(file))
         toCsvOutputStream(outputStream, node, sep, eol, newlineReplacement, nodePart)
+        outputStream.close()
     }
 
     static String toCsvString(Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
@@ -112,6 +113,5 @@ class Export {
             (0..<delta).each { outputStream.write(sepAsBytes) }
             outputStream.write(eol.getBytes(charset))
         }
-        outputStream.close()
     }
 }
