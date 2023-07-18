@@ -43,15 +43,19 @@ class Export {
 
     static String toMarkdownLevelStylesOutputStream(OutputStream outputStream, Node node) {
         def nlBytes = NL.getBytes(charset)
-        def levelStyles = levelStyleToMdHeading.keySet()
+        def spaceBytes = ' '.getBytes(charset)
+        def levelStyleToMdHeadingBytes = new LinkedHashMap<String, byte[]>()
+        levelStyleToMdHeading.each {k, v ->
+            levelStyleToMdHeadingBytes[k] = v.getBytes(charset)
+        }
         node.find { it.visible }.each {
             boolean isHeading = false
             for (String styleName in it.style.allActiveStyles) {
-                if (styleName in levelStyles) {
+                if (levelStyleToMdHeadingBytes.containsKey(styleName)) {
                     isHeading = true
                     if (!it.root) outputStream.write(nlBytes)
-                    outputStream.write(levelStyleToMdHeading[styleName].getBytes(charset))
-                    outputStream.write(' '.getBytes(charset))
+                    outputStream.write(levelStyleToMdHeadingBytes[styleName])
+                    outputStream.write(spaceBytes)
                     break
                 }
             }
