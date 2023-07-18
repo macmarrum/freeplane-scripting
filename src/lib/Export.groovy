@@ -12,49 +12,58 @@ class Export {
     public static final String TAB = '\t'
     public static final String NL = '\n'
     public static final String CR = '\r'
+    public static final levelStyleToMdHeading = [
+            'AutomaticLayout.level.root': '#',
+            'AutomaticLayout.level,1'   : '##',
+            'AutomaticLayout.level,2'   : '###',
+            'AutomaticLayout.level,3'   : '####',
+            'AutomaticLayout.level,4'   : '#####',
+            'AutomaticLayout.level,5'   : '######',
+            'AutomaticLayout.level,6'   : '#######',
+    ]
 
     enum NodePart {
         CORE, DETAILS, NOTE
     }
 
-
-    static void exportMarkdownLevelStyles(File file, Node parent) {
-        def text = createMarkdownLevelStyles(parent)
-        file.setText(text, charset.name())
+    static void toMarkdownLevelStylesFile(File file, Node node) {
+        def outputStream = new BufferedOutputStream(new FileOutputStream(file))
+        toMarkdownLevelStylesOutputStream(outputStream, node)
     }
 
     /**
      * https://github.com/freeplane/freeplane/issues/333
      */
-    static String createMarkdownLevelStyles(Node parent) {
-        def map = [
-                'AutomaticLayout.level.root': '#',
-                'AutomaticLayout.level,1'   : '##',
-                'AutomaticLayout.level,2'   : '###',
-                'AutomaticLayout.level,3'   : '####',
-                'AutomaticLayout.level,4'   : '#####',
-                'AutomaticLayout.level,5'   : '######',
-                'AutomaticLayout.level,6'   : '#######',
-        ]
-        def levelStyles = map.keySet()
-        def sb = new StringBuilder()
-        parent.find { it.visible }.each {
+    static String toMarkdownLevelStylesString(Node node) {
+        def outputStream = new ByteArrayOutputStream()
+        toMarkdownLevelStylesOutputStream(outputStream, node)
+        return outputStream.toString(charset)
+    }
+
+    static String toMarkdownLevelStylesOutputStream(OutputStream outputStream, Node node) {
+        def nlBytes = NL.getBytes(charset)
+        def levelStyles = levelStyleToMdHeading.keySet()
+        node.find { it.visible }.each {
             boolean isHeading = false
             for (String styleName in it.style.allActiveStyles) {
                 if (styleName in levelStyles) {
                     isHeading = true
-                    if (!it.root) sb << NL
-                    sb << map[styleName] << ' '
+                    if (!it.root) outputStream.write(nlBytes)
+                    outputStream.write(levelStyleToMdHeading[styleName].getBytes(charset))
+                    outputStream.write(' '.getBytes(charset))
                     break
                 }
             }
-            if (!isHeading) sb << NL
-            sb << it.text << NL
-            if (it.detailsText) {
-                sb << it.details.text << NL
+            if (!isHeading) outputStream.write(nlBytes)
+            outputStream.write(it.text.getBytes(charset))
+            outputStream.write(nlBytes)
+            def detailsText = it.details?.text
+            if (detailsText) {
+                outputStream.write(detailsText.getBytes(charset))
+                outputStream.write(nlBytes)
             }
         }
-        return sb.toString()
+        outputStream.close()
     }
 
     static List<List<Node>> createListOfRows(Node node) {
@@ -65,18 +74,18 @@ class Export {
         }
     }
 
-    static void exportCsv(File file, Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
+    static void toCsvFile(File file, Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
         def outputStream = new BufferedOutputStream(new FileOutputStream(file))
-        exportCsvToOutputStream(outputStream, node, sep, eol, newlineReplacement, nodePart)
+        toCsvOutputStream(outputStream, node, sep, eol, newlineReplacement, nodePart)
     }
 
-    static String createCsv(Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
+    static String toCsvString(Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
         def outputStream = new ByteArrayOutputStream()
-        exportCsvToOutputStream(outputStream, node, sep, eol, newlineReplacement, nodePart)
+        toCsvOutputStream(outputStream, node, sep, eol, newlineReplacement, nodePart)
         return outputStream.toString(charset)
     }
 
-    static void exportCsvToOutputStream(OutputStream outputStream, Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
+    static void toCsvOutputStream(OutputStream outputStream, Node node, String sep = COMMA, String eol = NL, String newlineReplacement = CR, NodePart nodePart = NodePart.CORE) {
         def sepAsBytes = sep.getBytes(charset)
         def rows = createListOfRows(node)
         def rowSizes = rows.collect { it.size() }
