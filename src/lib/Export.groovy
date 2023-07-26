@@ -1,8 +1,11 @@
 package io.github.macmarrum.freeplane
 
 import org.freeplane.api.Node
+import org.freeplane.core.ui.components.UITools
 import org.freeplane.core.util.HtmlUtils
 
+import javax.swing.JFileChooser
+import javax.swing.JOptionPane
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.regex.Pattern
@@ -13,13 +16,17 @@ class Export {
     public static final String TAB = '\t'
     public static final String NL = '\n'
     public static final String CR = '\r'
+    public static final String SPACE = ' '
     public static final String HASH = '#'
     public static final Pattern RX_MULTILINE_BEGINING = ~/(?m)^/
     public static final String GT_SPACE = '> '
     public static final String FOUR_SPACES = '    '
     public static final Pattern RX_HARD_LINE_BREAK_CANDIDATE = ~/(?<!^|\\|\n)\n(?!\n|$)/
     public static final String BACKSLASH_NL = '\\\\\n'
-    public static final String AUTOMATIC_LAYOUT_LEVEL = 'AutomaticLayout.level.'
+    public static final Pattern RX_AUTOMATIC_LAYOUT_LEVEL = ~/^AutomaticLayout.level(,|\.)/
+    public static final String BLANK = ''
+    public static final String ROOT = 'root'
+    public static final String ZERO = '0'
     public static final Integer MIN_LEVEL_CEILING = 999
     public static levelStyleToMdHeading = [
             'AutomaticLayout.level.root': '#',
@@ -30,7 +37,7 @@ class Export {
             'AutomaticLayout.level,5'   : '######',
             'AutomaticLayout.level,6'   : '#######',
     ]
-    public static mdSettings = [levelStyles: MdLevelStyles.STATIC, details: MdInclude.HLB, note: MdInclude.NONE]
+    public static mdSettings = [levelStyles: MdLevelStyles.REL, details: MdInclude.HLB, note: MdInclude.PLAIN]
     public static csvSettings = [sep: COMMA, eol: NL, newlineReplacement: CR, nodePart: NodePart.CORE]
 
     enum NodePart {
@@ -44,17 +51,21 @@ class Export {
      *     <li>NONE - not included</li>
      *     <li>QUOTE - as a quote; lines will be merged</li>
      *     <li>HLB - hard line breaks for each line</li>
-     *     <li>QUOTE_HLB - as a quote with a hard line break for each line</li>
+     *     <li>QTHLB - as a quote with a hard line break for each line</li>
      *     <li>CODE - as a code block</li>
-     *     <li>ASIS - as is, without any modification</li>
+     *     <li>PLAIN - plain text, without any modification</li>
      * </ul>
      */
     enum MdInclude {
-        NONE, QUOTE, HLB, QTHLB, CODE, ASIS
+        NONE, QUOTE, HLB, QTHLB, CODE, PLAIN
     }
 
+    /**
+     * ABS - absolute, i.e. root: #, Level 1: ##, etc.
+     * REL - relative, i.e. the first encountered Level Style: #, the second: ##, etc
+     */
     enum MdLevelStyles {
-        NONE, STATIC, DYNAMIC
+        NONE, ABS, REL
     }
 
     static void toMarkdownFile(File file, Node node, HashMap<String, Object> settings = null) {
@@ -75,35 +86,32 @@ class Export {
     static String toMarkdownOutputStream(OutputStream outputStream, Node node, HashMap<String, Object> settings = null) {
         settings = !settings ? mdSettings.clone() : mdSettings + settings
         def nlBytes = NL.getBytes(charset)
-        def spaceBytes = ' '.getBytes(charset)
+        def spaceBytes = SPACE.getBytes(charset)
         def mdLevelStyles = settings.levelStyles as MdLevelStyles
-        def levelStyleToMdHeadingBytes = new LinkedHashMap<String, byte[]>()
-        if (mdLevelStyles == MdLevelStyles.STATIC) {
-            levelStyleToMdHeading.each { k, v ->
-                levelStyleToMdHeadingBytes[k] = v.getBytes(charset)
-            }
+        def levelStyleToMdHeadingBytes
+        if (mdLevelStyles == MdLevelStyles.ABS) {
+            levelStyleToMdHeadingBytes = levelStyleToMdHeading.collectEntries { k, v -> [k, v.getBytes(charset)] }
         }
         def nodeToStyles = new LinkedHashMap<Node, List<String>>()
         node.find { it.visible }.each { nodeToStyles[it] = it.style.allActiveStyles }
-        def minLevel = MIN_LEVEL_CEILING
+        Integer minStyleLevelNum = MIN_LEVEL_CEILING
         def nodeToStyleLevelNum = new HashMap<Node, Integer>()
-        if (mdLevelStyles == MdLevelStyles.DYNAMIC) {
-            // find nodes with AUTOMATIC_LAYOUT_LEVEL and record lowest number
+        if (mdLevelStyles == MdLevelStyles.REL) {
             nodeToStyles.each { n, allActiveStyles ->
                 def assignedLevelStyle = allActiveStyles.find { it in levelStyleToMdHeading }
                 if (assignedLevelStyle) {
-                    def styleLevelStr = assignedLevelStyle.replaceAll(/^AutomaticLayout.level(,|\.)/, '').replace('root', '0')
+                    def styleLevelStr = assignedLevelStyle.replaceAll(RX_AUTOMATIC_LAYOUT_LEVEL, BLANK).replace(ROOT, ZERO)
                     def styleLevelNum = styleLevelStr as Integer
                     nodeToStyleLevelNum[n] = styleLevelNum
-                    if (styleLevelNum < minLevel)
-                        minLevel = styleLevelNum
+                    if (styleLevelNum < minStyleLevelNum)
+                        minStyleLevelNum = styleLevelNum
                 }
             }
         }
         nodeToStyles.each { n, allActiveStyles ->
             boolean isHeading = false
             switch (mdLevelStyles) {
-                case MdLevelStyles.STATIC -> {
+                case MdLevelStyles.ABS -> {
                     for (def styleName in allActiveStyles) {
                         if (levelStyleToMdHeadingBytes.containsKey(styleName)) {
                             isHeading = true
@@ -114,13 +122,13 @@ class Export {
                         }
                     }
                 }
-                case MdLevelStyles.DYNAMIC -> {
-                    println(":: minLevel: ${minLevel}")
+                case MdLevelStyles.REL -> {
+//                    println(":: minLevel: ${minLevel}")
                     Integer styleLevelNum
-                    if (minLevel < MIN_LEVEL_CEILING && (styleLevelNum = nodeToStyleLevelNum[n])) {
+                    if (minStyleLevelNum < MIN_LEVEL_CEILING && (styleLevelNum = nodeToStyleLevelNum[n])) {
                         isHeading = true
                         if (!n.root) outputStream.write(nlBytes)
-                        def hashCount = styleLevelNum - minLevel + 1
+                        def hashCount = styleLevelNum - minStyleLevelNum + 1
                         assert hashCount > 0
                         outputStream.write((HASH * hashCount).getBytes(charset))
                         outputStream.write(spaceBytes)
@@ -141,7 +149,7 @@ class Export {
                     outputStream.write(nlBytes)
                     def processedText = switch (mdIn) {
                         case MdInclude.HLB -> _replaceNewLinesWithHardLineBreaks(text)
-                        case MdInclude.ASIS -> text
+                        case MdInclude.PLAIN -> text
                         case MdInclude.QTHLB -> _quoteMdWithHardLineBreaks(text)
                         case MdInclude.QUOTE -> _quoteMd(text)
                         case MdInclude.CODE -> _codeMd(text)
@@ -153,6 +161,7 @@ class Export {
             }
         }
     }
+
 
     static String _replaceNewLinesWithHardLineBreaks(String text) {
         text.replaceAll(RX_HARD_LINE_BREAK_CANDIDATE, BACKSLASH_NL)
@@ -223,5 +232,25 @@ class Export {
             (0..<delta).each { outputStream.write(sepAsBytes) }
             outputStream.write(eol.getBytes(charset))
         }
+    }
+
+    static File askForFile(File suggestedFile = null) {
+        final fileChooser = new JFileChooser()
+        fileChooser.multiSelectionEnabled = false
+        if (suggestedFile)
+            fileChooser.selectedFile = suggestedFile
+        final returnVal = fileChooser.showOpenDialog()
+        if (returnVal != JFileChooser.APPROVE_OPTION) {
+            return
+        }
+        def file = fileChooser.getSelectedFile()
+        if (file.exists()) {
+            def message = "${file.path} exists.\nOverwrite?"
+            def title = 'Confirm overwrite'
+            def decision = UITools.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+            if (decision != JOptionPane.YES_OPTION)
+                return
+        }
+        return file
     }
 }
