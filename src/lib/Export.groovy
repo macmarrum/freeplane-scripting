@@ -187,13 +187,13 @@ class Export {
         }
     }
 
-    static void toCsvFile(File file, Node node, HashMap<String, Object> settings) {
+    static void toCsvFile(File file, Node node, HashMap<String, Object> settings = null) {
         def outputStream = new BufferedOutputStream(new FileOutputStream(file))
         toCsvOutputStream(outputStream, node, settings)
         outputStream.close()
     }
 
-    static String toCsvString(Node node, HashMap<String, Object> settings) {
+    static String toCsvString(Node node, HashMap<String, Object> settings = null) {
         def outputStream = new ByteArrayOutputStream()
         toCsvOutputStream(outputStream, node, settings)
         outputStream.toString(charset)
