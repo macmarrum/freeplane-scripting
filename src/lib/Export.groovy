@@ -245,7 +245,7 @@ class Export {
         }
         def file = fileChooser.getSelectedFile()
         if (file.exists()) {
-            def message = "${file.path} exists.\nOverwrite?"
+            def message = "The file exists\n${file.path}.\nOverwrite?"
             def title = 'Confirm overwrite'
             def decision = UITools.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
             if (decision != JOptionPane.YES_OPTION)
