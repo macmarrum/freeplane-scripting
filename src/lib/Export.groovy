@@ -37,7 +37,7 @@ class Export {
             'AutomaticLayout.level,5'   : '######',
             'AutomaticLayout.level,6'   : '#######',
     ]
-    public static mdSettings = [levelStyles: MdLevelStyles.REL, details: MdInclude.HLB, note: MdInclude.PLAIN]
+    public static mdSettings = [h1: MdH1.NODE, details: MdInclude.HLB, note: MdInclude.PLAIN]
     public static csvSettings = [sep: COMMA, eol: NL, newlineReplacement: CR, nodePart: NodePart.CORE]
 
     enum NodePart {
@@ -51,21 +51,23 @@ class Export {
      *     <li>NONE - not included</li>
      *     <li>QUOTE - as a quote; lines will be merged</li>
      *     <li>HLB - hard line breaks for each line</li>
-     *     <li>QTHLB - as a quote with a hard line break for each line</li>
+     *     <li>QUOTE_HLB - as a quote with a hard line break for each line</li>
      *     <li>CODE - as a code block</li>
      *     <li>PLAIN - plain text, without any modification</li>
      * </ul>
      */
     enum MdInclude {
-        NONE, QUOTE, HLB, QTHLB, CODE, PLAIN
+        NONE, QUOTE, HLB, QUOTE_HLB, CODE, PLAIN
     }
 
     /**
-     * ABS - absolute, i.e. root: #, Level 1: ##, etc.
-     * REL - relative, i.e. the first encountered Level Style: #, the second: ##, etc
+     * <ul>
+     * <li>ROOT - root: #, Level 1: ##, etc.</li>
+     * <li>NODE - the first encountered Level Style: #, the second: ##, etc</li>
+     * </ul>
      */
-    enum MdLevelStyles {
-        NONE, ABS, REL
+    enum MdH1 {
+        NONE, ROOT, NODE
     }
 
     static void toMarkdownFile(File file, Node node, HashMap<String, Object> settings = null) {
@@ -87,16 +89,16 @@ class Export {
         settings = !settings ? mdSettings.clone() : mdSettings + settings
         def nlBytes = NL.getBytes(charset)
         def spaceBytes = SPACE.getBytes(charset)
-        def mdLevelStyles = settings.levelStyles as MdLevelStyles
+        def mdH1 = settings.h1 as MdH1
         def levelStyleToMdHeadingBytes
-        if (mdLevelStyles == MdLevelStyles.ABS) {
+        if (mdH1 == MdH1.ROOT) {
             levelStyleToMdHeadingBytes = levelStyleToMdHeading.collectEntries { k, v -> [k, v.getBytes(charset)] }
         }
         def nodeToStyles = new LinkedHashMap<Node, List<String>>()
         node.find { it.visible }.each { nodeToStyles[it] = it.style.allActiveStyles }
         Integer minStyleLevelNum = MIN_LEVEL_CEILING
         def nodeToStyleLevelNum = new HashMap<Node, Integer>()
-        if (mdLevelStyles == MdLevelStyles.REL) {
+        if (mdH1 == MdH1.NODE) {
             nodeToStyles.each { n, allActiveStyles ->
                 def assignedLevelStyle = allActiveStyles.find { it in levelStyleToMdHeading }
                 if (assignedLevelStyle) {
@@ -110,8 +112,8 @@ class Export {
         }
         nodeToStyles.each { n, allActiveStyles ->
             boolean isHeading = false
-            switch (mdLevelStyles) {
-                case MdLevelStyles.ABS -> {
+            switch (mdH1) {
+                case MdH1.ROOT -> {
                     for (def styleName in allActiveStyles) {
                         if (levelStyleToMdHeadingBytes.containsKey(styleName)) {
                             isHeading = true
@@ -122,8 +124,7 @@ class Export {
                         }
                     }
                 }
-                case MdLevelStyles.REL -> {
-//                    println(":: minLevel: ${minLevel}")
+                case MdH1.NODE -> {
                     Integer styleLevelNum
                     if (minStyleLevelNum < MIN_LEVEL_CEILING && (styleLevelNum = nodeToStyleLevelNum[n])) {
                         isHeading = true
@@ -134,7 +135,7 @@ class Export {
                         outputStream.write(spaceBytes)
                     }
                 }
-                default -> println("** Unexpected mdLevelStyles: ${mdLevelStyles}")
+                default -> println("** Unexpected mdLevelStyles: ${mdH1}")
             }
             if (!isHeading) outputStream.write(nlBytes)
             outputStream.write(n.text.getBytes(charset))
@@ -150,7 +151,7 @@ class Export {
                     def processedText = switch (mdIn) {
                         case MdInclude.HLB -> _replaceNewLinesWithHardLineBreaks(text)
                         case MdInclude.PLAIN -> text
-                        case MdInclude.QTHLB -> _quoteMdWithHardLineBreaks(text)
+                        case MdInclude.QUOTE_HLB -> _quoteMdWithHardLineBreaks(text)
                         case MdInclude.QUOTE -> _quoteMd(text)
                         case MdInclude.CODE -> _codeMd(text)
                         default -> '#ERR!'
