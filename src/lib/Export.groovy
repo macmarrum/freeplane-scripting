@@ -70,6 +70,26 @@ class Export {
         NONE, ROOT, NODE
     }
 
+    static File askForFile(File suggestedFile = null) {
+        final fileChooser = new JFileChooser()
+        fileChooser.multiSelectionEnabled = false
+        if (suggestedFile)
+            fileChooser.selectedFile = suggestedFile
+        final returnVal = fileChooser.showOpenDialog()
+        if (returnVal != JFileChooser.APPROVE_OPTION) {
+            return
+        }
+        def file = fileChooser.getSelectedFile()
+        if (file.exists()) {
+            def message = "The file exists\n${file.path}.\nOverwrite?"
+            def title = 'Confirm overwrite'
+            def decision = UITools.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+            if (decision != JOptionPane.YES_OPTION)
+                return
+        }
+        return file
+    }
+
     static void toMarkdownFile(File file, Node node, HashMap<String, Object> settings = null) {
         def outputStream = new BufferedOutputStream(new FileOutputStream(file))
         toMarkdownOutputStream(outputStream, node, settings)
@@ -163,7 +183,6 @@ class Export {
         }
     }
 
-
     static String _replaceNewLinesWithHardLineBreaks(String text) {
         text.replaceAll(RX_HARD_LINE_BREAK_CANDIDATE, BACKSLASH_NL)
     }
@@ -200,7 +219,6 @@ class Export {
         outputStream.toString(charset)
     }
 
-
     static void toCsvOutputStream(OutputStream outputStream, Node node, HashMap<String, Object> settings) {
         settings = !settings ? csvSettings.clone() : csvSettings + settings
         def sep = settings.sep as String
@@ -233,25 +251,5 @@ class Export {
             (0..<delta).each { outputStream.write(sepAsBytes) }
             outputStream.write(eol.getBytes(charset))
         }
-    }
-
-    static File askForFile(File suggestedFile = null) {
-        final fileChooser = new JFileChooser()
-        fileChooser.multiSelectionEnabled = false
-        if (suggestedFile)
-            fileChooser.selectedFile = suggestedFile
-        final returnVal = fileChooser.showOpenDialog()
-        if (returnVal != JFileChooser.APPROVE_OPTION) {
-            return
-        }
-        def file = fileChooser.getSelectedFile()
-        if (file.exists()) {
-            def message = "The file exists\n${file.path}.\nOverwrite?"
-            def title = 'Confirm overwrite'
-            def decision = UITools.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
-            if (decision != JOptionPane.YES_OPTION)
-                return
-        }
-        return file
     }
 }
