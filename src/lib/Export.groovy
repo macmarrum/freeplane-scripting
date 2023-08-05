@@ -28,6 +28,11 @@ class Export {
     public static final String ROOT = 'root'
     public static final String ZERO = '0'
     public static final Integer MIN_LEVEL_CEILING = 999
+    public static final String SINGLE_QUOTE = '\''
+    public static final String DOUBLE_QUOTE = '"'
+    public static final String MULTILINE_SINGLE_QUOTE = '\'\'\''
+    public static final String MULTILINE_DOUBLE_QUOTE = '"""'
+    public static final RUMAR_TOML_SETTING_NAMES = ['backup_base_dir', 'source_dir', 'backup_base_dir_for_profile', 'included_top_dirs', 'excluded_top_dirs', 'included_dirs_as_regex', 'excluded_dirs_as_regex', 'included_files_as_glob', 'excluded_files_as_glob', 'included_files_as_regex', 'excluded_files_as_regex', 'archive_format', 'compression_level', 'no_compression_suffixes_default', 'no_compression_suffixes', 'tar_format', 'sha256_comparison_if_same_size', 'file_deduplication', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_week_to_keep', 'number_of_backups_per_month_to_keep', 'commands_using_filters', 'suffixes_without_compression']
     public static levelStyleToMdHeading = [
             'AutomaticLayout.level.root': '#',
             'AutomaticLayout.level,1'   : '##',
@@ -199,10 +204,10 @@ class Export {
         text.replaceAll(RX_MULTILINE_BEGINING, FOUR_SPACES)
     }
 
-    static List<List<Node>> createListOfRows(Node node) {
+    static List<List<Node>> createListOfRows(Node node, Integer skipNodes = 0) {
         node.find { it.leaf && it.visible }.collect {
             def eachNodeFromRootToIt = it.pathToRoot
-            def i = eachNodeFromRootToIt.findIndexOf { it == node }
+            def i = eachNodeFromRootToIt.findIndexOf { it == node } + skipNodes
             eachNodeFromRootToIt[i..-1]
         }
     }
@@ -251,5 +256,55 @@ class Export {
             (0..<delta).each { outputStream.write(sepAsBytes) }
             outputStream.write(eol.getBytes(charset))
         }
+    }
+
+    static String toRumarTomlString(Node node) {
+        def outputStream = new ByteArrayOutputStream()
+        toRumarTomlOutputStream(outputStream, node)
+        outputStream.toString(charset)
+    }
+
+    static void toRumarTomlOutputStream(OutputStream outputStream, Node node) {
+        byte[] nlBytes = NL.getBytes(charset)
+        String text
+        node.children.each { one ->
+            if (one.children) {
+                if (one.text in RUMAR_TOML_SETTING_NAMES) {
+                    text = _toRumarTomlEntry(one)
+                } else { // profile
+                    text = "$NL[${_quoteIfHasSpace(one.text)}]$NL${one.children.collect { _toRumarTomlEntry(it) }.join(NL)}"
+                }
+                outputStream.write(text.getBytes(charset))
+                outputStream.write(nlBytes)
+            }
+        }
+    }
+
+    static String _toRumarTomlEntry(Node n) {
+        def listOfRows = createListOfRows(n, 1)
+        if (listOfRows.size() == 1) {
+            "${n.text} = ${_quote(listOfRows[0]*.text.join(BLANK))}"
+        } else {
+            "${n.text} = [$NL${listOfRows.collect { row -> FOUR_SPACES + _quote(row*.text.join(BLANK)) + COMMA }.join(NL)}$NL]"
+        }
+    }
+
+    static String _quoteIfHasSpace(String text) {
+        text.contains(SPACE) ? _quote(text) : text
+    }
+
+    static String _quote(String text) {
+        String quote
+        if (SINGLE_QUOTE !in text)
+            quote = SINGLE_QUOTE
+        else if (DOUBLE_QUOTE !in text)
+            quote = DOUBLE_QUOTE
+        else if (MULTILINE_SINGLE_QUOTE !in text)
+            quote = MULTILINE_SINGLE_QUOTE
+        else if (MULTILINE_DOUBLE_QUOTE !in text)
+            quote = MULTILINE_DOUBLE_QUOTE
+        else
+            throw new IllegalArgumentException("cannot quote `${text}` because it already contains all possible quote options")
+        quote + text + quote
     }
 }
