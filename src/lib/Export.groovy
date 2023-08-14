@@ -84,6 +84,8 @@ class Export {
     }
 
     /**
+     * <p>Markdown Heading1</p>
+     * <p>Reflects where headings are counted from when Level Styles are encountered</p>
      * <ul>
      * <li>ROOT - root: #, Level 1: ##, etc.</li>
      * <li>NODE - the first encountered Level Style: #, the second: ##, etc</li>
