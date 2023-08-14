@@ -32,7 +32,9 @@ class Export {
     public static final String DOUBLE_QUOTE = '"'
     public static final String MULTILINE_SINGLE_QUOTE = '\'\'\''
     public static final String MULTILINE_DOUBLE_QUOTE = '"""'
-    public static final RUMAR_TOML_SETTING_NAMES = ['backup_base_dir', 'source_dir', 'backup_base_dir_for_profile', 'included_top_dirs', 'excluded_top_dirs', 'included_dirs_as_regex', 'excluded_dirs_as_regex', 'included_files_as_glob', 'excluded_files_as_glob', 'included_files_as_regex', 'excluded_files_as_regex', 'archive_format', 'compression_level', 'no_compression_suffixes_default', 'no_compression_suffixes', 'tar_format', 'sha256_comparison_if_same_size', 'file_deduplication', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_week_to_keep', 'number_of_backups_per_month_to_keep', 'commands_using_filters', 'suffixes_without_compression']
+    public static final Pattern RX_TOML_KEY = ~/[A-Za-z0-9_-]+/
+    public static final RUMAR_TOML_STRING_SETTINGS = ['backup_base_dir', 'source_dir', 'backup_base_dir_for_profile', 'archive_format', 'compression_level', 'no_compression_suffixes_default', 'no_compression_suffixes', 'tar_format', 'sha256_comparison_if_same_size', 'file_deduplication', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_week_to_keep', 'number_of_backups_per_month_to_keep']
+    public static final RUMAR_TOML_ARRAY_SETTINGS = ['included_top_dirs', 'excluded_top_dirs', 'included_dirs_as_regex', 'excluded_dirs_as_regex', 'included_files_as_glob', 'excluded_files_as_glob', 'included_files_as_regex', 'excluded_files_as_regex', 'commands_using_filters']
     public static levelStyleToMdHeading = [
             'AutomaticLayout.level.root': '#',
             'AutomaticLayout.level,1'   : '##',
@@ -266,13 +268,20 @@ class Export {
 
     static void toRumarTomlOutputStream(OutputStream outputStream, Node node) {
         byte[] nlBytes = NL.getBytes(charset)
-        String text
-        node.children.each { one ->
-            if (one.children) {
-                if (one.text in RUMAR_TOML_SETTING_NAMES) {
-                    text = _toRumarTomlEntry(one)
-                } else { // profile
-                    text = "$NL[${_quoteIfHasSpace(one.text)}]$NL${one.children.collect { _toRumarTomlEntry(it) }.join(NL)}"
+        GString text
+        GString profile
+        String entries
+        List<Node> nChildren
+        node.children.each { n ->
+            nChildren = n.children
+            if (nChildren) {
+                def nText = n.text
+                if (nText in RUMAR_TOML_STRING_SETTINGS || nText in RUMAR_TOML_ARRAY_SETTINGS) {
+                    text = _toRumarTomlEntry(n)
+                } else {
+                    profile = "[${_quoteTomlKeyIfNeeded(nText)}]"
+                    entries = nChildren.collect { _toRumarTomlEntry(it) }.join(NL)
+                    text = "$NL$profile$NL$entries"
                 }
                 outputStream.write(text.getBytes(charset))
                 outputStream.write(nlBytes)
@@ -280,17 +289,19 @@ class Export {
         }
     }
 
-    static String _toRumarTomlEntry(Node n) {
+    static GString _toRumarTomlEntry(Node n) {
         def listOfRows = createListOfRows(n, 1)
-        if (listOfRows.size() == 1) {
+        if (n.text in RUMAR_TOML_STRING_SETTINGS) {
             "${n.text} = ${_quote(listOfRows[0]*.text.join(BLANK))}"
-        } else {
+        } else if (n.text in RUMAR_TOML_ARRAY_SETTINGS) {
             "${n.text} = [$NL${listOfRows.collect { row -> FOUR_SPACES + _quote(row*.text.join(BLANK)) + COMMA }.join(NL)}$NL]"
+        } else {
+            throw IllegalArgumentException("${n.text} not in RUMAR_TOML_STRING_SETTINGS or in RUMAR_TOML_ARRAY_SETTINGS")
         }
     }
 
-    static String _quoteIfHasSpace(String text) {
-        text.contains(SPACE) ? _quote(text) : text
+    static String _quoteTomlKeyIfNeeded(String text) {
+        text ==~ RX_TOML_KEY ? text : _quote(text)
     }
 
     static String _quote(String text) {
