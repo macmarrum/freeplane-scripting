@@ -52,13 +52,9 @@ class MindMapComparator {
                 def n = parent.appendChild(it)
                 n.left = it.left
                 n.moveTo(parent, it.parent.getChildPosition(it))
-                // only add style if parent wasn't deleted too
-                def pcs = parent.conditionalStyles.collect()
-                if (!pcs || !pcs.find { it.active && it.always && it.styleName == style.DEL && !it.last }) {
-                    n.conditionalStyles.insert(0, true, null, style.DEL, false)
-                    c.select(n)
-                    MenuUtils.executeMenuItems(ADD_CONNECTOR_ACTION_LIST)
-                }
+                n.conditionalStyles.insert(0, true, null, style.DEL, false)
+                c.select(n)
+                MenuUtils.executeMenuItems(ADD_CONNECTOR_ACTION_LIST)
             }
         }
         c.select(newMindMap.root)
