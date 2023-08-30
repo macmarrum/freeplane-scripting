@@ -1,4 +1,4 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac3"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 
 
 import org.freeplane.api.MindMap
