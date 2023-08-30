@@ -1,16 +1,14 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 
 
-import org.freeplane.api.Node
 import org.freeplane.api.MindMap
+import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
 import org.freeplane.core.util.MenuUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import javax.swing.*
 import javax.swing.filechooser.FileNameExtensionFilter
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 
 def node = ScriptUtils.node()
 def c = ScriptUtils.c()
@@ -108,11 +106,7 @@ static void compareNodeRecursively(Node node, MindMap oldMindMap) {
 
 def oldFile = askForFile()
 if (oldFile) {
-    def file = node.mindMap.file
-    def diffFile = new File(file.parent, file.name.replaceAll(/\.mm$/, '~diff.mm'))
-    c.openMindMaps.find { MindMap it -> it.file == diffFile}.each { MindMap it -> it.close(true, false) /* force, dis-allowInteraction */ }
-    Files.copy(node.mindMap.file.toPath(), diffFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
-    def diffMindMap = c.mapLoader(diffFile).withView().mindMap
+    def mindMap = c.mapLoader(node.mindMap.file).unsetMapLocation().withView().mindMap
     def oldMindMap = c.mapLoader(oldFile).mindMap
-    compare(diffMindMap, oldMindMap)
+    compare(mindMap, oldMindMap)
 }
