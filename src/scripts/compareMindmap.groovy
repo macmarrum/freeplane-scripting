@@ -41,27 +41,25 @@ class MindMapComparator {
      */
     static void compare(MindMap newMindMap, MindMap oldMindMap) {
         createStylesIfMissing(newMindMap.delegate)
-        if (newMindMap.root.id != oldMindMap.root.id) {
-            UITools.showMessage('Mind maps have different root nodes', JOptionPane.ERROR_MESSAGE)
-        } else {
-            compareNodeRecursively(newMindMap.root, oldMindMap)
-            def c = ScriptUtils.c()
-            oldMindMap.root.findAll().each { Node it ->
-                if (!newMindMap.node(it.id)) {
-                    def parent = newMindMap.node(it.parent.id)
-                    def n = parent.appendChild(it)
-                    n.left = it.left
-                    n.moveTo(parent, it.parent.getChildPosition(it))
-                    // only add style if parent wasn't deleted too
-                    def pcs = parent.conditionalStyles.collect()
-                    if (!pcs || !pcs.find { it.always && it.styleName == style.DEL && it.active && !it.last }) {
-                        n.conditionalStyles.insert(0, true, null, style.DEL, false)
-                        c.select(n)
-                        MenuUtils.executeMenuItems(['AddConnectorAction'])
-                    }
+        compareNodeRecursively(newMindMap.root, oldMindMap)
+        // add deleted nodes to mark them as DEL
+        def c = ScriptUtils.c()
+        oldMindMap.root.findAll().each { Node it ->
+            if (!newMindMap.node(it.id)) {
+                def parent = newMindMap.node(it.parent.id)
+                def n = parent.appendChild(it)
+                n.left = it.left
+                n.moveTo(parent, it.parent.getChildPosition(it))
+                // only add style if parent wasn't deleted too
+                def pcs = parent.conditionalStyles.collect()
+                if (!pcs || !pcs.find { it.active && it.always && it.styleName == style.DEL && !it.last }) {
+                    n.conditionalStyles.insert(0, true, null, style.DEL, false)
+                    c.select(n)
+                    MenuUtils.executeMenuItems(['AddConnectorAction'])
                 }
             }
         }
+        c.select(newMindMap.root)
     }
 
     static void compareNodeRecursively(Node node, MindMap oldMindMap) {
@@ -123,6 +121,7 @@ class MindMapComparator {
             conn.middleLabel = styleName[stylePrefix.size()..-1]
             conn.colorCode = colorCode
             conn.shape = shape
+            conn.width = 4
             conn.startArrow = true
             conn.endArrow = false
         }
