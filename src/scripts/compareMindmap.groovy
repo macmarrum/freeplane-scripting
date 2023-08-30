@@ -94,9 +94,9 @@ class MindMapComparator {
                     MenuUtils.executeMenuItems(['AddConnectorAction'])
                 }
             }
-            node.children.each { Node nChild ->
-                compareNodeRecursively(nChild, oldMindMap)
-            }
+        }
+        node.children.each { Node nChild ->
+            compareNodeRecursively(nChild, oldMindMap)
         }
     }
 
