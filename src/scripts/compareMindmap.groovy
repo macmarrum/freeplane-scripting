@@ -18,7 +18,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 
 import static org.freeplane.features.styles.MapStyleModel.STYLES_USER_DEFINED
 
-class MindMapComparer {
+class MindMapComparator {
     public static String stylePrefix = 'diff:'
     public static style = [
             NEW        : "${stylePrefix}NEW",
@@ -159,10 +159,10 @@ if (!config.getBooleanProperty('assignsNodeDependantStylesToNewConnectors'))
 else {
     def node = ScriptUtils.node()
     def c = ScriptUtils.c()
-    def oldFile = MindMapComparer.askForFile()
+    def oldFile = MindMapComparator.askForFile()
     if (oldFile) {
         def oldMindMap = c.mapLoader(oldFile).mindMap
         def mindMap = c.mapLoader(node.mindMap.file).unsetMapLocation().withView().mindMap
-        MindMapComparer.compare(mindMap, oldMindMap)
+        MindMapComparator.compare(mindMap, oldMindMap)
     }
 }
