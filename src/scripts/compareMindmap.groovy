@@ -114,6 +114,13 @@ class MindMapComparator {
         }
     }
 
+    static void compareFiles(File oldMindmapFile, File newMindmapFile) {
+        def c = ScriptUtils.c()
+        def oldMindmap = c.mapLoader(oldMindmapFile).mindMap
+        def newMindmap = c.mapLoader(newMindmapFile).unsetMapLocation().withView().mindMap
+        compare(newMindmap, oldMindmap)
+    }
+
     static void createStylesIfMissing(MapModel mapModel) {
         createDiffStyleIfMissing(mapModel, style.NEW, '#52D273', 'LINE')
         createDiffStyleIfMissing(mapModel, style.DEL, '#f9556b', 'LINE')
