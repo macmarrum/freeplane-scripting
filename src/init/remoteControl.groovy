@@ -8,16 +8,16 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
  * Set SHOULD_PRINT_SCRIPT to 1 to see in Freeplane console the script being executed;
  *     keep in mind to start Freeplane with a visible console, e.g. with freeplaneConsole.exe
  */
-final PORT = System.getenv('FREEPLANE_GROOVY_SCRIPTING_SERVER_PORT') as Integer ?: 48112
-final ADDRESS = System.getenv('FREEPLANE_GROOVY_SCRIPTING_SERVER_ADDRESS') ?: '127.0.0.1'
-final SHOULD_PRINT_SCRIPT = System.getenv('FREEPLANE_GROOVY_SCRIPTING_SERVER_PRINT_SCRIPT') == '1'
+final PORT = System.getenv('FREEPLANE_REMOTE_CONTROL_PORT') as Integer ?: 48112
+final ADDRESS = System.getenv('FREEPLANE_REMOTE_CONTROL_ADDRESS') ?: '127.0.0.1'
+final SHOULD_PRINT_SCRIPT = System.getenv('FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT') == '1'
 
 final SCRIPT_HEADER = '''\
-def __groovyScriptingServerReminderNode = node
+def __remoteControlReminderNode = node
 '''
 final SCRIPT_FOOTER = '''\
-if (__groovyScriptingServerReminderNode)
-    __groovyScriptingServerReminderNode.reminder.remove()
+if (__remoteControlReminderNode)
+    __remoteControlReminderNode.reminder.remove()
 '''
 final REMINDER_AFTER_MILLIS = 100
 final REMINDER_PERIOD_UNIT = 'YEAR'
@@ -29,11 +29,11 @@ final ERROR = 'ERROR'
 new Thread(() -> {
     def server = new ServerSocket()
     server.bind(new InetSocketAddress(ADDRESS, PORT), 1)
-    LogUtils.info("Groovy scripting server sterted on port ${server.localPort}")
+    LogUtils.info("Freeplane Remote Control sterted on port ${server.localPort}")
 
     while (true) {
         server.accept(false) { socket ->
-            LogUtils.info("Groovy scripting server connection: ${socket}")
+            LogUtils.info("Freeplane Remote Control connection: ${socket}")
             socket.withStreams { input, output ->
                 // Avoid using the Groovy readLine(), as it closes input
                 // and, apparently because of that,
@@ -67,4 +67,4 @@ new Thread(() -> {
             }
         }
     }
-}, 'scripting-server').start()
+}, 'freeplane-remote-control').start()
