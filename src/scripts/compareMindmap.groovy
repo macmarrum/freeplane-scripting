@@ -57,7 +57,7 @@ class MindMapComparator {
      * changed details
      * changed note
      */
-    static void compare(MindMap newMindMap, MindMap oldMindMap) {
+    static void compare(MindMap oldMindMap, MindMap newMindMap) {
         createStylesIfMissing(newMindMap.delegate)
         compareNodeRecursively(newMindMap.root, oldMindMap)
         // add deleted nodes to mark them as DEL
@@ -118,7 +118,7 @@ class MindMapComparator {
         def c = ScriptUtils.c()
         def oldMindmap = c.mapLoader(oldMindmapFile).mindMap
         def newMindmap = c.mapLoader(newMindmapFile).unsetMapLocation().withView().mindMap
-        compare(newMindmap, oldMindmap)
+        compare(oldMindmap, newMindmap)
     }
 
     static void createStylesIfMissing(MapModel mapModel) {
@@ -184,6 +184,6 @@ else {
     if (oldFile) {
         def oldMindMap = c.mapLoader(oldFile).mindMap
         def mindMap = c.mapLoader(node.mindMap.file).unsetMapLocation().withView().mindMap
-        MindMapComparator.compare(mindMap, oldMindMap)
+        MindMapComparator.compare(oldMindMap, mindMap)
     }
 }
