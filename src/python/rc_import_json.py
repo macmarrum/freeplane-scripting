@@ -4,7 +4,7 @@ import base64
 from datetime import datetime
 from pathlib import Path
 
-from groovy_scripting_client import transfer
+from remote_control import transfer
 
 me = Path(__file__)
 encoding = 'UTF-8'
