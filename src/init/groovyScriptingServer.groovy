@@ -5,7 +5,7 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
 
 /* Set PORT to 0 for a random one
  * Set HOSTNAME to '0.0.0.0' to enable access from outside
- * Set SHOULD_PRINT_SCRIPT to see in Freeplane console the script being executed;
+ * Set SHOULD_PRINT_SCRIPT to 1 to see in Freeplane console the script being executed;
  *     keep in mind to start Freeplane with a visible console, e.g. with freeplaneConsole.exe
  */
 final PORT = System.getenv('FREEPLANE_GROOVY_SCRIPTING_SERVER_PORT') as Integer ?: 48112
