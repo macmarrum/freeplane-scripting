@@ -1,3 +1,4 @@
+package io.github.macmarrum.freeplane
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 /*
 Copyright (C) 2023  macmarrum
