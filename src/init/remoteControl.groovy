@@ -25,8 +25,8 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
  * Set SHOULD_PRINT_SCRIPT to 1 to see in Freeplane console the script being executed;
  *     keep in mind to start Freeplane with a visible console, e.g. with freeplaneConsole.exe
  */
-final PORT = System.getenv('FREEPLANE_REMOTE_CONTROL_PORT') as Integer ?: 48112
 final ADDRESS = System.getenv('FREEPLANE_REMOTE_CONTROL_ADDRESS') ?: '127.0.0.1'
+final PORT = System.getenv('FREEPLANE_REMOTE_CONTROL_PORT') as Integer ?: 48112
 final SHOULD_PRINT_SCRIPT = System.getenv('FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT') == '1'
 
 final SCRIPT_HEADER = '''\
