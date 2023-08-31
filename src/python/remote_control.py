@@ -14,17 +14,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import os
 import sys
 import socket
 
-host = '127.0.0.1'
-port = 48112
+address = os.environ.get('FREEPLANE_REMOTE_CONTROL_ADDRESS', '127.0.0.1')
+port = int(port) if (port := os.environ.get('FREEPLANE_REMOTE_CONTROL_PORT')) else 48112
 encoding = 'UTF-8'
 
 
 def transfer(text: str) -> str:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, port))
+    s.connect((address, port))
     s.sendall(text.encode(encoding))
     s.shutdown(socket.SHUT_WR)
     response = []
