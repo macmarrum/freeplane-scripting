@@ -121,6 +121,12 @@ class MindMapComparator {
         compare(oldMindmap, newMindmap)
     }
 
+    static void compareFiles(String oldMindmap, String newMindmap) {
+        def oldMindmapFile = new File(oldMindmap)
+        def newMindmapFile = new File(newMindmap)
+        compareFiles(oldMindmapFile, newMindmapFile)
+    }
+
     static void createStylesIfMissing(MapModel mapModel) {
         createDiffStyleIfMissing(mapModel, style.NEW, '#52D273', 'LINE')
         createDiffStyleIfMissing(mapModel, style.DEL, '#f9556b', 'LINE')
