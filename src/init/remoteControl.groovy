@@ -29,7 +29,7 @@ final ERROR = 'ERROR'
 new Thread(() -> {
     def server = new ServerSocket()
     server.bind(new InetSocketAddress(ADDRESS, PORT), 1)
-    LogUtils.info("Freeplane Remote Control sterted on port ${server.localPort}")
+    LogUtils.info("Freeplane Remote Control started on ${server.inetAddress.hostAddress}:${server.localPort}")
 
     while (true) {
         server.accept(false) { socket ->
