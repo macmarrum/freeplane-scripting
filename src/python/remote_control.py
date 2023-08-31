@@ -2,13 +2,14 @@
 import sys
 import socket
 
+host = '127.0.0.1'
 port = 48112
 encoding = 'UTF-8'
 
 
 def transfer(text: str) -> str:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('127.0.0.1', port))
+    s.connect((host, port))
     s.sendall(text.encode(encoding))
     s.shutdown(socket.SHUT_WR)
     response = []
