@@ -19,6 +19,10 @@ import sys
 import base64
 from datetime import datetime
 from pathlib import Path
+from textwrap import dedent
+from typing import Union
+
+via_base64 = False
 
 address = os.environ.get('FREEPLANE_REMOTE_CONTROL_ADDRESS', '127.0.0.1')
 port = int(port) if (port := os.environ.get('FREEPLANE_REMOTE_CONTROL_PORT')) else 48112
@@ -39,16 +43,39 @@ def transfer(text: str) -> str:
     return ''.join(response)
 
 
+def quote_path(path: Union[str, Path]) -> str:
+    path = str(path)
+    if '/' not in path:
+        return '/' + path + '/'
+    if '$/' not in path and '/$' not in path:
+        return '$/' + path + '/$'
+    for qt in ["'", '"', "'''", '"""']:
+        if qt not in path:
+            return qt + path.replace('\\', '\\\\') + qt
+    raise ValueError(f"unable to quote path `{path}`")
+
+
 # path to the json file is the first argument to the script
-json_path = Path(sys.argv[1])
-json_data = json_path.read_text(encoding=encoding)
-json_base64 = base64.b64encode(json_data.encode(encoding)).decode('L1')
-groovy_script = f"""
-import io.github.macmarrum.freeplane.Import
-def parent = node.mindMap.root.createChild()
-parent.text = '{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
-def n = Import.importJsonBase64('{json_base64}', parent)
-c.select(n)
-"""
+json_path = Path(sys.argv[1]).absolute()
+
+if via_base64:
+    json_data = json_path.read_text(encoding=encoding)
+    json_base64 = base64.b64encode(json_data.encode(encoding)).decode('L1')
+    groovy_script = dedent(f"""\
+    import io.github.macmarrum.freeplane.Import
+    def parent = node.mindMap.root.createChild()
+    parent.text = '{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
+    def n = Import.fromJsonStringBase64('{json_base64}', parent)
+    c.select(n)
+    """)
+else:
+    groovy_script = dedent(f"""\
+    import io.github.macmarrum.freeplane.Import
+    def parent = node.mindMap.root.createChild()
+    parent.text = '{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
+    def file = new File({quote_path(json_path)})
+    def n = Import.fromJsonFile(file, parent)
+    c.select(n)
+    """)
 response = transfer(groovy_script)
 print(response)
