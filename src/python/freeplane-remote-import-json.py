@@ -18,10 +18,24 @@ import base64
 from datetime import datetime
 from pathlib import Path
 
-from freeplane_remote import transfer
-
-me = Path(__file__)
+address = os.environ.get('FREEPLANE_REMOTE_CONTROL_ADDRESS', '127.0.0.1')
+port = int(port) if (port := os.environ.get('FREEPLANE_REMOTE_CONTROL_PORT')) else 48112
 encoding = 'UTF-8'
+
+
+def transfer(text: str) -> str:
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((address, port))
+    s.sendall(text.encode(encoding))
+    s.shutdown(socket.SHUT_WR)
+    response = []
+    response_chunk = b'x'
+    while response_chunk:
+        response_chunk = s.recv(1024)
+        response.append(response_chunk.decode(encoding))
+    s.close()
+    return ''.join(response)
+
 
 # path to the json file is the first argument to the script
 json_path = Path(sys.argv[1])
