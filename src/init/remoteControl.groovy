@@ -65,21 +65,26 @@ new Thread(() -> {
                 def script = sb.toString()
                 if (SHOULD_PRINT_SCRIPT)
                     print(script)
-                try {
-                    def reminder = ScriptUtils.node().reminder
-                    reminder.remove()
-                    def remindAt = new Date(Calendar.instance.timeInMillis + REMINDER_AFTER_MILLIS)
-                    reminder.createOrReplace(remindAt, REMINDER_PERIOD_UNIT, REMINDER_PERIOD)
-                    reminder.script = script
-                    output.withWriter {
-                        it << SCHEDULED
+                if (!ScriptUtils.c().openMindMaps) {
+                    output.withWriter { it.write('ERROR: no mind map is open')}
+                    LogUtils.warn('Freeplane Remote Control - no mind map is open')
+                } else {
+                    try {
+                        def reminder = ScriptUtils.node().reminder
+                        reminder.remove()
+                        def remindAt = new Date(Calendar.instance.timeInMillis + REMINDER_AFTER_MILLIS)
+                        reminder.createOrReplace(remindAt, REMINDER_PERIOD_UNIT, REMINDER_PERIOD)
+                        reminder.script = script
+                        output.withWriter {
+                            it << SCHEDULED
+                        }
+                    } catch (Exception e) {
+                        output.withPrintWriter {
+                            it.println(ERROR)
+                            e.printStackTrace(it)
+                        }
+                        LogUtils.warn(e)
                     }
-                } catch (Exception e) {
-                    output.withPrintWriter {
-                        it.println(ERROR)
-                        e.printStackTrace(it)
-                    }
-                    LogUtils.warn(e)
                 }
             }
         }
