@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# remote_control.py - a client for Freeplane remoteControl.groovy server
+# freeplane_remote.py - a client for Freeplane remoteControl.groovy server
 # Copyright (C) 2023  macmarrum
 #
 # This program is free software: you can redistribute it and/or modify

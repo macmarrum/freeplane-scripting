@@ -18,7 +18,7 @@ import base64
 from datetime import datetime
 from pathlib import Path
 
-from remote_control import transfer
+from freeplane_remote import transfer
 
 me = Path(__file__)
 encoding = 'UTF-8'
