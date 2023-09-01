@@ -33,23 +33,23 @@ class Import {
         return new String(base64.decodeBase64())
     }
 
-    static Node importJson(File file, Node parent = null, boolean shouldFold = false) {
-        importJson(file.getText(UTF8), parent, shouldFold)
+    static Node fromJsonFile(File file, Node parent = null, boolean shouldFold = false) {
+        fromJsonString(file.getText(UTF8), parent, shouldFold)
     }
 
-    static Node importJsonBase64(String base64, Node parent = null, boolean shouldFold = false) {
-        return importJson(decodeBase64(base64), parent, shouldFold)
+    static Node fromJsonStringBase64(String base64, Node parent = null, boolean shouldFold = false) {
+        return fromJsonString(decodeBase64(base64), parent, shouldFold)
     }
 
-    static Node importJson(String content, Node parent = null, boolean shouldFold = false) {
+    static Node fromJsonString(String content, Node parent = null, boolean shouldFold = false) {
         if (!parent)
             parent = ScriptUtils.node().mindMap.root.createChild('JSON')
         fold(shouldFold, parent)
         def jObject = new JsonSlurper(type: JsonParserType.INDEX_OVERLAY).parseText(content)
         if (jObject instanceof Map)
-            importMapRecursively(jObject, parent)
+            fromMapRecursively(jObject, parent)
         else if (jObject instanceof List)
-            importList(jObject, parent)
+            fromList(jObject, parent)
         unfold(shouldFold, parent)
         return parent
     }
@@ -68,7 +68,7 @@ class Import {
         }
     }
 
-    static void importMapRecursively(Map<String, Object> jMap, Node node) {
+    static void fromMapRecursively(Map<String, Object> jMap, Node node) {
         jMap.each { key, value ->
             if (key == DETAILS && value !instanceof Map && value !instanceof List) {
                 node.details = value
@@ -78,16 +78,16 @@ class Import {
                 node.note = value
             } else if (value instanceof Map) {
                 def n = node.createChild(key)
-                importMapRecursively(value as Map, n)
+                fromMapRecursively(value as Map, n)
             } else if (value instanceof List) {
                 def n = node.createChild(key)
-                importList(value, n)
+                fromList(value, n)
             } else {
                 def n = node.createChild(key)
                 if (value instanceof Map) {
-                    importMapRecursively(value as Map, n)
+                    fromMapRecursively(value as Map, n)
                 } else if (value instanceof List) {
-                    importList(value, n)
+                    fromList(value, n)
                 } else if (value !== null) {
                     def child = n.createChild()
                     child.text = value
@@ -96,10 +96,10 @@ class Import {
         }
     }
 
-    static void importList(List list, Node node) {
+    static void fromList(List list, Node node) {
         list.each {
             if (it instanceof Map) {
-                importMapRecursively(it, node)
+                fromMapRecursively(it, node)
             } else {
                 def child = node.createChild()
                 child.text = it
