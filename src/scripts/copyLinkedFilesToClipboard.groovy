@@ -47,11 +47,11 @@ class FileTransferable implements Transferable {
  */
 static File getCanonicalFile(URI uri, File mapFile) {
     try {
-        File file
         if (uri == null)
             return null
-        if (uri.scheme == null || uri.scheme == 'file' || uri.scheme == 'freeplane') {
-            def uriPathForFile = uri.scheme != 'freeplane' ? uri.path : uri.path.replaceFirst($/^/ /$, '')
+        File file
+        if (uri.scheme == 'file' || uri.scheme == null || uri.scheme == 'freeplane') {
+            def uriPathForFile = uri.scheme == 'freeplane' ? uri.path.replaceFirst($/^/ /$, '') : uri.path
             def fileFromUriPath = new File(uriPathForFile)
             if (fileFromUriPath.isAbsolute()) {
                 file = fileFromUriPath
@@ -65,8 +65,7 @@ static File getCanonicalFile(URI uri, File mapFile) {
             file = new File(uri)
         }
         return file.canonicalFile
-    }
-    catch (Exception e) {
+    } catch (Exception ignored) {
         return null
     }
 }
