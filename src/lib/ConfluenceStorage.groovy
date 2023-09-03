@@ -1,6 +1,20 @@
 /*
- * Inspired by https://github.com/EdoFro/Freeplane_MarkdownHelper
+ * Copyright (C) 2023  macmarrum
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+// Inspired by https://github.com/EdoFro/Freeplane_MarkdownHelper
 
 
 import groovy.xml.XmlUtil
@@ -33,7 +47,7 @@ class ConfluenceStorage {
             numbers_inputNumbers         : 'emoji-1F522',
             collapse_fastUpButton        : 'emoji-23EB',
             xmlEscape_broom              : 'emoji-1F9F9',
-            pReplacements_doubleCurlyLoop: 'emoji-27BF',
+            replacements_doubleCurlyLoop: 'emoji-27BF',
             stopAtThis_stopSign          : 'emoji-1F6D1',
             noSepAfter_lastQuarterMoon   : 'emoji-1F317',
     ]
@@ -68,35 +82,61 @@ class ConfluenceStorage {
     static String getContent(FN n) {
         String content = isMarkupMaker(n) ? makeMarkup(n) : n.note?.text ?: n.transformedText
         if (hasIcon(n, icon.xmlEscape_broom)) content = XmlUtil.escapeXml(content)
-        if (hasIcon(n, icon.pReplacements_doubleCurlyLoop)) content = _applyReplacements(n, content)
+        if (hasIcon(n, icon.replacements_doubleCurlyLoop)) content = _applyReplacements(n, content)
         return hasIcon(n, icon.nbsp_gemini) ? content.replaceAll(/ /, '&nbsp;') : content
     }
 
+    static mk = [
+            parent      : 'parent',
+            table       : 'table',
+            list        : 'list',
+            zip_list    : 'zip-list',
+            quote       : 'quote',
+            link        : 'link',
+            expand      : 'expand',
+            div         : 'div',
+            code        : 'code',
+            page_info   : 'page-info',
+            div_expand  : 'div-expand',
+            attachments : 'attachments',
+            style_import: 'style-import',
+            style       : 'style',
+            html        : 'html',
+            image       : 'image',
+            csv         : 'csv',
+            wiki        : 'wiki',
+            markdown    : 'markdown',
+            section     : 'section',
+            column      : 'column',
+            template    : 'template',
+            format      : 'format',
+    ]
+
     static String makeMarkup(FN n) {
         return switch (n.text) {
-            case 'parent' -> mkParent(n)
-            case 'table' -> mkTable(n)
-            case 'list' -> mkList(n)
-            case 'zip-list' -> mkZipList(n)
-            case 'quote' -> mkQuote(n)
-            case 'link' -> mkLink(n)
-            case 'expand' -> mkExpand(n)
-            case 'div' -> mkDiv(n)
-            case 'code' -> mkCode(n)
-            case 'page-info' -> mkPageInfo(n)
-            case 'div-expand' -> mkDivExpand(n)
-            case 'attachments' -> mkAttachments(n)
-            case 'style-import' -> mkStyleImport(n)
-            case 'style' -> mkStyle(n)
-            case 'html' -> mkHtml(n)
-            case 'image' -> mkImage(n)
-            case 'csv' -> mkCsv(n)
-            case 'wiki' -> mkWiki(n)
-            case 'markdown' -> mkMarkdown(n)
-            case 'section' -> mkSection(n)
-            case 'column' -> mkColumn(n)
-            case 'template' -> mkTemplate(n)
-            case 'format' -> mkFormat(n)
+            case mk.parent -> mkParent(n)
+            case mk.table -> mkTable(n)
+            case mk.list -> mkList(n)
+            case mk.zip_list -> mkZipList(n)
+            case mk.quote -> mkQuote(n)
+            case mk.link -> mkLink(n)
+            case mk.expand -> mkExpand(n)
+            case mk.div -> mkDiv(n)
+            case mk.code -> mkCode(n)
+            case mk.page_info -> mkPageInfo(n)
+            case mk.div_expand -> mkDivExpand(n)
+            case mk.attachments -> mkAttachments(n)
+            case mk.style_import -> mkStyleImport(n)
+            case mk.style -> mkStyle(n)
+            case mk.html -> mkHtml(n)
+            case mk.image -> mkImage(n)
+            case mk.csv -> mkCsv(n)
+            case mk.wiki -> mkWiki(n)
+            case mk.markdown -> mkMarkdown(n)
+            case mk.section -> mkSection(n)
+            case mk.column -> mkColumn(n)
+            case mk.template -> mkTemplate(n)
+            case mk.format -> mkFormat(n)
             default -> "<!-- mk function by that name not found: ${n.text} -->"
         }
     }
@@ -130,24 +170,24 @@ class ConfluenceStorage {
         def nl = getNewLine(n)
         def sb = new StringBuilder()
         n.children.each { sb << mkNode(it) << nl }
-        sb << getEol(n)
+        sb << getEol(n) // mkNode avoids adding it for mkParent
         return sb.toString()
     }
 
     static LinkedHashMap<String, String> pReplacements = [
-            /(?m)(?<=^| )-> /                              : '→ ',
-            /(?m)(?<=^| )=> /                              : '&rArr; ',
-            /(?m)(?<=^| )>> /                              : '&#8611; ', // >->
-            /(?m)(?<=^| )=- /                              : '→ ',
-            /(?m)(?<=^| )== /                              : '&#8611; ', // >->
-            /(?m)(?<=^|[^-])---(?=[^-]|$)/                 : '&mdash;',
-            /(?m)(?<=^|[^-])--(?=[^-]|$)/                  : '&ndash;',
-            /\{\{([^{]+)\}\}/                              : '<code>$1</code>',
-            /`([^`]+)`/                                    : '<code>$1</code>',
-            /(?<=^|[^a-zA-Z0-9])\*(?! )(.+?)(?<! )\*(?=[^a-zA-Z0-9]|$)/: '<b>$1</b>',
-            /(?<=^|[^a-zA-Z0-9])_(?! )(.+?)(?<! )_(?=[^a-zA-Z0-9]|$)/  : '<i>$1</i>',
-            /(?<=^|[^a-zA-Z0-9])-(?! )(.+?)(?<! )-(?=[^a-zA-Z0-9]|$)/  : '<del>$1</del>',
-            /(?<=^|[^a-zA-Z0-9])\+(?! )(.+?)(?<! )\+(?=[^a-zA-Z0-9]|$)/: '<ins>$1</ins>',
+            /(?m)(?<=^| )-> /                                                          : '→ ',
+            /(?m)(?<=^| )=> /                                                          : '&rArr; ',
+            /(?m)(?<=^| )>> /                                                          : '&#8611; ', // >->
+            /(?m)(?<=^| )=- /                                                          : '→ ',
+            /(?m)(?<=^| )== /                                                          : '&#8611; ', // >->
+            /(?m)(?<=^|[^-])---(?=[^-]|$)/                                             : '&mdash;',
+            /(?m)(?<=^|[^-])--(?=[^-]|$)/                                              : '&ndash;',
+            /\{\{([^{]+)\}\}/                                                          : '<code>$1</code>',
+            /`([^`]+)`/                                                                : '<code>$1</code>',
+            /(?<=^|[^a-zA-Z0-9])\*(?! )(.+?)(?<! )\*(?=[^a-zA-Z0-9]|$)/                : '<b>$1</b>',
+            /(?<=^|[^a-zA-Z0-9])_(?! )(.+?)(?<! )_(?=[^a-zA-Z0-9]|$)/                  : '<i>$1</i>',
+            /(?<=^|[^a-zA-Z0-9])-(?! )(.+?)(?<! )-(?=[^a-zA-Z0-9]|$)/                  : '<del>$1</del>',
+            /(?<=^|[^a-zA-Z0-9])\+(?! )(.+?)(?<! )\+(?=[^a-zA-Z0-9]|$)/                : '<ins>$1</ins>',
             /(?<=^|[^a-zA-Z0-9])\(([a-z]+)\)(?! )(.+?)(?<! )\(\/\1\)(?=[^a-zA-Z0-9]|$)/: '<span style="color: $1">$2</span>',
     ]
 
@@ -170,34 +210,30 @@ class ConfluenceStorage {
             return result
         } else {
             def eol = getEol(n)
-            def nl = getNewLine(n)
-            def sep = getSpaceSep(n)
-            def isP = hasIcon(n, icon.pButton)
             if (isMarkupMaker(n)) {
-                if (isP) {
-                    result << '<p>' << nl << makeMarkup(n) << '</p>' << eol
-                    return result
-                } else {
-                    result << makeMarkup(n) << sep << eol
-                    return result
-                }
+                result << makeMarkup(n)
+                if (n.text != mk.parent) // avoid double eol
+                    result << eol
+                return result
             } else {
+                def nl = getNewLine(n)
                 if (_isHeading(n)) {
-                    result << _mkHeading(n, nl) << eol
+                    result << _mkHeading(n, nl, eol) // also includes children
                     return result
                 } else {
+                    def isP = hasIcon(n, icon.pButton)
+                    def sep = getSpaceSep(n)
                     String pContent
-                    if (isP && !hasIcon(n, icon.pReplacements_doubleCurlyLoop)) // avoid double replacements
-                        pContent = _applyReplacements(n, getContent(n))
-                    else
-                        pContent = getContent(n)
-                    if (isP)
-                        result << '<p>'
-                    result << pContent << sep << eol
+                    if (isP) { // no auto-replacements - getContent will do replacements, if icon is set
+                        result << '<p>' << nl << getContent(n) << sep
+                    } else { // not a heading, not a P, must be a regular node
+                        result << getContent(n) << sep
+                        result << eol
+                    }
                     if (!hasIcon(n, icon.stopAtThis_stopSign))
                         n.children.each { result << mkNode(it) }
                     if (isP)
-                        result << '</p>'
+                        result << nl << '</p>' << eol
                     return result
                 }
             }
@@ -208,12 +244,12 @@ class ConfluenceStorage {
         return (n.icons.size() > 0 && n.icons.icons.any { it.startsWith('full-') })
     }
 
-    static StringBuilder _mkHeading(FN n, String nl) {
+    static StringBuilder _mkHeading(FN n, String nl, String eol) {
         def hIcon = n.icons.icons.find { it.startsWith('full-') }
         def hLevel = hIcon[5..-1]
         def childrenBody = n.children.size() > 0 ? n.children.collect { mkNode(it) }.join('') : ''
         def result = new StringBuilder()
-        result << '<h' << hLevel << '>' << nl << getContent(n) << nl << '</h' << hLevel << '>' << childrenBody
+        result << '<h' << hLevel << '>' << nl << getContent(n) << nl << '</h' << hLevel << '>' << eol << childrenBody
         return result
     }
 
@@ -506,7 +542,7 @@ class ConfluenceStorage {
                     cdata = mkParent(child)
                 else
                     cdata = child.plainNote  // no formula evaluation (unexposed method)
-            if (child.detailsText) title = child.details.text
+                if (child.detailsText) title = child.details.text
             }
             def params = [language: lang]
             if (title) params.title = title
@@ -542,7 +578,7 @@ class ConfluenceStorage {
         return result.toString()
     }
 
-    static String _mkMacroRich(FN n, String macro, Map<String, String> parameters = null, String body = null) {
+    static StringBuilder _mkMacroRich(FN n, String macro, Map<String, String> parameters = null, String body = null) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
         def _body = body ?: _mkParent(n)
@@ -553,7 +589,7 @@ class ConfluenceStorage {
             }
         result << '<ac:rich-text-body>' << nl << _body << nl << '</ac:rich-text-body>' << nl
         result << '</ac:structured-macro>'
-        return result.toString()
+        return result
     }
 
     static String mkDivExpand(FN n) {
@@ -728,7 +764,7 @@ class ConfluenceStorage {
         c.select(code)
     }
 
-    static createDivExpandCode(FN node, String details = 'Expand: SQL Statement', String cssClassName = 'macmarrum-expand', String language ='sql', boolean showLineNumbers = true, String theme = 'Eclipse') {
+    static createDivExpandCode(FN node, String details = 'Expand: SQL Statement', String cssClassName = 'macmarrum-expand', String language = 'sql', boolean showLineNumbers = true, String theme = 'Eclipse') {
         def n = createMarkupMaker(node, 'div-expand')
         n.details = details
         n.link.text = cssClassName
