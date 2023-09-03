@@ -1,19 +1,19 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Copy"})
 // https://github.com/freeplane/freeplane/issues/1376
 
+
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.awt.*
 import java.awt.datatransfer.*
-import java.util.List
 
 class FileTransferable implements Transferable {
     private static CRLF = '\r\n'
     private static LF = '\n'
     private static uriListFlavor = new DataFlavor('text/uri-list;class=java.lang.String')
-    private List<File> files
+    private Collection<File> files
 
-    FileTransferable(List<File> files) {
+    FileTransferable(Collection<File> files) {
         this.files = files
     }
 
@@ -30,8 +30,8 @@ class FileTransferable implements Transferable {
     @Override
     Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         return switch (flavor) {
-            case DataFlavor.javaFileListFlavor -> files
-            case uriListFlavor -> files.collect { it.toURI() }.join(CRLF) // rfc2483
+            case DataFlavor.javaFileListFlavor -> files.toList()
+            case uriListFlavor -> files.collect() { it.toURI() }.join(CRLF) // rfc2483
             case DataFlavor.stringFlavor -> files.collect { it.path }.join(LF)
             default -> throw new UnsupportedFlavorException(flavor)
         }
@@ -41,21 +41,30 @@ class FileTransferable implements Transferable {
 /**
  * A modified version of org.freeplane.plugin.script.proxy.LinkProxy#getFile()
  * As of Freeplane v1.11.6, the original is buggy.
+ * Extended
+ * - to get canonical file, so that deduplication can take place
+ * - to include schema `freeplane`, so that mind maps are also recognized as files.
  */
-static File getFile(URI uri, File mapFile) {
+static File getCanonicalFile(URI uri, File mapFile) {
     try {
+        File file
         if (uri == null)
             return null
-        if (uri.scheme == null || uri.scheme == 'file') {
-            def file = new File(uri.path)
-            if (file.isAbsolute()) {
-                return file
+        if (uri.scheme == null || uri.scheme == 'file' || uri.scheme == 'freeplane') {
+            def uriPathForFile = uri.scheme != 'freeplane' ? uri.path : uri.path.replaceFirst($/^/ /$, '')
+            def fileFromUriPath = new File(uriPathForFile)
+            if (fileFromUriPath.isAbsolute()) {
+                file = fileFromUriPath
             } else {
-                return mapFile ? new File(mapFile.parent, uri.path) : null
+                if (!mapFile)
+                    return null
+                else
+                    file = new File(mapFile.parent, uriPathForFile)
             }
         } else {
-            return new File(uri)
+            file = new File(uri)
         }
+        return file.canonicalFile
     }
     catch (Exception e) {
         return null
@@ -63,7 +72,7 @@ static File getFile(URI uri, File mapFile) {
 }
 
 def mapFile = ScriptUtils.node().mindMap.file
-def files = ScriptUtils.c().selecteds.collect { getFile(it.link.uri, mapFile) }.findAll()
+def files = ScriptUtils.c().selecteds.collect(new HashSet<File>()) { getCanonicalFile(it.link.uri, mapFile) }.findAll()
 Toolkit.defaultToolkit.systemClipboard.setContents(new FileTransferable(files), new ClipboardOwner() {
     @Override
     void lostOwnership(Clipboard clipboard, Transferable transferable) {}
