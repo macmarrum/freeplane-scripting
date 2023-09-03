@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 // Inspired by https://github.com/EdoFro/Freeplane_MarkdownHelper
+package io.github.macmarrum.freeplane
 
 
 import groovy.xml.XmlUtil
