@@ -49,6 +49,7 @@ class Export {
     public static final String MULTILINE_SINGLE_QUOTE = '\'\'\''
     public static final String MULTILINE_DOUBLE_QUOTE = '"""'
     public static final Pattern RX_TOML_KEY = ~/[A-Za-z0-9_-]+/
+    public static final RUMAR_TOML_INTEGER_SETTINGS = ['version']
     public static final RUMAR_TOML_STRING_SETTINGS = ['backup_base_dir', 'source_dir', 'backup_base_dir_for_profile', 'archive_format', 'compression_level', 'no_compression_suffixes_default', 'no_compression_suffixes', 'tar_format', 'sha256_comparison_if_same_size', 'file_deduplication', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_week_to_keep', 'number_of_backups_per_month_to_keep']
     public static final RUMAR_TOML_ARRAY_SETTINGS = ['included_top_dirs', 'excluded_top_dirs', 'included_dirs_as_regex', 'excluded_dirs_as_regex', 'included_files_as_glob', 'excluded_files_as_glob', 'included_files_as_regex', 'excluded_files_as_regex', 'commands_using_filters']
     public static levelStyleToMdHeading = [
@@ -290,14 +291,15 @@ class Export {
         GString profile
         String entries
         List<Node> nChildren
+        def allSettingNames = RUMAR_TOML_INTEGER_SETTINGS + RUMAR_TOML_STRING_SETTINGS + RUMAR_TOML_ARRAY_SETTINGS
         node.children.each { n ->
             nChildren = n.children
             if (nChildren) {
-                def nText = n.text
-                if (nText in RUMAR_TOML_STRING_SETTINGS || nText in RUMAR_TOML_ARRAY_SETTINGS) {
+                def nTextUncommented = n.text.replaceFirst(/^#/, '')
+                if (nTextUncommented in allSettingNames) {
                     text = _toRumarTomlEntry(n)
                 } else {
-                    profile = "[${_quoteTomlKeyIfNeeded(nText)}]"
+                    profile = "[${_quoteTomlKeyIfNeeded(n.text)}]"
                     entries = nChildren.collect { _toRumarTomlEntry(it) }.join(NL)
                     text = "$NL$profile$NL$entries"
                 }
@@ -309,9 +311,12 @@ class Export {
 
     static GString _toRumarTomlEntry(Node n) {
         def listOfRows = createListOfRows(n, 1)
-        if (n.text in RUMAR_TOML_STRING_SETTINGS) {
+        def settingNameUncommented = n.text.replaceFirst(/^#/, '')
+        if (settingNameUncommented in RUMAR_TOML_INTEGER_SETTINGS) {
+            "${n.text} = ${listOfRows[0]*.text.join(BLANK)}"
+        } else if (settingNameUncommented in RUMAR_TOML_STRING_SETTINGS) {
             "${n.text} = ${_quote(listOfRows[0]*.text.join(BLANK))}"
-        } else if (n.text in RUMAR_TOML_ARRAY_SETTINGS) {
+        } else if (settingNameUncommented in RUMAR_TOML_ARRAY_SETTINGS) {
             "${n.text} = [$NL${listOfRows.collect { row -> FOUR_SPACES + _quote(row*.text.join(BLANK)) + COMMA }.join(NL)}$NL]"
         } else {
             throw IllegalArgumentException("${n.text} not in RUMAR_TOML_STRING_SETTINGS or in RUMAR_TOML_ARRAY_SETTINGS")
