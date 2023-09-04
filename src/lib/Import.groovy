@@ -1,20 +1,20 @@
-package io.github.macmarrum.freeplane
 /*
-Copyright (C) 2023  macmarrum
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * Copyright (C) 2023  macmarrum
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package io.github.macmarrum.freeplane
 
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
@@ -33,15 +33,17 @@ class Import {
         return new String(base64.decodeBase64())
     }
 
-    static Node fromJsonFile(File file, Node parent = null, boolean shouldFold = false) {
+    static Node fromJsonFile(File file, Node parent = null, Boolean shouldFold = null) {
         fromJsonString(file.getText(UTF8), parent, shouldFold)
     }
 
-    static Node fromJsonStringBase64(String base64, Node parent = null, boolean shouldFold = false) {
+    static Node fromJsonStringBase64(String base64, Node parent = null, Boolean shouldFold = null) {
         return fromJsonString(decodeBase64(base64), parent, shouldFold)
     }
 
-    static Node fromJsonString(String content, Node parent = null, boolean shouldFold = false) {
+    static Node fromJsonString(String content, Node parent = null, Boolean shouldFold = null) {
+        if (shouldFold == null)
+            shouldFold = false
         if (!parent)
             parent = ScriptUtils.node().mindMap.root.createChild('JSON')
         fold(shouldFold, parent)
