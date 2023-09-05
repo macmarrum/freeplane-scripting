@@ -2,6 +2,7 @@
 // https://github.com/freeplane/freeplane/issues/1376
 
 
+import org.apache.commons.lang.SystemUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.awt.*
@@ -52,6 +53,11 @@ static File getCanonicalFile(URI uri, File mapFile) {
         File file
         if (uri.scheme == 'file' || uri.scheme == null || uri.scheme == 'freeplane') {
             def uriPathForFile = uri.scheme == 'freeplane' ? uri.path.replaceFirst($/^/ /$, '') : uri.path
+            if (SystemUtils.IS_OS_WINDOWS && uriPathForFile.startsWith('../')) {
+                // Freeplane allows relative URI paths across drives, but such URI paths aren't recognized by File
+                // File needs a path to start with a drive letter, therefore remove all `../` in front of a drive letter
+                uriPathForFile = uriPathForFile.replaceFirst($/^(../)+(?=[a-zA-Z]:/)/$, '')
+            }
             def fileFromUriPath = new File(uriPathForFile)
             if (fileFromUriPath.isAbsolute()) {
                 file = fileFromUriPath
