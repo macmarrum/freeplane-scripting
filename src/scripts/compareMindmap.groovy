@@ -1,20 +1,21 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 /*
-Copyright (C) 2023  macmarrum
+ * Copyright (C) 2023  macmarrum
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
 
 import io.github.macmarrum.freeplane.MindMapComparator
 import org.freeplane.core.ui.components.UITools
@@ -25,7 +26,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 
 static File askForFile() {
     final fileChooser = new JFileChooser()
-    fileChooser.dialogTitle = 'Select old mind map to compare'
+    fileChooser.dialogTitle = 'Select the original mind map (i.e. older version)'
     fileChooser.multiSelectionEnabled = false
     fileChooser.fileFilter = new FileNameExtensionFilter('Mind map', 'mm')
     fileChooser.currentDirectory = ScriptUtils.node().mindMap.file.parentFile
