@@ -63,9 +63,7 @@ class MindMapComparator {
                 def n = parent.appendChild(it)
                 n.left = it.left
                 n.moveTo(parent, it.parent.getChildPosition(it))
-                n.conditionalStyles.insert(0, true, null, style.DEL, false)
-                c.select(n)
-                MenuUtils.executeMenuItems(ADD_CONNECTOR_ACTION_LIST)
+                styleIt(n, style.DEL)
             }
         }
         c.select(newMindMap.root)
@@ -74,38 +72,40 @@ class MindMapComparator {
     static void compareNodeRecursively(Node node, MindMap oldMindMap) {
         def c = ScriptUtils.c()
         def oldNode = oldMindMap.node(node.id)
-        c.select(node)
+        if (node.visible)
+            c.select(node)
         if (oldNode == null) {
             // no such node in oldMindMap
-            node.conditionalStyles.insert(0, true, null, style.NEW, false)
-            MenuUtils.executeMenuItems(ADD_CONNECTOR_ACTION_LIST)
+            styleIt(node, style.NEW)
         } else {
             if (node.text != oldNode.text) {
-                node.conditionalStyles.insert(0, true, null, style.CH_text, false)
-                MenuUtils.executeMenuItems(ADD_CONNECTOR_ACTION_LIST)
+                styleIt(node, style.CH_text)
             }
             if (node.detailsText != oldNode.detailsText) {
-                node.conditionalStyles.insert(0, true, null, style.CH_details, false)
-                MenuUtils.executeMenuItems(ADD_CONNECTOR_ACTION_LIST)
+                styleIt(node, style.CH_details)
             }
             if (node.noteText != oldNode.noteText) {
-                node.conditionalStyles.insert(0, true, null, style.CH_note, false)
-                MenuUtils.executeMenuItems(ADD_CONNECTOR_ACTION_LIST)
+                styleIt(node, style.CH_note)
             }
             if (!node.root) {
                 if (node.parent.id != oldNode.parent.id) {
                     // parent changed
-                    node.conditionalStyles.insert(0, true, null, style.MV_parent, false)
-                    MenuUtils.executeMenuItems(ADD_CONNECTOR_ACTION_LIST)
+                    styleIt(node, style.MV_parent)
                 } else if (node.parent.getChildPosition(node) != oldNode.parent.getChildPosition(oldNode)) {
                     // position changed
-                    node.conditionalStyles.insert(0, true, null, style.MV_position, false)
-                    MenuUtils.executeMenuItems(ADD_CONNECTOR_ACTION_LIST)
+                    styleIt(node, style.MV_position)
                 }
             }
         }
         node.children.each { Node nChild ->
             compareNodeRecursively(nChild, oldMindMap)
+        }
+    }
+
+    def static styleIt(Node node, String styleName) {
+        node.conditionalStyles.insert(0, true, null, styleName, false)
+        if (node.visible) {
+            MenuUtils.executeMenuItems(ADD_CONNECTOR_ACTION_LIST)
         }
     }
 
