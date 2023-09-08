@@ -49,7 +49,7 @@ void appendHotKeyNodes(Node root, Enumeration<TreeNode> children, String title, 
     }
     // submenus
     submenus.each { DefaultMutableTreeNode treeNode ->
-        def subtitle = (level > 2 ? title + '->' : '') + treeNode.userObject
+        def subtitle = (level > 2 ? title + ' -> ' : '') + treeNode.userObject
         appendHotKeyNodes(root, treeNode.children(), subtitle, level + 1)
     }
 }
