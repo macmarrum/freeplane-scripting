@@ -53,7 +53,7 @@ return CS.canApply(node, cs[1], cond)</script>
             </script_condition>
         </conditional_style>
     </conditional_styles>
-    <properties show_icon_for_attributes="true" fit_to_viewport="false" show_note_icons="true" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff"/>
+    <properties show_icon_for_attributes="true" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#41b1d1ff,#c54499ff,#d76b4fff" show_note_icons="true" fit_to_viewport="false"/>
 
 <map_styles>
 <stylenode LOCALIZED_TEXT="styles.root_node" ID="ID_680156716" STYLE="oval" UNIFORM_SHAPE="true" VGAP_QUANTITY="24 pt">
@@ -149,14 +149,14 @@ ol {
 <icon BUILTIN="emoji-1F426"/>
 </stylenode>
 <stylenode TEXT="Next Action Done" ID="ID_1431546927">
-<icon BUILTIN="emoji-1F983"/>
+<icon BUILTIN="emoji-1F99C"/>
 <font STRIKETHROUGH="true"/>
 </stylenode>
 <stylenode TEXT="Waiting For" ID="ID_832755575">
 <icon BUILTIN="emoji-1F433"/>
 </stylenode>
 <stylenode TEXT="Waiting For Done" ID="ID_156169656">
-<icon BUILTIN="emoji-1F988"/>
+<icon BUILTIN="emoji-1F422"/>
 <font STRIKETHROUGH="true"/>
 </stylenode>
 <stylenode TEXT="Project" ID="ID_351748814" VGAP_QUANTITY="3 pt">
@@ -412,10 +412,10 @@ ol {
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,3" ID="ID_352058479" COLOR="#e5c453" BACKGROUND_COLOR="#59553f" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="14"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,4" ID="ID_294563152" COLOR="#d349a4" BACKGROUND_COLOR="#49434f" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,4" ID="ID_119767224" COLOR="#46bddf" BACKGROUND_COLOR="#435357" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="14"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,5" ID="ID_119767224" COLOR="#46bddf" BACKGROUND_COLOR="#435357" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,5" ID="ID_294563152" COLOR="#d349a4" BACKGROUND_COLOR="#49434f" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="14"/>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,6" ID="ID_1794312820" COLOR="#e57255" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
@@ -430,10 +430,10 @@ ol {
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,9" ID="ID_885575204" COLOR="#e5c453" BACKGROUND_COLOR="#59553f" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,10" ID="ID_703695337" COLOR="#d349a4" BACKGROUND_COLOR="#49434f" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,10" COLOR="#46bddf" BACKGROUND_COLOR="#435357" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,11" COLOR="#46bddf" BACKGROUND_COLOR="#435357" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,11" ID="ID_703695337" COLOR="#d349a4" BACKGROUND_COLOR="#49434f" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,12" COLOR="#e57255" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
