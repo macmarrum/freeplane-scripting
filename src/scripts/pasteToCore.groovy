@@ -25,7 +25,7 @@ def shouldOutcomeContainTagsHtmlBody = !isTargetMarkdownOrText
 def text = getString(t, shouldOutcomeContainTagsHtmlBody)
 if (text) {
     if (shouldOutcomeContainTagsHtmlBody && isTargetMarkdownOrText && HtmlUtils.isHtml(text))
-        text = (FreeplaneVersion.version.isOlderThan(FreeplaneVersion.getVersion('1.11.1')) ? /'/ : ' ') + text
+        text = (FreeplaneVersion.version < FreeplaneVersion.getVersion('1.11.1') ? /'/ : ' ') + text
     node.text = text
 }
 
