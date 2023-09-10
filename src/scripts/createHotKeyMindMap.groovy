@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 import org.freeplane.api.Node
+import org.freeplane.core.util.FreeplaneVersion
 import org.freeplane.core.util.MenuUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
@@ -54,7 +56,13 @@ void appendHotKeyNodes(Node root, Enumeration<TreeNode> children, String title, 
     }
 }
 
-MenuUtils.executeMenuItems(['NewMapAction'])
-def hotKeyRoot = ScriptUtils.node().mindMap.root.createChild('Hot Keys')
+def mindMap = ScriptUtils.c().newMindMap()
+if (FreeplaneVersion.version < FreeplaneVersion.getVersion('1.11.1')) {
+    mindMap.root.childNodesAlignment = Class.forName('org.freeplane.api.ChildNodesAlignment').BY_FIRST_NODE
+} else {
+    mindMap.root.childNodesLayout = Class.forName('org.freeplane.api.ChildNodesLayout').AUTO_FIRST
+}
 def menuEntryTree = MenuUtils.createAcceleratebleMenuEntryTree('main_menu')
+def hotKeyRoot = mindMap.root.createChild('Hot Keys')
+hotKeyRoot.left = false
 appendHotKeyNodes(hotKeyRoot, menuEntryTree.children(), null, 2)
