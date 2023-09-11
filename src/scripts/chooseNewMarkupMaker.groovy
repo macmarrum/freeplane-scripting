@@ -1,6 +1,7 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 
 import org.freeplane.plugin.script.proxy.ScriptUtils
+import io.github.macmarrum.freeplane.ConfluenceStorage
 
 import javax.swing.*
 
