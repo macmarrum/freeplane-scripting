@@ -279,6 +279,12 @@ class Export {
         }
     }
 
+    static void toRumarTomlFile(File file, Node node) {
+        def outputStream = new BufferedOutputStream(new FileOutputStream(file))
+        toRumarTomlOutputStream(outputStream, node)
+        outputStream.close()
+    }
+
     static String toRumarTomlString(Node node) {
         def outputStream = new ByteArrayOutputStream()
         toRumarTomlOutputStream(outputStream, node)
