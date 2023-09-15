@@ -1,21 +1,14 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Jump"})
+
+import org.freeplane.core.util.MenuUtils
+import org.freeplane.plugin.script.proxy.ScriptUtils
+
 
 // put the name of your custom style, if different
 def jumpInStyleName = 'JumpIn'
 
-def styleName = node.style.name
-if (!styleName) {
-    // no style -- apply jumpInStyleName
-    node.style.name = jumpInStyleName
-} else if (styleName == jumpInStyleName) {
-    // jumpInStyleName is already applied
-} else {
-    // there is already a style applied, and it isn't jumpInStyleName
-    // save the currently applied style as a Node Conditional Style, if not already there
-    def styleAlreadyAdded = node.conditionalStyles.collect().find { it.styleName == styleName }
-    if (!styleAlreadyAdded)
-        node.conditionalStyles.add(true, null, styleName, false)
-    // apply jumpInStyleName
-    node.style.name = jumpInStyleName
-}
-menuUtils.executeMenuItems(['JumpInAction'])
+def node = ScriptUtils.node()
+def styleAlreadyAdded = node.conditionalStyles.find { it.active && it.always && it.styleName == jumpInStyleName && !it.last }
+if (!styleAlreadyAdded)
+    node.conditionalStyles.insert(0, true, null, jumpInStyleName, false)
+MenuUtils.executeMenuItems(['JumpInAction'])
