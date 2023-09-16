@@ -6,17 +6,24 @@ import org.freeplane.core.util.FreeplaneVersion
 import org.freeplane.core.util.MenuUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
-// put the name of your custom style, if different
+// put the name of your custom style - must be the same as in jumpInWithStyle.groovy
 def jumpInStyleName = 'JumpIn'
 
-ScriptUtils.c().viewRoot.conditionalStyles.findAll {
+def node = ScriptUtils.node()
+def c = ScriptUtils.c()
+c.viewRoot.conditionalStyles.findAll {
     it.active && it.always && it.styleName == jumpInStyleName && !it.last
 }.each { ConditionalStyle it ->
     it.remove()
 }
+def viewRoot = c.viewRoot
+def jumpInBackgroundColorCode = viewRoot['jumpInBackgroundColor']
+if (jumpInBackgroundColorCode) {
+    node.mindMap.backgroundColorCode = jumpInBackgroundColorCode
+    viewRoot['jumpInBackgroundColor'] = null
+}
 MenuUtils.executeMenuItems(['JumpOutAction'])
 if (FreeplaneVersion.version < new FreeplaneVersion(1, 11, 1)) {
     // force view refresh
-    def node = ScriptUtils.node()
     node.style.name = node.style.name
 }
