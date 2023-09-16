@@ -44,7 +44,7 @@ if (!node.isRoot()) {
     }
     if (jumpInMapBackgroundColorCode) {
         // save the original color to restore it on jump out
-        ScriptUtils.c().viewRoot['jumpInBackgroundColor'] = node.mindMap.backgroundColorCode
+        ScriptUtils.c().viewRoot['jumpInBackgroundColor'] = node.mindMap.backgroundColorCode ?: 'null'
         node.mindMap.backgroundColorCode = jumpInMapBackgroundColorCode
     }
     if (FreeplaneVersion.version < new FreeplaneVersion(1, 11, 1)) {

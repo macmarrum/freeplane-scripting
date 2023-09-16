@@ -19,7 +19,7 @@ c.viewRoot.conditionalStyles.findAll {
 def viewRoot = c.viewRoot
 def jumpInBackgroundColorCode = viewRoot['jumpInBackgroundColor']
 if (jumpInBackgroundColorCode) {
-    node.mindMap.backgroundColorCode = jumpInBackgroundColorCode
+    node.mindMap.backgroundColorCode = jumpInBackgroundColorCode == 'null' ? null : jumpInBackgroundColorCode
     viewRoot['jumpInBackgroundColor'] = null
 }
 MenuUtils.executeMenuItems(['JumpOutAction'])
