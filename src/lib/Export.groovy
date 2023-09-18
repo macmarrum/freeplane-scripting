@@ -62,7 +62,7 @@ class Export {
             'AutomaticLayout.level,6'   : '#######',
     ]
     public static mdSettings = [h1: MdH1.NODE, details: MdInclude.HLB, note: MdInclude.PLAIN]
-    public static csvSettings = [sep: COMMA, eol: NL, newlineReplacement: CR, nodePart: NodePart.CORE]
+    public static csvSettings = [sep: COMMA, eol: NL, newlineReplacement: CR, nodePart: NodePart.CORE, numOfNodesToIgnore: 0, sepAtRowEnds: false]
 
     enum NodePart {
         CORE, DETAILS, NOTE
@@ -225,10 +225,10 @@ class Export {
         text.replaceAll(RX_MULTILINE_BEGINING, FOUR_SPACES)
     }
 
-    static List<List<Node>> createListOfRows(Node node, Integer skipNodes = 0) {
+    static List<List<Node>> createListOfRows(Node node, Integer numOfNodesToIgnore = 0) {
         node.find { it.leaf && it.visible }.collect {
             def eachNodeFromRootToIt = it.pathToRoot
-            def i = eachNodeFromRootToIt.findIndexOf { it == node } + skipNodes
+            def i = eachNodeFromRootToIt.findIndexOf { it == node } + numOfNodesToIgnore
             eachNodeFromRootToIt[i..-1]
         }
     }
@@ -251,11 +251,15 @@ class Export {
         def eol = settings.eol as String
         def newlineReplacement = settings.newlineReplacement as String
         def nodePart = settings.nodePart as NodePart
+        def numOfNodesToIgnore = settings.numOfNodesToIgnore as Integer
+        def sepAtRowEnds = settings.sepAtRowEnds as Boolean
         def sepAsBytes = sep.getBytes(charset)
-        def rows = createListOfRows(node)
+        def rows = createListOfRows(node, numOfNodesToIgnore)
         def rowSizes = rows.collect { it.size() }
         def maxRowSize = rowSizes.max()
         rows.eachWithIndex { row, i ->
+            if (sepAtRowEnds)
+                outputStream.write(sepAsBytes)
             def rowSize = rowSizes[i]
             row.eachWithIndex { n, j ->
                 def text = switch (nodePart) {
@@ -275,6 +279,8 @@ class Export {
             }
             def delta = maxRowSize - rowSize
             (0..<delta).each { outputStream.write(sepAsBytes) }
+            if (sepAtRowEnds)
+                outputStream.write(sepAsBytes)
             outputStream.write(eol.getBytes(charset))
         }
     }
