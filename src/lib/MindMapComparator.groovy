@@ -66,6 +66,7 @@ class MindMapComparator {
                     node.left = oldNode.left
                     node.moveTo(parent, oldNode.parent.getChildPosition(oldNode))
                 }
+                c.select(node)
                 styleIt(node, style.DEL)
             }
         }
@@ -106,7 +107,11 @@ class MindMapComparator {
     }
 
     def static styleIt(Node node, String styleName) {
-        node.conditionalStyles.insert(0, true, null, styleName, false)
+        def oldStyleName = node.style.name
+        if (oldStyleName) {
+            node.conditionalStyles.insert(0, true, null, oldStyleName, false)
+        }
+        node.style.name = styleName
         if (node.visible) {
             MenuUtils.executeMenuItems(ADD_CONNECTOR_ACTION_LIST)
         }
