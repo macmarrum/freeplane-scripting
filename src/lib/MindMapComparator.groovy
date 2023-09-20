@@ -1,4 +1,3 @@
-package io.github.macmarrum.freeplane
 /*
 Copyright (C) 2023  macmarrum
 
@@ -15,6 +14,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+package io.github.macmarrum.freeplane
+
 
 import org.freeplane.api.MindMap
 import org.freeplane.api.Node
@@ -52,24 +53,26 @@ class MindMapComparator {
      * changed details
      * changed note
      */
-    static void compare(MindMap oldMindMap, MindMap newMindMap) {
-        createStylesIfMissing(newMindMap.delegate)
-        compareNodeRecursively(newMindMap.root, oldMindMap)
+    static void compare(MindMap oldMindMap, MindMap mindMap) {
+        createStylesIfMissing(mindMap.delegate)
+        compareNodeRecursively(oldMindMap, mindMap.root)
         // add deleted nodes to mark them as DEL
         def c = ScriptUtils.c()
-        oldMindMap.root.findAll().each { Node it ->
-            if (!newMindMap.node(it.id)) {
-                def parent = newMindMap.node(it.parent.id)
-                def n = parent.appendChild(it)
-                n.left = it.left
-                n.moveTo(parent, it.parent.getChildPosition(it))
-                styleIt(n, style.DEL)
+        oldMindMap.root.findAll().each { Node oldNode ->
+            if (!mindMap.node(oldNode.id)) {
+                def parent = oldNode.isRoot() ? mindMap.root : mindMap.node(oldNode.parent.id)
+                def node = parent.appendChild(oldNode)
+                if (!oldNode.isRoot()) {
+                    node.left = oldNode.left
+                    node.moveTo(parent, oldNode.parent.getChildPosition(oldNode))
+                }
+                styleIt(node, style.DEL)
             }
         }
-        c.select(newMindMap.root)
+        c.select(mindMap.root)
     }
 
-    static void compareNodeRecursively(Node node, MindMap oldMindMap) {
+    static void compareNodeRecursively(MindMap oldMindMap, Node node) {
         def c = ScriptUtils.c()
         def oldNode = oldMindMap.node(node.id)
         if (node.visible)
@@ -87,7 +90,7 @@ class MindMapComparator {
             if (node.noteText != oldNode.noteText) {
                 styleIt(node, style.CH_note)
             }
-            if (!node.root) {
+            if (!node.isRoot() && !oldNode.isRoot()) {
                 if (node.parent.id != oldNode.parent.id) {
                     // parent changed
                     styleIt(node, style.MV_parent)
@@ -98,7 +101,7 @@ class MindMapComparator {
             }
         }
         node.children.each { Node nChild ->
-            compareNodeRecursively(nChild, oldMindMap)
+            compareNodeRecursively(oldMindMap, nChild)
         }
     }
 
