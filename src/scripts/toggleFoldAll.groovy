@@ -9,7 +9,7 @@ def UNFOLD_ALL_ACTION = ['UnfoldAllAction']
 def FOLD_ALL_ACTION = ['FoldAllAction']
 def c = ScriptUtils.c()
 def selectedNodes = c.selecteds.collect()
-def root = selectedNodes[0].mindMap.root
+def root = c.viewRoot
 if (root in selectedNodes) {
     c.select(root)
     if (root.children.findAll { !it.leaf }.every { it.isFolded() }) {
