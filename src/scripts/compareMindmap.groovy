@@ -26,7 +26,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
 
 static File askForFile() {
     final fileChooser = new JFileChooser()
-    fileChooser.dialogTitle = 'Select the original mind map (i.e. older version)'
+    fileChooser.dialogTitle = 'Select the original mind map (i.e. an older version)'
     fileChooser.multiSelectionEnabled = false
     fileChooser.fileFilter = new FileNameExtensionFilter('Mind map', 'mm')
     fileChooser.currentDirectory = ScriptUtils.node().mindMap.file.parentFile
