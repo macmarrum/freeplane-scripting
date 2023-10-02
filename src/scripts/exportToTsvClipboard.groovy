@@ -5,5 +5,5 @@ import io.github.macmarrum.freeplane.Export
 import org.freeplane.core.util.TextUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
-def text = Export.toCsvString(ScriptUtils.node(), Export.TAB)
+def text = Export.toCsvString(ScriptUtils.node(), [sep: Export.TAB])
 TextUtils.copyToClipboard(text)
