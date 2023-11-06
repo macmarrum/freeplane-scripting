@@ -274,11 +274,9 @@ ol {
 </stylenode>
 <stylenode TEXT="=New" COLOR="#52d273" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#368b4c">
 <icon BUILTIN="emoji-1F331"/>
-<font SIZE="12"/>
 </stylenode>
 <stylenode TEXT="=Warn" COLOR="#e5c453" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#9f893a">
 <icon BUILTIN="emoji-26A0"/>
-<font SIZE="12"/>
 </stylenode>
 <stylenode TEXT="=Question" COLOR="#e57255" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#b35242">
 <icon BUILTIN="emoji-2754"/>
