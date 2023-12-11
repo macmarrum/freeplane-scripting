@@ -63,7 +63,7 @@ class Export {
             'AutomaticLayout.level,6'   : '#######',
     ]
     public static mdSettings = [h1: MdH1.NODE, details: MdInclude.HLB, note: MdInclude.PLAIN]
-    public static csvSettings = [sep: COMMA, eol: NL, newlineReplacement: CR, nodePart: NodePart.CORE, numOfNodesToIgnore: 0, sepAtRowEnds: false]
+    public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip: 0, tail: false]
     private static String DETAILS = '@details'
     private static String ATTRIBUTES = '@attributes'
     private static String NOTE = '@note'
@@ -254,10 +254,10 @@ class Export {
         settings = !settings ? csvSettings.clone() : csvSettings + settings
         def sep = settings.sep as String
         def eol = settings.eol as String
-        def newlineReplacement = settings.newlineReplacement as String
-        def nodePart = settings.nodePart as NodePart
-        def numOfNodesToIgnore = settings.numOfNodesToIgnore as Integer
-        def sepAtRowEnds = settings.sepAtRowEnds as Boolean
+        def newlineReplacement = settings.getOrDefault('newlineReplacement', settings.nl) as String
+        def nodePart = settings.getOrDefault('nodePart', settings.np) as NodePart
+        def numOfNodesToIgnore = settings.getOrDefault('numOfNodesToIgnore', settings.skip) as Integer
+        def sepAtRowEnds = settings.getOrDefault('sepAtRowEnds', settings.tail) as Boolean
         def sepAsBytes = sep.getBytes(charset)
         def rows = createListOfRows(node, numOfNodesToIgnore)
         def rowSizes = rows.collect { it.size() }
