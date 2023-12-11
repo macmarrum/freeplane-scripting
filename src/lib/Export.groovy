@@ -29,6 +29,7 @@ import java.util.regex.Pattern
 class Export {
     public static Charset charset = StandardCharsets.UTF_8
     public static final String COMMA = ','
+    public static final String PIPE = '|'
     public static final String TAB = '\t'
     public static final String NL = '\n'
     public static final String CR = '\r'
@@ -63,6 +64,10 @@ class Export {
     ]
     public static mdSettings = [h1: MdH1.NODE, details: MdInclude.HLB, note: MdInclude.PLAIN]
     public static csvSettings = [sep: COMMA, eol: NL, newlineReplacement: CR, nodePart: NodePart.CORE, numOfNodesToIgnore: 0, sepAtRowEnds: false]
+    private static String DETAILS = '@details'
+    private static String ATTRIBUTES = '@attributes'
+    private static String NOTE = '@note'
+    private static String UTF8 = StandardCharsets.UTF_8.name()
 
     enum NodePart {
         CORE, DETAILS, NOTE
