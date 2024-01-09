@@ -4,7 +4,8 @@ import org.freeplane.api.NodeRO as FPN
 
 int getWidth(FPN node, float zoom) {
     def v = node.delegate.viewers
-    assert v.size() == 1
+    def viewCount = v.size()
+    assert viewCount == 1, "Only one view is supported, got ${viewCount}"
     double width = v[0].mainView.width / zoom
     return Math.ceil(width)
 }
