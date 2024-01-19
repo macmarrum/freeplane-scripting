@@ -820,6 +820,9 @@ class ConfluenceStorage {
     }
 
     static createImage(FN node) {
-        createMarkupMaker(node, 'image')
+        def n = createMarkupMaker(node, 'image')
+        def o = n.createChild('filename.png')
+        o[KEY_TITLE] = ''
+        c.select(o)
     }
 }
