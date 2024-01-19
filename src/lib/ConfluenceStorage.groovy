@@ -30,6 +30,8 @@ class ConfluenceStorage {
     static c = ScriptUtils.c()
 
     static final HILITE1ST = 'hiLite1st'
+    static final KEY_TITLE = 'key:title'
+    static final COLON = ':'
 
     static style = [
             cStorageMarkupRoot : 'cStorageMarkupRoot',
@@ -636,6 +638,11 @@ class ConfluenceStorage {
         })
     }
 
+    /**
+     * To set a height, put a number in details.
+     * To add a border, use icon `unchecked`.
+     * To link an image attached in a different page, put `page` attribute with <space key>:<page title>
+     */
     static String mkImage(FN n) {
         for (child in n.children.find { FN it -> it.text }) {
             def result = new StringBuilder()
@@ -646,6 +653,13 @@ class ConfluenceStorage {
                 result << 'ac:border="true" '
             result << '>'
             result << '<ri:attachment ri:filename="' << child.text << '" />'
+            def key_title = child[KEY_TITLE].text
+            if (key_title && key_title.contains(COLON)) {
+                def (spaceKey, contentTitle) = key_title.split(COLON, 2)
+                result << '<ri:page ri:space-key="' << spaceKey << '" ri:content-title="' << contentTitle << '" />'
+            } else {
+                println("** ConfluenceStorage - mkImage - no `${COLON}` in node['${KEY_TITLE}'].text")
+            }
             result << '</ac:image>'
             return result.toString()
         }
@@ -655,7 +669,7 @@ class ConfluenceStorage {
     /**
      * mkCsv is like mkParent but using getContent instead of mkNode (no headings or paragraphs)
      * + collects only the first child of each node
-     * + uses a comma or any string as the separator
+     * + uses a comma_space or any string as the separator
      */
     static StringBuilder mkCsv(FN n) {
         // sep can be defined as the attribute csvSep
@@ -803,5 +817,9 @@ class ConfluenceStorage {
 
     static createCsv(FN node) {
         createMarkupMaker(node, 'csv')
+    }
+
+    static createImage(FN node) {
+        createMarkupMaker(node, 'image')
     }
 }
