@@ -652,12 +652,14 @@ class ConfluenceStorage {
             if (hasIcon(child, icon.border_unchecked))
                 result << 'ac:border="true" '
             result << '>'
-            result << '<ri:attachment ri:filename="' << child.text << '" />'
+            result << '<ri:attachment ri:filename="' << child.text
             def key_title = child[KEY_TITLE].text
             if (key_title && key_title.contains(COLON)) {
+                result << '">'
                 def (spaceKey, contentTitle) = key_title.split(COLON, 2)
-                result << '<ri:page ri:space-key="' << spaceKey << '" ri:content-title="' << contentTitle << '" />'
+                result << '<ri:page ri:space-key="' << spaceKey << '" ri:content-title="' << contentTitle << '" /></ri:attachment>'
             } else {
+                result << '" />'
                 println("** ConfluenceStorage - mkImage - no `${COLON}` in node['${KEY_TITLE}'].text")
             }
             result << '</ac:image>'
