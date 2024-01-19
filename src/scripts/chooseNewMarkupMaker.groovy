@@ -16,6 +16,7 @@ final action = [
         'div-expand+code': ConfluenceStorage::createDivExpandCode,
         'format': ConfluenceStorage::createFormat,
         'parent': ConfluenceStorage::createParent,
+        'image': ConfluenceStorage::createImage,
 ]
 String input = JOptionPane.showInputDialog(null, null, title,
         JOptionPane.QUESTION_MESSAGE, null, action.keySet().toArray(), null)
