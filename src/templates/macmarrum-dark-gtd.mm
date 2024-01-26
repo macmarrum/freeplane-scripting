@@ -1,9 +1,9 @@
 <map version="freeplane 1.9.13">
 <!--To view this file, download free mind mapping software Freeplane from https://www.freeplane.org -->
-<node TEXT="GTD" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1939172785" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES" VGAP_QUANTITY="20 pt">
+<node TEXT="macmarrum-dark-gtd" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1939172785" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES" VGAP_QUANTITY="20 pt">
 <font BOLD="false"/>
 <hook NAME="AutomaticEdgeColor" COUNTER="0" RULE="FOR_LEVELS"/>
-<attribute_layout NAME_WIDTH="81.75 pt" VALUE_WIDTH="194.24999 pt"/>
+<attribute_layout NAME_WIDTH="86.25 pt" VALUE_WIDTH="194.24999 pt"/>
 <attribute NAME="scriptOnMapOpen" VALUE="def n = node.createChild()&#xa;n.text = (new Date()).format(&apos;yyyy-MM-dd HH:mm:ss&apos;)&#xa;"/>
 <attribute NAME="scriptOnMapOpen2" VALUE="NodeIdRefresher.refreshAll(node)"/>
 <hook NAME="MapStyle" background="#2b2b2b">
@@ -396,6 +396,12 @@ ol {
 <stylenode TEXT="=Code" MAX_WIDTH="25 cm">
 <font NAME="JetBrains Mono" SIZE="11"/>
 </stylenode>
+<stylenode TEXT="JumpIn" ID="ID_202746744">
+<icon BUILTIN="emoji-1F4CD"/>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" LAST="false"/>
+</hook>
+</stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="right" STYLE="bubble">
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level.root" ID="ID_1659178249" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="10 pt" VGAP_QUANTITY="20 pt">
@@ -441,6 +447,7 @@ ol {
 </stylenode>
 </map_styles>
 </hook>
+<node TEXT="GTD" POSITION="right" ID="ID_1176543057">
 <node TEXT="Inbox" POSITION="right" ID="ID_253550823" ICON_SIZE="30 px" CHILD_NODES_ALIGNMENT="BY_LAST_NODE">
 <icon BUILTIN="emoji-1F423"/>
 <font SIZE="18"/>
@@ -468,6 +475,7 @@ ol {
 <node TEXT="Archive" POSITION="left" ID="ID_1132191027" ICON_SIZE="30 px" CHILD_NODES_ALIGNMENT="BY_FIRST_NODE">
 <icon BUILTIN="emoji-1F342"/>
 <font SIZE="18"/>
+</node>
 </node>
 </node>
 </map>
