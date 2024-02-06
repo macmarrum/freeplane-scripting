@@ -63,7 +63,7 @@ class Export {
             'AutomaticLayout.level,6'   : '#######',
     ]
     public static mdSettings = [h1: MdH1.NODE, details: MdInclude.HLB, note: MdInclude.PLAIN]
-    public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip: 0, tail: false]
+    public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip: 0, tail: false, quote: false]
     private static String DETAILS = '@details'
     private static String ATTRIBUTES = '@attributes'
     private static String NOTE = '@note'
@@ -250,12 +250,27 @@ class Export {
         outputStream.toString(charset)
     }
 
+    /**
+     * Output to CSV, using any deilmeter as a separator (comma by default)
+     *
+     * @param outputStream - the stream to write to
+     * @param node - the starting node for the export (see also settings.skip)
+     * @param settings - a hashMap -- see csvSettings for default values
+     *  - sep, -- separator to use
+     *  - eol, -- end of line to use
+     *  - nl, -- in-value new-line replacement (e.g. CR in place on NL)
+     *  - np, -- NodePart to take the value from
+     *  - skip: 0, -- how many levels to skip (e.g. 1 to consider only child nodes)
+     *  - tail: false, -- whether to put Separator after the last value
+     *  - quote: false -- whether to force quotes around each value - defualt: auto-quote when sep or nl in value
+     */
     static void toCsvOutputStream(OutputStream outputStream, Node node, HashMap<String, Object> settings) {
         settings = !settings ? csvSettings.clone() : csvSettings + settings
         def sep = settings.sep as String
         def eol = settings.eol as String
         def newlineReplacement = settings.getOrDefault('newlineReplacement', settings.nl) as String
         def nodePart = settings.getOrDefault('nodePart', settings.np) as NodePart
+        def shouldQuote = settings.quote as Boolean
         def numOfNodesToIgnore = settings.getOrDefault('numOfNodesToIgnore', settings.skip) as Integer
         def sepAtRowEnds = settings.getOrDefault('sepAtRowEnds', settings.tail) as Boolean
         def sepAsBytes = sep.getBytes(charset)
@@ -273,10 +288,10 @@ class Export {
                     case NodePart.NOTE -> (n.note?.plain ?: '')
                     default -> '#ERR!'
                 }
-                if (text.contains(sep) && sep != '"')
-                    text = /"$text"/
                 if (newlineReplacement !== null)
                     text = text.replace(NL, newlineReplacement)
+                if ((shouldQuote || text.contains(sep) || text.contains(NL)) && sep != '"')
+                    text = /"$text"/
                 outputStream.write(text.getBytes(charset))
                 def isLastRow = j == rowSize - 1
                 if (!isLastRow)
