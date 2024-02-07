@@ -16,6 +16,7 @@
  */
 package io.github.macmarrum.freeplane
 
+import groovy.json.JsonOutput
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
 import org.freeplane.core.util.HtmlUtils
@@ -64,10 +65,15 @@ class Export {
     ]
     public static mdSettings = [h1: MdH1.NODE, details: MdInclude.HLB, note: MdInclude.PLAIN]
     public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip: 0, tail: false, quote: false]
-    private static String DETAILS = '@details'
-    private static String ATTRIBUTES = '@attributes'
-    private static String NOTE = '@note'
-    private static String UTF8 = StandardCharsets.UTF_8.name()
+    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, icons: true, skip1: false, denullify: false, pretty: false]
+    private static final DETAILS = '@details'
+    private static final ATTRIBUTES = '@attributes'
+    private static final NOTE = '@note'
+    private static final STYLE = '@style'
+    private static final ICONS = '@icons'
+    private static final UTF8 = StandardCharsets.UTF_8.name()
+    private static final EMPTY_MAP = Collections.emptyMap()
+    private static final EMPTY_LIST = Collections.emptyList()
 
     enum NodePart {
         CORE, DETAILS, NOTE
@@ -372,5 +378,86 @@ class Export {
         else
             throw new IllegalArgumentException("cannot quote `${text}` because it already contains all possible quote options")
         quote + text + quote
+    }
+
+    static void toJsonFile(File file, Node node, HashMap<String, Object> settings = null) {
+        def jsonStr = toJsonString(node, settings)
+        file.setText(jsonStr, charset)
+    }
+
+    /**
+     * Export to JSON, with the assumption that each node on the same level has a unique core text,
+     * because it is used as Key in JSON
+     * @param node - the starting node of the branch to be exported -- see also settings.skip1
+     * @param settings - a hashMap -- see jsonSettings for default values
+     *  - details -- whether to include details;
+     *  - note -- whether to include note;
+     *  - attributes -- whether to include attributes;
+     *  - transformed -- whether to use transformed text, i.e. after formula/numbering/format evaluation;
+     *  - skip1 -- skip the first node;
+     *  - denullify -- try to avoid `{"Node text": null}` by replacing it with `["Node text"]` where possible;
+     *  - pretty -- use pretty output format
+     * @return JSON representation of the branch
+     */
+    static String toJsonString(Node node, HashMap<String, Object> settings = null) {
+        settings = !settings ? jsonSettings.clone() : jsonSettings + settings
+        def mapOrList = _toJson_getBodyRecursively(node, settings)
+        if (!settings.skip1)
+            mapOrList = ["${settings.transformed ? node.transformedText : node.plainText}": mapOrList]
+        if (settings.denullify) {
+            // use a wrapper to also denullyfy top-level entries, so that top-level object can be a list
+            mapOrList = _toJson_denullify(['x': mapOrList])['x']
+        }
+        def jsonPayload = JsonOutput.toJson(mapOrList)
+        if (settings.pretty)
+            return JsonOutput.prettyPrint(jsonPayload)
+        else
+            return jsonPayload
+    }
+
+    static HashMap<String, Object> _toJson_getBodyRecursively(Node node, HashMap<String, Object> settings, int level=1) {
+        def details = settings.details ? (settings.transformed ? node.details?.text : HtmlUtils.htmlToPlain(node.detailsText ?: '')) : null
+        def note = settings.note ? (settings.transformed ? node.note?.text : HtmlUtils.htmlToPlain(node.noteText ?: '')) : null
+        def attributes = settings.attributes ? (settings.transformed ? node.attributes.transformed.map : node.attributes.map) : EMPTY_MAP
+        def style = settings.style ? node.style.name : null
+        def icons = settings.icons ? node.icons.icons : EMPTY_LIST
+        def children = node.children.findAll { it.visible }
+        if (!details && !note && !attributes && !style && !icons && !children) {
+            return null
+        } else {
+            def result = [:]
+            if (!(level == 1 && settings.skip1)) {
+                if (details)
+                    result[DETAILS] = details
+                if (note)
+                    result[NOTE] = note
+                if (attributes)
+                    result[ATTRIBUTES] = attributes
+                if (style)
+                    result[STYLE] = style
+                if (icons)
+                    result[ICONS] = icons
+            }
+            children.each {Node n ->
+                result["${settings.transformed ? n.transformedText : n.plainText}"] = _toJson_getBodyRecursively(n, settings, level + 1)
+            }
+            return result
+        }
+    }
+
+    static HashMap<String, Object> _toJson_denullify(HashMap<String, Object> hashMap) {
+        def newHashMap = [:]
+        hashMap.each { k, v ->
+            if (v instanceof HashMap) {
+                if (v.every { it.value === null }) {
+                    newHashMap[k] = v.collect { it.key }
+                } else {
+                    newHashMap[k] = _toJson_denullify(v)
+                }
+            } else {
+                newHashMap[k] = v
+            }
+        }
+        return newHashMap
     }
 }
