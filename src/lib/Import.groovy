@@ -24,10 +24,12 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
 import java.nio.charset.StandardCharsets
 
 class Import {
-    private static String DETAILS = '@details'
-    private static String ATTRIBUTES = '@attributes'
-    private static String NOTE = '@note'
-    private static String UTF8 = StandardCharsets.UTF_8.name()
+    private static final DETAILS = '@details'
+    private static final ATTRIBUTES = '@attributes'
+    private static final NOTE = '@note'
+    private static final STYLE = '@style'
+    private static final ICONS = '@icons'
+    private static final UTF8 = StandardCharsets.UTF_8.name()
 
     static String decodeBase64(String base64) {
         return new String(base64.decodeBase64())
@@ -74,10 +76,14 @@ class Import {
         jMap.each { key, value ->
             if (key == DETAILS && value !instanceof Map && value !instanceof List) {
                 node.details = value
-            } else if (key == ATTRIBUTES && value instanceof Map) {
-                value.each { attrName, attrValue -> node[attrName as String] = attrValue }
             } else if (key == NOTE && value !instanceof Map && value !instanceof List) {
                 node.note = value
+            } else if (key == ATTRIBUTES && value instanceof Map) {
+                value.each { attrName, attrValue -> node[attrName as String] = attrValue }
+            } else if (key == STYLE && value instanceof String) {
+                node.style.name = value
+            } else if (key == ICONS && value instanceof List) {
+                node.icons.addAll(value)
             } else if (value instanceof Map) {
                 def n = node.createChild(key)
                 fromMapRecursively(value as Map, n)
