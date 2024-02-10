@@ -49,7 +49,7 @@ class Import {
         if (!parent)
             parent = ScriptUtils.node().mindMap.root.createChild('JSON')
         fold(shouldFold, parent)
-        def jObject = new JsonSlurper(type: JsonParserType.INDEX_OVERLAY).parseText(content)
+        def jObject = new JsonSlurper(type: JsonParserType.CHAR_BUFFER).parseText(content)
         if (jObject instanceof Map)
             fromMapRecursively(jObject, parent)
         else if (jObject instanceof List)
