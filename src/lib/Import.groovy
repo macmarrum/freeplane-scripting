@@ -97,8 +97,7 @@ class Import {
                 } else if (value instanceof List) {
                     fromList(value, n)
                 } else if (value !== null) {
-                    def child = n.createChild()
-                    child.text = value
+                    def child = n.createChild(value)
                 }
             }
         }
