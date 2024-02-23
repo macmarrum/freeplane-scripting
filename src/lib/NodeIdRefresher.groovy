@@ -1,10 +1,27 @@
+/*
+Copyright (C) 2023, 2024  macmarrum
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 import groovy.json.JsonSlurper
 import org.freeplane.api.Node as FN
 
 class NodeIdRefresher {
-    public static final ATTR_PREFIX = 'freshIdToOriginal_'
-    public static final DATETIME_FORMAT = 'yyyy-MM-dd_HH:mm:ss'
-    public static final RESTORED_PREFIX = 'restored_'
+    public static REFRESHED_PREFIX = 'freshIdToOriginal_'
+    public static DATETIME_FORMAT = 'yyyy-MM-dd_HH:mm:ss'
+    public static RESTORED_PREFIX = 'restored_'
 
     static refreshAll(FN node) {
         def mm = node.mindMap
@@ -33,7 +50,7 @@ class NodeIdRefresher {
         sb << '}'
 
         def now = (new Date()).format(DATETIME_FORMAT)
-        root["${ATTR_PREFIX}${now}"] = sb
+        root[REFRESHED_PREFIX + now] = sb
     }
 
     static refresh(FN node) {
@@ -45,7 +62,7 @@ class NodeIdRefresher {
     }
 
     static Map.Entry<String, Object> getLatestSavepoint(FN root) {
-        def savepoints = root.attributes.findAll { it.key.startsWith(ATTR_PREFIX) }
+        def savepoints = root.attributes.findAll { Map.Entry<String, Object> it -> it.key.startsWith(REFRESHED_PREFIX) }
         if (savepoints)
             return savepoints.sort().last()
     }
