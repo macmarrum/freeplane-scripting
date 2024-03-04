@@ -4,8 +4,7 @@
 <font BOLD="false"/>
 <hook NAME="AutomaticEdgeColor" COUNTER="0" RULE="FOR_LEVELS"/>
 <attribute_layout NAME_WIDTH="86.25 pt" VALUE_WIDTH="194.24999 pt"/>
-<attribute NAME="scriptOnMapOpen" VALUE="def n = node.createChild()&#xa;n.text = (new Date()).format(&apos;yyyy-MM-dd HH:mm:ss&apos;)&#xa;"/>
-<attribute NAME="scriptOnMapOpen2" VALUE="NodeIdRefresher.refreshAll(node)"/>
+<attribute NAME="scriptOnMapOpen" VALUE="NodeIdRefresher.refreshAll(node)"/>
 <hook NAME="MapStyle" background="#2b2b2b">
     <conditional_styles>
         <conditional_style ACTIVE="false" STYLE_REF="?bg" LAST="false"/>
@@ -59,7 +58,7 @@ return CS.canApply(node, cs[1], cond)</script>
 <stylenode LOCALIZED_TEXT="styles.root_node" ID="ID_680156716" STYLE="oval" UNIFORM_SHAPE="true" VGAP_QUANTITY="24 pt">
 <font SIZE="24"/>
 <stylenode LOCALIZED_TEXT="styles.predefined" POSITION="right" STYLE="bubble">
-<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="20 px" FORMAT_AS_HYPERLINK="false" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" BACKGROUND_ALPHA="0" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="0 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#2b2b2b" BORDER_DASH_LIKE_EDGE="false" BORDER_DASH="SOLID" VGAP_QUANTITY="20 pt" CHILD_NODES_ALIGNMENT="AS_PARENT" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
+<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="20 px" FORMAT_AS_HYPERLINK="false" COLOR="#a9b7c6" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="0 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#2b2b2b" BORDER_DASH_LIKE_EDGE="false" BORDER_DASH="SOLID" VGAP_QUANTITY="20 pt" CHILD_NODES_ALIGNMENT="AS_PARENT" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
 <arrowlink SHAPE="CUBIC_CURVE" COLOR="#a89984" WIDTH="2" TRANSPARENCY="255" DASH="" FONT_SIZE="9" FONT_FAMILY="SansSerif" DESTINATION="ID_602083445" STARTINCLINATION="102.75 pt;0 pt;" ENDINCLINATION="102.75 pt;3 pt;" STARTARROW="NONE" ENDARROW="DEFAULT"/>
 <font NAME="Lato" SIZE="14" BOLD="false" STRIKETHROUGH="false" ITALIC="false"/>
 <edge STYLE="bezier" COLOR="#808080" WIDTH="4" DASH="SOLID"/>
@@ -145,6 +144,22 @@ ol {
 </stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.user-defined" POSITION="right" STYLE="bubble">
+<stylenode TEXT="Inbox" ID="ID_1628185139" ICON_SIZE="30 px">
+<icon BUILTIN="emoji-1F423"/>
+<font SIZE="18"/>
+</stylenode>
+<stylenode TEXT="Projects" ID="ID_851594446" ICON_SIZE="30 px">
+<icon BUILTIN="emoji-1F334"/>
+<font SIZE="18"/>
+</stylenode>
+<stylenode TEXT="Somday/maybe" ID="ID_590906336" ICON_SIZE="30 px">
+<icon BUILTIN="emoji-1F98B"/>
+<font SIZE="18"/>
+</stylenode>
+<stylenode TEXT="Archive" ID="ID_803838958" ICON_SIZE="30 px">
+<icon BUILTIN="emoji-1F342"/>
+<font SIZE="18"/>
+</stylenode>
 <stylenode TEXT="Next Action" ID="ID_914962296">
 <icon BUILTIN="emoji-1F426"/>
 </stylenode>
@@ -393,7 +408,7 @@ ol {
 <stylenode TEXT="MaterializedSymlink">
 <icon BUILTIN="emoji-2744"/>
 </stylenode>
-<stylenode TEXT="=Code" MAX_WIDTH="25 cm">
+<stylenode TEXT="=Code" ID="ID_1148084453" MAX_WIDTH="25 cm">
 <font NAME="JetBrains Mono" SIZE="11"/>
 </stylenode>
 <stylenode TEXT="JumpIn" ID="ID_202746744">
@@ -409,56 +424,197 @@ ol {
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,1" ID="ID_771207535" COLOR="#52d273" BACKGROUND_COLOR="#455448" BACKGROUND_ALPHA="64" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="8 pt" SHAPE_VERTICAL_MARGIN="5 pt" VGAP_QUANTITY="18 pt">
 <font SIZE="18"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #52d273
+    </p>
+  </body>
+</html>
+</richcontent>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,2" ID="ID_814211067" COLOR="#f9556b" BACKGROUND_COLOR="#574248" BACKGROUND_ALPHA="64" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="8 pt" SHAPE_VERTICAL_MARGIN="5 pt" VGAP_QUANTITY="16 pt">
 <font SIZE="16"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #f9556b
+    </p>
+  </body>
+</html>
+</richcontent>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,3" ID="ID_352058479" COLOR="#e5c453" BACKGROUND_COLOR="#59553f" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="14"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #e5c453
+    </p>
+  </body>
+</html>
+</richcontent>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,4" ID="ID_119767224" COLOR="#46bddf" BACKGROUND_COLOR="#435357" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="14"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #46bddf
+    </p>
+  </body>
+</html>
+</richcontent>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,5" ID="ID_294563152" COLOR="#d349a4" BACKGROUND_COLOR="#49434f" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="14"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #d349a4
+    </p>
+  </body>
+</html>
+</richcontent>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,6" ID="ID_1794312820" COLOR="#e57255" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #e57255
+    </p>
+  </body>
+</html>
+</richcontent>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,7" ID="ID_759282133" COLOR="#52d273" BACKGROUND_COLOR="#455448" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #52d273
+    </p>
+  </body>
+</html>
+</richcontent>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,8" ID="ID_94638384" COLOR="#f9556b" BACKGROUND_COLOR="#574248" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #f9556b
+    </p>
+  </body>
+</html>
+</richcontent>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,9" ID="ID_885575204" COLOR="#e5c453" BACKGROUND_COLOR="#59553f" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #e5c453
+    </p>
+  </body>
+</html>
+</richcontent>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,10" COLOR="#46bddf" BACKGROUND_COLOR="#435357" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #46bddf
+    </p>
+  </body>
+</html>
+</richcontent>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,11" ID="ID_703695337" COLOR="#d349a4" BACKGROUND_COLOR="#49434f" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #d349a4
+    </p>
+  </body>
+</html>
+</richcontent>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,12" COLOR="#e57255" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,12" ID="ID_417359754" COLOR="#e57255" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64" VGAP_QUANTITY="14 pt">
 <font SIZE="12"/>
+<richcontent CONTENT-TYPE="xml/" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #e57255
+    </p>
+  </body>
+</html>
+</richcontent>
 </stylenode>
 </stylenode>
 </stylenode>
 </map_styles>
 </hook>
+<hook NAME="accessories/plugins/AutomaticLayout.properties" VALUE="ALL"/>
 <node TEXT="GTD" POSITION="right" ID="ID_1176543057">
-<node TEXT="Inbox" POSITION="right" ID="ID_253550823" ICON_SIZE="30 px" CHILD_NODES_ALIGNMENT="BY_LAST_NODE">
-<icon BUILTIN="emoji-1F423"/>
-<font SIZE="18"/>
+<node TEXT="Inbox" STYLE_REF="Inbox" POSITION="right" ID="ID_253550823">
 <node TEXT="Next Action 1" STYLE_REF="Next Action" ID="ID_1267688390"/>
 <node TEXT="Next Action 2" STYLE_REF="Next Action Done" ID="ID_675320670"/>
 <node TEXT="Waiting For 1" STYLE_REF="Waiting For" ID="ID_1031159864"/>
 <node TEXT="Waiting For 2" STYLE_REF="Waiting For Done" ID="ID_751101877"/>
 </node>
-<node TEXT="Projects" POSITION="right" ID="ID_1355144522" ICON_SIZE="30 px" CHILD_NODES_ALIGNMENT="BY_FIRST_NODE">
-<icon BUILTIN="emoji-1F334"/>
-<font SIZE="18"/>
+<node TEXT="Projects" STYLE_REF="Projects" POSITION="right" ID="ID_1355144522">
 <node TEXT="Project 1" STYLE_REF="Project" ID="ID_1122066066">
 <node ID="ID_179614780" CONTENT_ID="ID_1267688390"/>
 <node ID="ID_1811605773" CONTENT_ID="ID_1031159864"/>
@@ -468,13 +624,17 @@ ol {
 <node ID="ID_936471557" CONTENT_ID="ID_751101877"/>
 </node>
 </node>
-<node TEXT="Somday/maybe" POSITION="left" ID="ID_1771227092" ICON_SIZE="30 px" CHILD_NODES_ALIGNMENT="BY_LAST_NODE">
-<icon BUILTIN="emoji-1F98B"/>
-<font SIZE="18"/>
+<node TEXT="Somday/maybe" STYLE_REF="Somday/maybe" POSITION="left" ID="ID_1771227092"/>
+<node TEXT="Archive" STYLE_REF="Archive" POSITION="left" ID="ID_1132191027"/>
 </node>
-<node TEXT="Archive" POSITION="left" ID="ID_1132191027" ICON_SIZE="30 px" CHILD_NODES_ALIGNMENT="BY_FIRST_NODE">
-<icon BUILTIN="emoji-1F342"/>
-<font SIZE="18"/>
+<node TEXT="+" POSITION="left" ID="ID_957212946">
+<node TEXT="ALS text color off" ID="ID_1915741710" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="123.75 pt"/>
+<attribute NAME="script1" VALUE="node.mindMap.root.style.styleNode.parent.children.drop(1).each {&#xa;    it.details = it.style.textColorCode&#xa;    it.style.textColor = null&#xa;}&#xa;menuUtils.executeMenuItems([&#xa;&apos;AutomaticLayoutControllerAction.null&apos;,&#xa;&apos;AutomaticLayoutControllerAction.ALL&apos;&#xa;])"/>
+</node>
+<node TEXT="ALS text color on" ID="ID_1544212826" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<attribute_layout NAME_WIDTH="34.5 pt" VALUE_WIDTH="121.5 pt"/>
+<attribute NAME="script1" VALUE="node.mindMap.root.style.styleNode.parent.children.drop(1).each {&#xa;    it.style.textColorCode = it.details.text&#xa;}&#xa;menuUtils.executeMenuItems([&#xa;&apos;AutomaticLayoutControllerAction.null&apos;,&#xa;&apos;AutomaticLayoutControllerAction.ALL&apos;&#xa;])"/>
 </node>
 </node>
 </node>
