@@ -757,132 +757,68 @@ ol {
 <attribute NAME="runMe" VALUE="menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node" OBJECT="java.net.URI|menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node"/>
 </node>
 </node>
-<node TEXT="+" POSITION="left" ID="ID_720535384"><richcontent TYPE="NOTE" CONTENT-TYPE="xml/">
+<node TEXT="+" POSITION="left" ID="ID_686574384"><richcontent TYPE="NOTE" CONTENT-TYPE="xml/">
 <html>
   <head>
     
   </head>
   <body>
-    <p>
-      import groovy.json.JsonSlurper
-    </p>
-    <p>
-      import groovy.json.JsonOutput
-    </p>
-    <p>
-      import org.freeplane.api.Node
-    </p>
-    <p>
-      import org.freeplane.core.util.MenuUtils
-    </p>
-    <p>
-      import org.freeplane.plugin.script.proxy.ScriptUtils
-    </p>
-    <p>
-      
-    </p>
-    <p>
-      class Styles {
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;static void eachALS(Closure closure) {
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;eachALS(closure, false)
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;}
-    </p>
-    <p>
-      
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;static void eachALS(Closure closure, boolean withRoot) {
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def als0 = ScriptUtils.node().mindMap.root.style.styleNode
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;//def als0 = als.children[0]
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def jsonStr = als0.note?.text
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def j = jsonStr ? new JsonSlurper().parseText(jsonStr) : [:]
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def als = als0.parent
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def children = withRoot ? als.children : als.children.drop(1)
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;children.each { n -&gt;
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def h = j.get(n.text, [:])
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;closure(n, h)
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;}
-    </p>
-    <p>
-      
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;als0.note = JsonOutput.prettyPrint(JsonOutput.toJson(j))
-    </p>
-    <p>
-      
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;MenuUtils.executeMenuItems([
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;'AutomaticLayoutControllerAction.null',
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;'AutomaticLayoutControllerAction.ALL'
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;])
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;}
-    </p>
-    <p>
-      }
-    </p>
+    <pre>import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+import org.freeplane.api.Node
+import org.freeplane.core.util.MenuUtils
+import org.freeplane.plugin.script.proxy.ScriptUtils
+
+class Styles {
+    static void eachALS(Closure closure) {
+        eachALS(closure, false)
+    }
+
+    static void eachALS(Closure closure, boolean withRoot) {
+        def als0 = ScriptUtils.node().mindMap.root.style.styleNode
+        //def als0 = als.children[0]
+        def jsonStr = als0.note?.text
+        def j = jsonStr ? new JsonSlurper().parseText(jsonStr) : [:]
+       
+        def als = als0.parent
+        def children = withRoot ? als.children : als.children.drop(1)
+        children.each { n -&gt;
+            def h = j.get(n.text, [:])
+            closure(n, h)
+        }
+
+        als0.note = JsonOutput.prettyPrint(JsonOutput.toJson(j))
+
+        MenuUtils.executeMenuItems([
+                'AutomaticLayoutControllerAction.null',
+                'AutomaticLayoutControllerAction.ALL'
+        ])
+    }
+}</pre>
   </body>
 </html>
 </richcontent>
-<node TEXT="ALS off" ID="ID_1150973169" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<node TEXT="ALS off" ID="ID_69599035" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute NAME="script1" VALUE="menuUtils.executeMenuItems([&apos;AutomaticLayoutControllerAction.null&apos;])"/>
 </node>
-<node TEXT="ALS on" ID="ID_1273700963" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<node TEXT="ALS on" ID="ID_261692170" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute NAME="script1" VALUE="menuUtils.executeMenuItems([&apos;AutomaticLayoutControllerAction.ALL&apos;])"/>
 </node>
-<node TEXT="ALS text color off" ID="ID_1129408520" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<node TEXT="ALS text color off" ID="ID_200422131" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="123.75 pt"/>
 <attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    if (n.style.isTextColorSet()) {&#xa;        h[&apos;textColor&apos;] = colorToRGBAString(n.style.textColor) //[0..6] + &apos;c0&apos;&#xa;        n.style.textColor = null&#xa;    }&#xa;}&#xa;"/>
 </node>
-<node TEXT="ALS text color on" ID="ID_718767722" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<node TEXT="ALS text color on" ID="ID_197571083" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute_layout NAME_WIDTH="34.5 pt" VALUE_WIDTH="121.5 pt"/>
 <attribute NAME="script1" VALUE="def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def tc = h[&apos;textColor&apos;]&#xa;    if (tc) {&#xa;        n.style.textColorCode = tc&#xa;    }&#xa;}"/>
 </node>
-<node TEXT="ALS font size off" ID="ID_1762413184" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<node TEXT="ALS font size off" ID="ID_1266522216" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    if (n.style.font.isSizeSet()) {&#xa;        h[&apos;fontSize&apos;] = n.style.font.size&#xa;        n.style.font.resetSize()&#xa;    }&#xa;}&#xa;"/>
 </node>
-<node TEXT="ALS font size on" ID="ID_1055321516" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<node TEXT="ALS font size on" ID="ID_179359070" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def fs = h[&apos;fontSize&apos;]&#xa;    if (fs) {&#xa;        n.style.font.size = fs&#xa;    }&#xa;}&#xa;"/>
 </node>
-<node TEXT="ALS bg color alpha set" ID="ID_1434480384" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<node TEXT="ALS bg color alpha set" ID="ID_1453019032" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="123.75 pt"/>
 <attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def c = colorToRGBAString(n.style.backgroundColor)[0..6] + &apos;40&apos;&#xa;    n.style.backgroundColorCode = c&#xa;}&#xa;"/>
 </node>

@@ -581,22 +581,23 @@ ol {
 </html>
 </richcontent>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,1" ID="ID_771207535" COLOR="#52d273" ALPHA="182" BACKGROUND_COLOR="#455448" BACKGROUND_ALPHA="64"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,2" ID="ID_814211067" COLOR="#f9556b" ALPHA="182" BACKGROUND_COLOR="#574248" BACKGROUND_ALPHA="64"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,3" ID="ID_352058479" COLOR="#e5c452" ALPHA="182" BACKGROUND_COLOR="#59553f" BACKGROUND_ALPHA="64"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,4" ID="ID_119767224" COLOR="#46bddf" ALPHA="182" BACKGROUND_COLOR="#435357" BACKGROUND_ALPHA="64"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,5" ID="ID_294563152" COLOR="#d349a4" ALPHA="182" BACKGROUND_COLOR="#49434f" BACKGROUND_ALPHA="64"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,6" ID="ID_1794312820" COLOR="#e57154" ALPHA="182" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,7" ID="ID_759282133" COLOR="#52d273" ALPHA="182" BACKGROUND_COLOR="#455448" BACKGROUND_ALPHA="64"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,8" ID="ID_94638384" COLOR="#f9556b" ALPHA="182" BACKGROUND_COLOR="#574248" BACKGROUND_ALPHA="64"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,9" ID="ID_885575204" COLOR="#e5c452" ALPHA="182" BACKGROUND_COLOR="#59553f" BACKGROUND_ALPHA="64"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,10" ID="ID_1798762136" COLOR="#46bddf" ALPHA="182" BACKGROUND_COLOR="#435357" BACKGROUND_ALPHA="64"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,11" ID="ID_703695337" COLOR="#d349a4" ALPHA="182" BACKGROUND_COLOR="#49434f" BACKGROUND_ALPHA="64"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,12" ID="ID_417359754" COLOR="#e57154" ALPHA="182" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,1" ID="ID_771207535" BACKGROUND_COLOR="#455448" BACKGROUND_ALPHA="64"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,2" ID="ID_814211067" BACKGROUND_COLOR="#574248" BACKGROUND_ALPHA="64"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,3" ID="ID_352058479" BACKGROUND_COLOR="#59553f" BACKGROUND_ALPHA="64"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,4" ID="ID_119767224" BACKGROUND_COLOR="#435357" BACKGROUND_ALPHA="64"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,5" ID="ID_294563152" BACKGROUND_COLOR="#49434f" BACKGROUND_ALPHA="64"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,6" ID="ID_1794312820" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,7" ID="ID_759282133" BACKGROUND_COLOR="#455448" BACKGROUND_ALPHA="64"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,8" ID="ID_94638384" BACKGROUND_COLOR="#574248" BACKGROUND_ALPHA="64"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,9" ID="ID_885575204" BACKGROUND_COLOR="#59553f" BACKGROUND_ALPHA="64"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,10" ID="ID_1798762136" BACKGROUND_COLOR="#435357" BACKGROUND_ALPHA="64"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,11" ID="ID_703695337" BACKGROUND_COLOR="#49434f" BACKGROUND_ALPHA="64"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,12" ID="ID_417359754" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64"/>
 </stylenode>
 </stylenode>
 </map_styles>
 </hook>
+<hook NAME="accessories/plugins/AutomaticLayout.properties" VALUE="ALL"/>
 <node TEXT="GTD" POSITION="right" ID="ID_1176543057">
 <node TEXT="Inbox" STYLE_REF="Inbox" POSITION="right" ID="ID_253550823">
 <node TEXT="Next Action 1" STYLE_REF="Next Action" ID="ID_1267688390"/>
@@ -623,104 +624,42 @@ ol {
     
   </head>
   <body>
-    <p>
-      import groovy.json.JsonSlurper
-    </p>
-    <p>
-      import groovy.json.JsonOutput
-    </p>
-    <p>
-      import org.freeplane.api.Node
-    </p>
-    <p>
-      import org.freeplane.core.util.MenuUtils
-    </p>
-    <p>
-      import org.freeplane.plugin.script.proxy.ScriptUtils
-    </p>
-    <p>
-      
-    </p>
-    <p>
-      class Styles {
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;static void eachALS(Closure closure) {
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;eachALS(closure, false)
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;}
-    </p>
-    <p>
-      
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;static void eachALS(Closure closure, boolean withRoot) {
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def als0 = ScriptUtils.node().mindMap.root.style.styleNode
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;//def als0 = als.children[0]
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def jsonStr = als0.note?.text
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def j = jsonStr ? new JsonSlurper().parseText(jsonStr) : [:]
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def als = als0.parent
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def children = withRoot ? als.children : als.children.drop(1)
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;children.each { n -&gt;
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def h = j.get(n.text, [:])
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;closure(n, h)
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;}
-    </p>
-    <p>
-      
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;als0.note = JsonOutput.prettyPrint(JsonOutput.toJson(j))
-    </p>
-    <p>
-      
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;MenuUtils.executeMenuItems([
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;'AutomaticLayoutControllerAction.null',
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;'AutomaticLayoutControllerAction.ALL'
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;])
-    </p>
-    <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;}
-    </p>
-    <p>
-      }
-    </p>
+    <pre>import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+import org.freeplane.api.Node
+import org.freeplane.core.util.MenuUtils
+import org.freeplane.plugin.script.proxy.ScriptUtils
+
+class Styles {
+    static void eachALS(Closure closure) {
+        eachALS(closure, false)
+    }
+
+    static void eachALS(Closure closure, boolean withRoot) {
+        def als0 = ScriptUtils.node().mindMap.root.style.styleNode
+        //def als0 = als.children[0]
+        def jsonStr = als0.note?.text
+        def j = jsonStr ? new JsonSlurper().parseText(jsonStr) : [:]
+       
+        def als = als0.parent
+        def children = withRoot ? als.children : als.children.drop(1)
+        children.each { n -&gt;
+            def h = j.get(n.text, [:])
+            closure(n, h)
+        }
+
+        als0.note = JsonOutput.prettyPrint(JsonOutput.toJson(j))
+
+        MenuUtils.executeMenuItems([
+                'AutomaticLayoutControllerAction.null',
+                'AutomaticLayoutControllerAction.ALL'
+        ])
+    }
+}
+    </pre>
   </body>
-</html></richcontent>
+</html>
+</richcontent>
 <node TEXT="ALS off" ID="ID_1150973169" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute NAME="script1" VALUE="menuUtils.executeMenuItems([&apos;AutomaticLayoutControllerAction.null&apos;])"/>
 </node>
