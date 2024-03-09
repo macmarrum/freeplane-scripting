@@ -785,10 +785,10 @@ ol {
       class Styles {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;static void eachALS(Node als, Closure closure) {
+      &#xa0;&#xa0;&#xa0;&#xa0;static void eachALS(Closure closure) {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;eachALS(als, closure, false)
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;eachALS(closure, false)
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;}
@@ -797,13 +797,13 @@ ol {
       
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;static void eachALS(Node als, Closure closure, boolean withRoot) {
+      &#xa0;&#xa0;&#xa0;&#xa0;static void eachALS(Closure closure, boolean withRoot) {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;//def als0 = ScriptUtils.node().mindMap.root.style.styleNode
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def als0 = ScriptUtils.node().mindMap.root.style.styleNode
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def als0 = als.children[0]
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;//def als0 = als.children[0]
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def jsonStr = als0.note?.text
@@ -813,6 +813,9 @@ ol {
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def als = als0.parent
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;def children = withRoot ? als.children : als.children.drop(1)
@@ -857,7 +860,8 @@ ol {
       }
     </p>
   </body>
-</html></richcontent>
+</html>
+</richcontent>
 <node TEXT="ALS off" ID="ID_1150973169" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute NAME="script1" VALUE="menuUtils.executeMenuItems([&apos;AutomaticLayoutControllerAction.null&apos;])"/>
 </node>
@@ -866,21 +870,21 @@ ol {
 </node>
 <node TEXT="ALS text color off" ID="ID_1129408520" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="123.75 pt"/>
-<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;def als = mindMap.root.style.styleNode.parent&#xa;Styles.eachALS(als) { n, h -&gt;&#xa;    if (n.style.isTextColorSet()) {&#xa;        h[&apos;textColor&apos;] = colorToRGBAString(n.style.textColor) //[0..6] + &apos;c0&apos;&#xa;        n.style.textColor = null&#xa;    }&#xa;}&#xa;"/>
+<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    if (n.style.isTextColorSet()) {&#xa;        h[&apos;textColor&apos;] = colorToRGBAString(n.style.textColor) //[0..6] + &apos;c0&apos;&#xa;        n.style.textColor = null&#xa;    }&#xa;}&#xa;"/>
 </node>
 <node TEXT="ALS text color on" ID="ID_718767722" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute_layout NAME_WIDTH="34.5 pt" VALUE_WIDTH="121.5 pt"/>
-<attribute NAME="script1" VALUE="def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;def als = mindMap.root.style.styleNode.parent&#xa;Styles.eachALS(als) { n, h -&gt;&#xa;    def tc = h[&apos;textColor&apos;]&#xa;    if (tc) {&#xa;        n.style.textColorCode = tc&#xa;    }&#xa;}"/>
+<attribute NAME="script1" VALUE="def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def tc = h[&apos;textColor&apos;]&#xa;    if (tc) {&#xa;        n.style.textColorCode = tc&#xa;    }&#xa;}"/>
 </node>
 <node TEXT="ALS font size off" ID="ID_1762413184" LINK="menuitem:_ExecuteScriptForSelectionAction">
-<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;def als = mindMap.root.style.styleNode.parent&#xa;Styles.eachALS(als) { n, h -&gt;&#xa;    if (n.style.font.isSizeSet()) {&#xa;        h[&apos;fontSize&apos;] = n.style.font.size&#xa;        n.style.font.resetSize()&#xa;    }&#xa;}&#xa;"/>
+<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    if (n.style.font.isSizeSet()) {&#xa;        h[&apos;fontSize&apos;] = n.style.font.size&#xa;        n.style.font.resetSize()&#xa;    }&#xa;}&#xa;"/>
 </node>
 <node TEXT="ALS font size on" ID="ID_1055321516" LINK="menuitem:_ExecuteScriptForSelectionAction">
-<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;def als = mindMap.root.style.styleNode.parent&#xa;Styles.eachALS(als) { n, h -&gt;&#xa;    def fs = h[&apos;fontSize&apos;]&#xa;    if (fs) {&#xa;        n.style.font.size = fs&#xa;    }&#xa;}&#xa;"/>
+<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def fs = h[&apos;fontSize&apos;]&#xa;    if (fs) {&#xa;        n.style.font.size = fs&#xa;    }&#xa;}&#xa;"/>
 </node>
 <node TEXT="ALS bg color alpha set" ID="ID_1434480384" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="123.75 pt"/>
-<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;def als = mindMap.root.style.styleNode.parent&#xa;Styles.eachALS(als) { n, h -&gt;&#xa;    def c = colorToRGBAString(n.style.backgroundColor)[0..6] + &apos;40&apos;&#xa;    n.style.backgroundColorCode = c&#xa;}&#xa;"/>
+<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def c = colorToRGBAString(n.style.backgroundColor)[0..6] + &apos;40&apos;&#xa;    n.style.backgroundColorCode = c&#xa;}&#xa;"/>
 </node>
 </node>
 </node>
