@@ -56,6 +56,16 @@ class X {
         }
     }
 
+    static String getUserDefStyleIfExistsOrFallback(String userDefStyle, String fallbackStyle) {
+        try {
+            if (userDefStyle in ScriptUtils.node().mindMap.userDefinedStylesNames)
+                return userDefStyle
+        } catch (MissingPropertyException ignored) {
+            // userDefinedStylesNames exists since 1.11.8
+        }
+        return fallbackStyle
+    }
+
     static void setStyleAndTimestampInAttribute(String name, NodeRO node = null, ZonedDateTime zonedDateTime = null) {
         node ?= ScriptUtils.node()
         if (!node[name]) {
