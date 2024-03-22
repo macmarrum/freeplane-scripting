@@ -12,6 +12,7 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
 import org.freeplane.view.swing.map.MapViewController
 
 import javax.swing.JOptionPane
+import java.nio.charset.StandardCharsets
 
 def c = ScriptUtils.c()
 def node = ScriptUtils.node()
@@ -23,7 +24,8 @@ if (!targetNode) { // not the case of same-map target node or a full node URI is
         def nodeAndMapReference = new NodeAndMapReference(linkText)
         if (nodeAndMapReference.hasFreeplaneFileExtension() && nodeAndMapReference.hasNodeReference()) {
             def thisFile = node.mindMap.file
-            def targetFile = new File(nodeAndMapReference.mapReference)
+            def mapReferenceDecoded = URLDecoder.decode(nodeAndMapReference.mapReference, StandardCharsets.UTF_8.name())
+            def targetFile = new File(mapReferenceDecoded)
             if (!targetFile.absolute) {
                 if (!thisFile) {
                     MenuUtils.executeMenuItems(['SaveAsAction'])
@@ -31,11 +33,13 @@ if (!targetNode) { // not the case of same-map target node or a full node URI is
                     if (!thisFile) // Save-As action was aborted
                         return
                 }
-                targetFile = new File(thisFile.parent, nodeAndMapReference.mapReference)
+                targetFile = new File(thisFile.parent, mapReferenceDecoded)
             }
             if (thisFile?.canonicalFile <=> targetFile.canonicalFile) {
                 // a different map - simply follow the link
                 c.statusInfo = "${this.class.simpleName}:  $linkText (following it) "
+                println("thisFile:   $thisFile.canonicalFile")
+                println("targetFile: $targetFile.canonicalFile")
                 MenuUtils.executeMenuItems(['FollowLinkAction'])
                 return
             } else {
