@@ -35,7 +35,9 @@ def transfer(data: bytes) -> str:
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
+    argc = len(sys.argv)
+    if argc > 1:
+        assert argc == 2, f"Got ${argc - 1} arguments - expected 1"
         data = sys.argv[1].encode(encoding)
     else:
         data = sys.stdin.read()
