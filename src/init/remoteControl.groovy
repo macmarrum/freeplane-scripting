@@ -1,6 +1,6 @@
 /*
 remoteControl.groovy - a Freeplane remote-control server
-Copyright (C) 2023  macmarrum
+Copyright (C) 2023, 2024  macmarrum
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
  * Set SHOULD_PRINT_SCRIPT to 1 to see in Freeplane console the script being executed;
  *     keep in mind to start Freeplane with a visible console, e.g. with freeplaneConsole.exe
  */
-final ADDRESS = System.getenv('FREEPLANE_REMOTE_CONTROL_ADDRESS') ?: '127.0.0.1'
-final PORT = System.getenv('FREEPLANE_REMOTE_CONTROL_PORT') as Integer ?: 48112
-final SHOULD_PRINT_SCRIPT = System.getenv('FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT') == '1'
+final ADDRESS = System.env.FREEPLANE_REMOTE_CONTROL_ADDRESS ?: '127.0.0.1'
+final PORT = System.env.FREEPLANE_REMOTE_CONTROL_PORT as Integer ?: 48112
+final FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT = System.env.FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT
 
 final SCRIPT_HEADER = '''\
 def __remoteControlReminderNode = node
@@ -43,10 +43,12 @@ final REMINDER_PERIOD = 999
 final SCHEDULED = 'SCHEDULED'
 final ERROR = 'ERROR'
 
-new Thread(() -> {
+final ENCODING = 'UTF-8'
+
+new Thread({
     def server = new ServerSocket()
     server.bind(new InetSocketAddress(ADDRESS, PORT), 1)
-    LogUtils.info("Freeplane Remote Control started on ${server.inetAddress.hostAddress}:${server.localPort}")
+    LogUtils.info("Freeplane Remote Control started on ${server.inetAddress.hostAddress}:${server.localPort} with FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT: $FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT")
 
     while (true) {
         server.accept(false) { socket ->
@@ -55,18 +57,14 @@ new Thread(() -> {
                 // Avoid using the Groovy readLine(), as it closes input
                 // and, apparently because of that,
                 // output cannot be written back to socket
-                def br = new BufferedReader(new InputStreamReader(input))
                 def sb = new StringBuilder(SCRIPT_HEADER)
-                String line
-                while ((line = br.readLine()) !== null) {
-                    sb << line << '\n'
-                }
+                input.withReader(ENCODING) { sb << it.text << '\n' }
                 sb << SCRIPT_FOOTER
                 def script = sb.toString()
-                if (SHOULD_PRINT_SCRIPT)
+                if (FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT == '1')
                     print(script)
                 if (!ScriptUtils.c().openMindMaps) {
-                    output.withWriter { it.write('ERROR: no mind map is open')}
+                    output.withWriter(ENCODING) { it.write('ERROR: no mind map is open') }
                     LogUtils.warn('Freeplane Remote Control - no mind map is open')
                 } else {
                     try {
@@ -75,9 +73,7 @@ new Thread(() -> {
                         def remindAt = new Date(Calendar.instance.timeInMillis + REMINDER_AFTER_MILLIS)
                         reminder.createOrReplace(remindAt, REMINDER_PERIOD_UNIT, REMINDER_PERIOD)
                         reminder.script = script
-                        output.withWriter {
-                            it << SCHEDULED
-                        }
+                        output.withWriter {it << SCHEDULED }
                     } catch (Exception e) {
                         output.withPrintWriter {
                             it.println(ERROR)
