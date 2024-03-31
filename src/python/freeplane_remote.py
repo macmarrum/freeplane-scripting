@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # freeplane_remote.py - a client for Freeplane remoteControl.groovy server
-# Copyright (C) 2023  macmarrum
+# Copyright (C) 2023, 2024  macmarrum
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,23 +23,20 @@ port = int(port) if (port := os.environ.get('FREEPLANE_REMOTE_CONTROL_PORT')) el
 encoding = 'UTF-8'
 
 
-def transfer(text: str) -> str:
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((address, port))
-    s.sendall(text.encode(encoding))
-    s.shutdown(socket.SHUT_WR)
-    response = []
-    response_chunk = b'x'
-    while response_chunk:
-        response_chunk = s.recv(1024)
-        response.append(response_chunk.decode(encoding))
-    s.close()
-    return ''.join(response)
+def transfer(data: bytes) -> str:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((address, port))
+        s.sendall(data)
+        s.shutdown(socket.SHUT_WR)
+        response: list[str] = []
+        while response_chunk := s.recv(1024):
+            response.append(response_chunk.decode(encoding))
+        return ''.join(response)
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
-        data = sys.argv[1]
+        data = sys.argv[1].encode(encoding)
     else:
         data = sys.stdin.read()
     print(transfer(data))
