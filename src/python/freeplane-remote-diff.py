@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Copyright (C) 2023  macmarrum
+# Copyright (C) 2023, 2024  macmarrum
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,28 +35,37 @@ port = int(port) if (port := os.environ.get('FREEPLANE_REMOTE_CONTROL_PORT')) el
 encoding = 'UTF-8'
 
 
-def transfer(text: str) -> str:
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((address, port))
-    s.sendall(text.encode(encoding))
-    s.shutdown(socket.SHUT_WR)
-    response = []
-    response_chunk = b'x'
-    while response_chunk:
-        response_chunk = s.recv(1024)
-        response.append(response_chunk.decode(encoding))
-    s.close()
-    return ''.join(response)
+def transfer(data: bytes) -> str:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((address, port))
+        s.sendall(data)
+        s.shutdown(socket.SHUT_WR)
+        response: list[str] = []
+        while response_chunk := s.recv(1024):
+            response.append(response_chunk.decode(encoding))
+        return ''.join(response)
 
 
-oldMindmap = Path(sys.argv[1]).absolute()
-newMindmap = Path(sys.argv[2]).absolute()
+def quote_path(path: Union[str, Path]) -> str:
+    path = str(path)
+    if '/' not in path:
+        return '/' + path + '/'
+    if '$/' not in path and '/$' not in path:
+        return '$/' + path + '/$'
+    for qt in ["'", '"', "'''", '"""']:
+        if qt not in path:
+            return qt + path.replace('\\', '\\\\') + qt
+    raise ValueError(f"unable to quote path `{path}`")
+
+
+oldMindmap = quote_path(Path(sys.argv[1]).absolute())
+newMindmap = quote_path(Path(sys.argv[2]).absolute())
 
 groovy_script = f"""
 import io.github.macmarrum.freeplane.MindMapComparator
-MindMapComparator.compareFiles($/{oldMindmap}/$, $/{newMindmap}/$)
+MindMapComparator.compareFiles({oldMindmap}, {newMindmap})
 """
-result = transfer(groovy_script)
+result = transfer(groovy_script.encode(encoding))
 print(result)
 if not result.startswith('ERROR'):
     sleep(30)  # to allow Freeplane to read the files and create a diff mind map before git deletes the temporary files
