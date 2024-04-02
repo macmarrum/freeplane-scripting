@@ -1,6 +1,6 @@
 <map version="freeplane 1.9.13">
 <!--To view this file, download free mind mapping software Freeplane from https://www.freeplane.org -->
-<node TEXT="macmarrum-dark" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1939172785" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES" VGAP_QUANTITY="20 pt" CHILD_NODES_ALIGNMENT="BY_FIRST_NODE"><hook NAME="MapStyle" background="#2b2b2b">
+<node TEXT="macmarrum-dark" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1939172785" VGAP_QUANTITY="20 pt" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES" CHILD_NODES_ALIGNMENT="BY_FIRST_NODE"><hook NAME="MapStyle" background="#2b2b2b">
     <conditional_styles>
         <conditional_style ACTIVE="false" STYLE_REF="?transBg" LAST="false"/>
         <conditional_style ACTIVE="true" STYLE_REF="?bigChildGap" LAST="false">
@@ -54,11 +54,21 @@ return CS.canApply(node, cs[1], cond)</script>
 <stylenode LOCALIZED_TEXT="styles.root_node" ID="ID_680156716" STYLE="oval" UNIFORM_SHAPE="true" VGAP_QUANTITY="24 pt">
 <font SIZE="24"/>
 <stylenode LOCALIZED_TEXT="styles.predefined" POSITION="right" STYLE="bubble">
-<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="16 px" FORMAT_AS_HYPERLINK="false" COLOR="#a9b7c6" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="0 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="64" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" CHILD_NODES_ALIGNMENT="AS_PARENT" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
-<arrowlink SHAPE="CUBIC_CURVE" COLOR="#a89984" WIDTH="2" TRANSPARENCY="255" DASH="" FONT_SIZE="9" FONT_FAMILY="SansSerif" DESTINATION="ID_602083445" STARTINCLINATION="102.78261 pt;0 pt;" ENDINCLINATION="102.78261 pt;3.13043 pt;" STARTARROW="NONE" ENDARROW="DEFAULT"/>
+<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="16 px" FORMAT_AS_HYPERLINK="false" COLOR="#cccccc" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="0 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="128" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" CHILD_NODES_ALIGNMENT="AS_PARENT" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
+<arrowlink SHAPE="CUBIC_CURVE" COLOR="#a89984" WIDTH="2" TRANSPARENCY="255" DASH="" FONT_SIZE="9" FONT_FAMILY="SansSerif" DESTINATION="ID_602083445" STARTINCLINATION="102.77419 pt;0 pt;" ENDINCLINATION="102.77419 pt;2.90323 pt;" STARTARROW="NONE" ENDARROW="DEFAULT"/>
 <font NAME="Lato" SIZE="12" BOLD="false" STRIKETHROUGH="false" ITALIC="false"/>
 <edge COLOR="#808080"/>
-<richcontent CONTENT-TYPE="plain/auto" TYPE="DETAILS"/>
+<richcontent CONTENT-TYPE="xml/auto" TYPE="DETAILS">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      #a9b7c6ff
+    </p>
+  </body>
+</html></richcontent>
 <richcontent TYPE="NOTE" CONTENT-TYPE="plain/auto"/>
 <hook NAME="NodeConditionalStyles">
     <conditional_style ACTIVE="true" LOCALIZED_STYLE_REF="default" LAST="false">
@@ -385,6 +395,11 @@ ol {
 <stylenode TEXT="=Seamless" ID="ID_218573881" BACKGROUND_COLOR="#2b2b2b" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0">
 <arrowlink DESTINATION="ID_218573881"/>
 </stylenode>
+<stylenode TEXT="JumpIn" ID="ID_581918860">
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" LAST="false"/>
+</hook>
+</stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="right" STYLE="bubble">
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level.root" ID="ID_1659178249" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="10 pt" VGAP_QUANTITY="20 pt">
@@ -402,10 +417,16 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 1&quot;: {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#52d273c0&quot;,
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#52d273b6&quot;,
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 18
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 18,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2d3830&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2d3830ff&quot;
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;},
@@ -414,10 +435,16 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 2&quot;: {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#f9556bc0&quot;,
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#f9556bb6&quot;,
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 16
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 16,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3e2b2d&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3e2b2dff&quot;
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;},
@@ -426,10 +453,16 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 3&quot;: {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e5c453c0&quot;,
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e5c452b6&quot;,
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 14
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 14,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3c382b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3c382bff&quot;
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;},
@@ -438,10 +471,16 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 4&quot;: {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#46bddfc0&quot;,
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#46bddfb6&quot;,
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 14
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 14,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2b363a&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2b363aff&quot;
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;},
@@ -450,10 +489,16 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 5&quot;: {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#d349a4c0&quot;,
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#d349a4b6&quot;,
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 14
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 14,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#372c33&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#372c33ff&quot;
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;},
@@ -462,10 +507,16 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 6&quot;: {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e57255c0&quot;,
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e57154b6&quot;,
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3d2f2b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3d2f2bff&quot;
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;},
@@ -474,10 +525,16 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 7&quot;: {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#52d273c0&quot;,
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#52d273b6&quot;,
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2d3830&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2d3830ff&quot;
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;},
@@ -486,10 +543,16 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 8&quot;: {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#f9556bc0&quot;,
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#f9556bb6&quot;,
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3e2b2d&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3e2b2dff&quot;
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;},
@@ -498,10 +561,16 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 9&quot;: {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e5c453c0&quot;,
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e5c452b6&quot;,
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3c382b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3c382bff&quot;
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;},
@@ -510,10 +579,16 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 10&quot;: {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#46bddfc0&quot;,
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#46bddfb6&quot;,
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2b363a&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2b363aff&quot;
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;},
@@ -522,10 +597,16 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 11&quot;: {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#d349a4c0&quot;,
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#d349a4b6&quot;,
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#372c33&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#372c33ff&quot;
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;},
@@ -534,10 +615,16 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 12&quot;: {
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e57255c0&quot;,
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e57154b6&quot;,
     </p>
     <p>
-      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3d2f2b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3d2f2bff&quot;
     </p>
     <p>
       &#xa0;&#xa0;&#xa0;&#xa0;}
@@ -546,30 +633,31 @@ ol {
       }
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,1" ID="ID_771207535" COLOR="#52d273" ALPHA="192" BACKGROUND_COLOR="#455448" BACKGROUND_ALPHA="64" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,2" ID="ID_814211067" COLOR="#f9556b" ALPHA="192" BACKGROUND_COLOR="#574248" BACKGROUND_ALPHA="64" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,3" ID="ID_352058479" COLOR="#e5c453" ALPHA="192" BACKGROUND_COLOR="#59553f" BACKGROUND_ALPHA="64" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,4" ID="ID_119767224" COLOR="#46bddf" ALPHA="192" BACKGROUND_COLOR="#435357" BACKGROUND_ALPHA="64" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,5" ID="ID_294563152" COLOR="#d349a4" ALPHA="192" BACKGROUND_COLOR="#49434f" BACKGROUND_ALPHA="64" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,6" ID="ID_1794312820" COLOR="#e57255" ALPHA="192" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,7" ID="ID_759282133" COLOR="#52d273" ALPHA="192" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,8" ID="ID_94638384" COLOR="#f9556b" ALPHA="192" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,9" ID="ID_885575204" COLOR="#e5c453" ALPHA="192" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,10" ID="ID_1580706732" COLOR="#46bddf" ALPHA="192" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,11" ID="ID_703695337" COLOR="#d349a4" ALPHA="192" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,12" ID="ID_1764911274" COLOR="#e57255" ALPHA="192" BACKGROUND_COLOR="#3d3d3d" BACKGROUND_ALPHA="64" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,1" ID="ID_771207535" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#52d273" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,2" ID="ID_814211067" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#f9556b" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,3" ID="ID_352058479" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e5c452" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,4" ID="ID_119767224" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#46bddf" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,5" ID="ID_294563152" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#d349a4" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,6" ID="ID_1794312820" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e57154" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,7" ID="ID_759282133" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#52d273" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,8" ID="ID_94638384" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#f9556b" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,9" ID="ID_885575204" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e5c452" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,10" ID="ID_1580706732" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#46bddf" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,11" ID="ID_703695337" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#d349a4" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,12" ID="ID_1764911274" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e57154" BORDER_COLOR_ALPHA="182"/>
 </stylenode>
 </stylenode>
 </map_styles>
 </hook>
 <attribute_layout VALUE_WIDTH="107.47826 pt"/>
 <attribute NAME="scriptOnMapOpen" VALUE="if (!node.mindMap.file) NodeIdRefresher.refreshAll(node)&#xa;// i.e. only for mind maps created from the template"/>
+<hook NAME="accessories/plugins/AutomaticLayout.properties" VALUE="ALL"/>
+<hook NAME="AutomaticEdgeColor" COUNTER="0" RULE="FOR_LEVELS"/>
 <node TEXT="Showcase" FOLDED="true" POSITION="left" ID="ID_1068881056">
 <node TEXT="1" OBJECT="java.lang.Long|1" ID="ID_1176543057">
-<node TEXT="2" OBJECT="java.lang.Long|2" STYLE_REF="Projects" POSITION="right" ID="ID_1355144522">
+<node TEXT="2" OBJECT="java.lang.Long|2" STYLE_REF="Projects" ID="ID_1355144522">
 <node TEXT="3" OBJECT="java.lang.Long|3" STYLE_REF="Project" ID="ID_1122066066">
 <node TEXT="4" OBJECT="java.lang.Long|4" STYLE_REF="Next Action" ID="ID_179614780">
 <node TEXT="5" OBJECT="java.lang.Long|5" ID="ID_1453584683">
@@ -757,7 +845,7 @@ ol {
 <attribute NAME="runMe" VALUE="menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node" OBJECT="java.net.URI|menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node"/>
 </node>
 </node>
-<node TEXT="+" POSITION="left" ID="ID_686574384"><richcontent TYPE="NOTE" CONTENT-TYPE="xml/">
+<node TEXT="+" FOLDED="true" POSITION="left" ID="ID_686574384"><richcontent TYPE="NOTE" CONTENT-TYPE="xml/">
 <html>
   <head>
     
@@ -796,8 +884,10 @@ class Styles {
     }
 }</pre>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
+<node TEXT="" ID="ID_433164527">
+<hook NAME="FirstGroupNode"/>
+</node>
 <node TEXT="ALS off" ID="ID_69599035" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute NAME="script1" VALUE="menuUtils.executeMenuItems([&apos;AutomaticLayoutControllerAction.null&apos;])"/>
 </node>
@@ -806,21 +896,132 @@ class Styles {
 </node>
 <node TEXT="ALS text color off" ID="ID_200422131" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="123.75 pt"/>
-<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    if (n.style.isTextColorSet()) {&#xa;        h[&apos;textColor&apos;] = colorToRGBAString(n.style.textColor) //[0..6] + &apos;c0&apos;&#xa;        n.style.textColor = null&#xa;    }&#xa;}&#xa;"/>
+<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def script = htmlUtils.htmlToPlain(parent.noteText, true, false)&#xa;def Styles = new GroovyClassLoader().parseClass(script)&#xa;Styles.eachALS { n, h -&gt;&#xa;    if (n.style.isTextColorSet()) {&#xa;        h[&apos;textColor&apos;] = colorToRGBAString(n.style.textColor) //[0..6] + &apos;c0&apos;&#xa;        n.style.textColor = null&#xa;    }&#xa;}&#xa;"/>
 </node>
 <node TEXT="ALS text color on" ID="ID_197571083" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute_layout NAME_WIDTH="34.5 pt" VALUE_WIDTH="121.5 pt"/>
-<attribute NAME="script1" VALUE="def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def tc = h[&apos;textColor&apos;]&#xa;    if (tc) {&#xa;        n.style.textColorCode = tc&#xa;    }&#xa;}"/>
+<attribute NAME="script1" VALUE="def script = htmlUtils.htmlToPlain(parent.noteText, true, false)&#xa;def Styles = new GroovyClassLoader().parseClass(script)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def tc = h[&apos;textColor&apos;]&#xa;    if (tc) {&#xa;        n.style.textColorCode = tc&#xa;    }&#xa;}"/>
 </node>
 <node TEXT="ALS font size off" ID="ID_1266522216" LINK="menuitem:_ExecuteScriptForSelectionAction">
-<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    if (n.style.font.isSizeSet()) {&#xa;        h[&apos;fontSize&apos;] = n.style.font.size&#xa;        n.style.font.resetSize()&#xa;    }&#xa;}&#xa;"/>
+<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def script = htmlUtils.htmlToPlain(parent.noteText, true, false)&#xa;def Styles = new GroovyClassLoader().parseClass(script)&#xa;Styles.eachALS { n, h -&gt;&#xa;    if (n.style.font.isSizeSet()) {&#xa;        h[&apos;fontSize&apos;] = n.style.font.size&#xa;        n.style.font.resetSize()&#xa;    }&#xa;}&#xa;"/>
 </node>
 <node TEXT="ALS font size on" ID="ID_179359070" LINK="menuitem:_ExecuteScriptForSelectionAction">
-<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def fs = h[&apos;fontSize&apos;]&#xa;    if (fs) {&#xa;        n.style.font.size = fs&#xa;    }&#xa;}&#xa;"/>
+<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def script = htmlUtils.htmlToPlain(parent.noteText, true, false)&#xa;def Styles = new GroovyClassLoader().parseClass(script)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def fs = h[&apos;fontSize&apos;]&#xa;    if (fs) {&#xa;        n.style.font.size = fs&#xa;    }&#xa;}&#xa;"/>
+</node>
+<node TEXT="ALS border color off" ID="ID_1935280726" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="123.75 pt"/>
+<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def script = htmlUtils.htmlToPlain(parent.noteText, true, false)&#xa;def Styles = new GroovyClassLoader().parseClass(script)&#xa;Styles.eachALS { n, h -&gt;&#xa;    if (n.style.border.isColorSet()) {&#xa;        h[&apos;borderColor&apos;] = colorToRGBAString(n.style.border.color) //[0..6] + &apos;c0&apos;&#xa;        n.style.border.color = null&#xa;    }&#xa;}&#xa;"/>
+</node>
+<node TEXT="ALS border color on" ID="ID_562820212" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<attribute_layout NAME_WIDTH="34.5 pt" VALUE_WIDTH="121.5 pt"/>
+<attribute NAME="script1" VALUE="def script = htmlUtils.htmlToPlain(parent.noteText, true, false)&#xa;def Styles = new GroovyClassLoader().parseClass(script)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def c = h[&apos;borderColor&apos;]&#xa;    if (c) {&#xa;        n.style.border.colorCode = c&#xa;    }&#xa;}"/>
+</node>
+<node TEXT="ALS border color transparent" ID="ID_1568973441" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<attribute_layout NAME_WIDTH="34.5 pt" VALUE_WIDTH="121.5 pt"/>
+<attribute NAME="script1" VALUE="def script = htmlUtils.htmlToPlain(parent.noteText, true, false)&#xa;def Styles = new GroovyClassLoader().parseClass(script)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def c = h[&apos;borderColor&apos;]&#xa;    if (c) {&#xa;        n.style.border.colorCode = c[0..6] + &apos;00&apos;&#xa;    }&#xa;}"/>
+</node>
+<node TEXT="ALS background color off" ID="ID_1074159512" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="123.75 pt"/>
+<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def script = htmlUtils.htmlToPlain(parent.noteText, true, false)&#xa;def Styles = new GroovyClassLoader().parseClass(script)&#xa;Styles.eachALS { n, h -&gt;&#xa;    if (n.style.isBackgroundColorSet()) {&#xa;        h[&apos;backgroundColor&apos;] = colorToRGBAString(n.style.backgroundColor) //[0..6] + &apos;c0&apos;&#xa;        n.style.backgroundColor = null&#xa;    }&#xa;}&#xa;"/>
+</node>
+<node TEXT="ALS backgorund color on" ID="ID_1975190231" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<attribute_layout NAME_WIDTH="34.5 pt" VALUE_WIDTH="121.5 pt"/>
+<attribute NAME="script1" VALUE="def script = htmlUtils.htmlToPlain(parent.noteText, true, false)&#xa;def Styles = new GroovyClassLoader().parseClass(script)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def bc = h[&apos;backgroundColor&apos;]&#xa;    if (bc) {&#xa;        n.style.backgroundColorCode = bc&#xa;    }&#xa;}"/>
+</node>
+<node TEXT="ALS restore blended background color" ID="ID_1837870854" LINK="menuitem:_ExecuteScriptForSelectionAction">
+<attribute_layout NAME_WIDTH="34.5 pt" VALUE_WIDTH="121.5 pt"/>
+<attribute NAME="script1" VALUE="def script = htmlUtils.htmlToPlain(parent.noteText, true, false)&#xa;def Styles = new GroovyClassLoader().parseClass(script)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def bc = h[&apos;backgroundColorBlended&apos;]&#xa;    if (bc) {&#xa;        n.style.backgroundColorCode = bc&#xa;    }&#xa;}"/>
 </node>
 <node TEXT="ALS bg color alpha set" ID="ID_1453019032" LINK="menuitem:_ExecuteScriptForSelectionAction">
 <attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="123.75 pt"/>
-<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def Styles = new GroovyClassLoader().parseClass(parent.note.text)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def c = colorToRGBAString(n.style.backgroundColor)[0..6] + &apos;40&apos;&#xa;    n.style.backgroundColorCode = c&#xa;}&#xa;"/>
+<attribute NAME="script1" VALUE="import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;&#xa;def script = htmlUtils.htmlToPlain(parent.noteText, true, false)&#xa;def Styles = new GroovyClassLoader().parseClass(script)&#xa;Styles.eachALS { n, h -&gt;&#xa;    def c = colorToRGBAString(n.style.backgroundColor)[0..6] + &apos;ff&apos;&#xa;    n.style.backgroundColorCode = c&#xa;}&#xa;"/>
+</node>
+<node TEXT="edge colors" FOLDED="true" ID="ID_1205335687" VGAP_QUANTITY="3 pt">
+<attribute NAME="script1" VALUE="node.children.each {&#xa;    it.style.backgroundColorCode = &quot;#$it.text&quot;&#xa;}"/>
+<attribute NAME="script2" VALUE="node.children.each { it.appendChild(it) }&#xa;"/>
+<node TEXT="4cc46b" ID="ID_695516513" COLOR="#000000" BACKGROUND_COLOR="#4cc46b">
+<node TEXT="4cc46b" ID="ID_377983408" COLOR="#cccccc" BACKGROUND_COLOR="#223928"/>
+</node>
+<node TEXT="e95065" ID="ID_1836862036" COLOR="#000000" BACKGROUND_COLOR="#e95065">
+<node TEXT="e95065" ID="ID_64734782" COLOR="#cccccc" BACKGROUND_COLOR="#8b2c39"/>
+</node>
+<node TEXT="d7b84d" ID="ID_1007232477" COLOR="#000000" BACKGROUND_COLOR="#d7b84d">
+<node TEXT="d7b84d" ID="ID_1384336038" COLOR="#cccccc" BACKGROUND_COLOR="#706232"/>
+</node>
+<node TEXT="41b1d1" ID="ID_1094864016" COLOR="#000000" BACKGROUND_COLOR="#41b1d1">
+<node TEXT="41b1d1" ID="ID_883393229" COLOR="#cccccc" BACKGROUND_COLOR="#2d5561"/>
+</node>
+<node TEXT="c54499" ID="ID_146958877" COLOR="#000000" BACKGROUND_COLOR="#c54499">
+<node TEXT="c54499" ID="ID_1198372385" COLOR="#cccccc" BACKGROUND_COLOR="#543047"/>
+</node>
+<node TEXT="d76b4f" ID="ID_910028178" COLOR="#000000" BACKGROUND_COLOR="#d76b4f">
+<node TEXT="d76b4f" ID="ID_1699672161" COLOR="#cccccc" BACKGROUND_COLOR="#4c2b23"/>
+</node>
+</node>
+<node TEXT="node colors" FOLDED="true" ID="ID_1842448486" VGAP_QUANTITY="3 pt">
+<attribute NAME="script1" VALUE="node.children.each { n -&gt;&#xa;    def k = n.appendChild(n)&#xa;    k.style.backgroundColor = n.style.textColor&#xa;}"/>
+<attribute NAME="script2" VALUE="node.children.each { n -&gt;&#xa;    def k = n.children[0]&#xa;    //def l = k.appendChild(k)&#xa;    def l = k.children[0]&#xa;    def bcc = k.style.backgroundColorCode + &apos;33&apos;&#xa;    k.style.backgroundColorCode = bcc&#xa;    l.style.backgroundColorCode = bcc&#xa;}&#xa;"/>
+<attribute NAME="script3" VALUE="import static org.freeplane.core.util.ColorUtils.makeNonTransparent&#xa;&#xa;def mbc = node.mindMap.backgroundColor&#xa;node.findAll().each {&#xa;    if (it.isLeaf())&#xa;        it.style.backgroundColor = makeNonTransparent(it.style.backgroundColor, mbc)&#xa;}"/>
+<attribute NAME="script4" VALUE="def f = &apos;&apos;&apos;=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)&apos;&apos;&apos;&#xa;&#xa;node.findAll().each {&#xa;    if (it.isLeaf()) {&#xa;        it.text = (f + &apos;[1..-3]&apos;)&#xa;        it.parent.text = (f + &apos;[1..-1]&apos;)&#xa;    }&#xa;}"/>
+<node TEXT="=node.style.textColorCode[1..-1]" ID="ID_1801338853" COLOR="#52d273" BACKGROUND_COLOR="#366c44">
+<font ITALIC="true"/>
+<node TEXT="=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)[1..-1]" ID="ID_212199897" COLOR="#52d273" BACKGROUND_COLOR="#366c44" BACKGROUND_ALPHA="51">
+<font ITALIC="true"/>
+<node TEXT="=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)[1..-3]" ID="ID_284290409" COLOR="#52d273" BACKGROUND_COLOR="#2d3830">
+<font ITALIC="true"/>
+</node>
+</node>
+</node>
+<node TEXT="=node.style.textColorCode[1..-1]" ID="ID_1601564508" COLOR="#e94f64" BACKGROUND_COLOR="#8b2c39">
+<font ITALIC="true"/>
+<node TEXT="=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)[1..-1]" ID="ID_934593830" COLOR="#e94f64" BACKGROUND_COLOR="#8b2c39" BACKGROUND_ALPHA="51">
+<font ITALIC="true"/>
+<node TEXT="=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)[1..-3]" ID="ID_716419414" COLOR="#e94f64" BACKGROUND_COLOR="#3e2b2d">
+<font ITALIC="true"/>
+</node>
+</node>
+</node>
+<node TEXT="=node.style.textColorCode[1..-1]" ID="ID_504358096" COLOR="#e5c351" BACKGROUND_COLOR="#84702d">
+<font ITALIC="true"/>
+<node TEXT="=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)[1..-1]" ID="ID_8709981" COLOR="#e5c351" BACKGROUND_COLOR="#84702d" BACKGROUND_ALPHA="51">
+<font ITALIC="true"/>
+<node TEXT="=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)[1..-3]" ID="ID_274893773" COLOR="#e5c351" BACKGROUND_COLOR="#3c382b">
+<font ITALIC="true"/>
+</node>
+</node>
+</node>
+<node TEXT="=node.style.textColorCode[1..-1]" ID="ID_1416396070" COLOR="#45bcdf" BACKGROUND_COLOR="#2c6576">
+<font ITALIC="true"/>
+<node TEXT="=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)[1..-1]" ID="ID_1216267398" COLOR="#45bcdf" BACKGROUND_COLOR="#2c6576" BACKGROUND_ALPHA="51">
+<font ITALIC="true"/>
+<node TEXT="=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)[1..-3]" ID="ID_846675839" COLOR="#45bcdf" BACKGROUND_COLOR="#2b363a">
+<font ITALIC="true"/>
+</node>
+</node>
+</node>
+<node TEXT="=node.style.textColorCode[1..-1]" ID="ID_1397101237" COLOR="#d349a4" BACKGROUND_COLOR="#683055">
+<font ITALIC="true"/>
+<node TEXT="=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)[1..-1]" ID="ID_78707706" COLOR="#d349a4" BACKGROUND_COLOR="#683055" BACKGROUND_ALPHA="51">
+<font ITALIC="true"/>
+<node TEXT="=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)[1..-3]" ID="ID_1985857134" COLOR="#d349a4" BACKGROUND_COLOR="#372c33">
+<font ITALIC="true"/>
+</node>
+</node>
+</node>
+<node TEXT="=node.style.textColorCode[1..-1]" ID="ID_1869253122" COLOR="#e57053" BACKGROUND_COLOR="#87412f">
+<font ITALIC="true"/>
+<node TEXT="=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)[1..-1]" ID="ID_925165623" COLOR="#e57053" BACKGROUND_COLOR="#87412f" BACKGROUND_ALPHA="51">
+<font ITALIC="true"/>
+<node TEXT="=import static org.freeplane.core.util.ColorUtils.colorToRGBAString&#xa;colorToRGBAString(node.style.backgroundColor)[1..-3]" ID="ID_436111382" COLOR="#e57053" BACKGROUND_COLOR="#3d2f2b">
+<font ITALIC="true"/>
+</node>
+</node>
+</node>
+</node>
+<node TEXT="" ID="ID_1088130982">
+<hook NAME="SummaryNode"/>
+<hook NAME="AlwaysUnfoldedNode"/>
+<node TEXT="" ID="ID_56709256"/>
 </node>
 </node>
 </node>
