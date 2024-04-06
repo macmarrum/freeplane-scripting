@@ -1,6 +1,6 @@
 /*
 remoteControl.groovy - a Freeplane remote-control server
-Copyright (C) 2023, 2024  macmarrum
+Copyright (C) 2023, 2024  macmarrum (at) outlook (dot) ie
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
