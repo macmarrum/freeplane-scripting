@@ -1,9 +1,23 @@
+/*
+ * Copyright (C) 2023, 2024  macmarrum
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Paste"})
 
-
-import groovy.xml.XmlParser
+import groovy.xml.XmlSlurper
 import org.freeplane.api.Node
-import org.freeplane.core.util.FreeplaneVersion
 import org.freeplane.core.util.HtmlUtils
 import org.freeplane.features.map.clipboard.MapClipboardController
 import org.freeplane.features.map.clipboard.MindMapNodesSelection
@@ -13,46 +27,91 @@ import java.awt.*
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 
-/** Paste HTML or String from Transferable (clipboard).
- *  If the content starts with <html> and ContentType aka Format is Markdown or Text/NoFormat/Html,
- *  add a space/apostrophe as the first character. This will prevent Freeplane from rewriting the HTML.
+/** Paste content from Transferable (clipboard).
+ *  The content might be
+ *  - Freeplane node(s)
+ *  - HTML: full or partial
+ *  - plain text
+ *  In case of HTML, when details' Format is Markdown or Text,
+ *  `<html><body>` and `</body><html>` is removed (if present),
+ *  to avoid auto-parsing of html by Freeplane, i.e. so that the content is pasted as is.
+ *  Otherwise `<html><body>` and `</body><html>` is kept or -- in the case of partial html -- added.
  */
-def t = Toolkit.defaultToolkit.systemClipboard.getContents(null)
+final SCRIPT_NAME = 'pasteToDetails'
 def node = ScriptUtils.node()
-def isTargetMarkdownOrText = node.detailsContentType in ['markdown', 'html'] //[TextController.CONTENT_TYPE_HTML, MarkdownRenderer.MARKDOWN_CONTENT_TYPE])
-def shouldOutcomeContainTagsHtmlBody = !isTargetMarkdownOrText
-//def shouldOutcomeContainHtmlBody = true
-def text = getString(t, shouldOutcomeContainTagsHtmlBody)
-if (text) {
-    if (shouldOutcomeContainTagsHtmlBody && isTargetMarkdownOrText && HtmlUtils.isHtml(text))
-        text = (FreeplaneVersion.version < FreeplaneVersion.getVersion('1.11.1') ? /'/ : ' ') + text
+//[MarkdownRenderer.MARKDOWN_CONTENT_TYPE, TextController.CONTENT_TYPE_HTML])
+def isOutcomeToContainTagsHtmlBody = node.detailsContentType !in ['markdown', 'html']
+def transferable = Toolkit.defaultToolkit.systemClipboard.getContents(null)
+def text = getString(transferable, isOutcomeToContainTagsHtmlBody, SCRIPT_NAME)
+if (text)
     node.detailsText = text
-}
 
-private static String getString(Transferable t, shouldOutcomeContainHtmlBody = false) {
+private static String getString(Transferable t, boolean isOutcomeToContainHtmlBody, String scriptName) {
     def c = ScriptUtils.c()
     if (t.isDataFlavorSupported(MindMapNodesSelection.mindMapNodesFlavor)) {
+        // a list of nodes => assume concatenation of core text is to be done
         try {
             def xml = t.getTransferData(MindMapNodesSelection.mindMapNodesFlavor).toString()
             def nodes = getNodesFromClipboardXml(xml)
-            return nodes.collect { it.text }.join('\n')
+            final nodeCount = nodes.size()
+            if (nodeCount == 0)
+                return null
+            def listOfTextToIsHtml = new ArrayList<Map.Entry<String, Boolean>>(nodeCount)
+            nodes.each {
+                def text = it.text
+                def entry = new AbstractMap.SimpleEntry<String, Boolean>(text, HtmlUtils.isHtml(text))
+                listOfTextToIsHtml << entry
+            }
+            def sb = new StringBuilder()
+            if (listOfTextToIsHtml.any { it.value }) {
+                // there is at least 1 html entry
+                if (isOutcomeToContainHtmlBody)
+                    sb << '<html><body>'
+                listOfTextToIsHtml.eachWithIndex { it, i ->
+                    if (it.value) { // isHtml
+                        sb << it.key.replaceAll($/\s*(<html>|<body>|</body>|</html>)\s*/$, '')
+                        sb << '\n'
+                    } else {
+                        it.key.split(/\n/).each {
+                            sb << '<p>' << it << '</p>'
+                            sb << '\n'
+                        }
+                    }
+                }
+                if (isOutcomeToContainHtmlBody)
+                    sb << '</body></html>'
+            } else {
+                // no html entries
+                listOfTextToIsHtml.eachWithIndex { it, i ->
+                    sb << it.key
+                    if (i < nodeCount - 1)
+                        sb << '\n'
+                }
+            }
+            return sb
         } catch (ignored) {
         }
     } else if (t.isDataFlavorSupported(DataFlavor.allHtmlFlavor)) {
         try {
             def html = t.getTransferData(DataFlavor.allHtmlFlavor).toString()
             html = html.replaceFirst($/(?i)^<!DOCTYPE html>\n*/$, '')
-            if (shouldOutcomeContainHtmlBody) {
+            if (isOutcomeToContainHtmlBody) {
                 if (HtmlUtils.isHtml(html)) {
+                    // full html => only remove head, as Freeplane doesn't use it
                     return html.replaceAll($/(?s)<head>.*</head>/$, '')
                 } else {
+                    // partial html => add tags so that Freeplane can auto-parse html
                     return "<html><body>$html</body></html>"
                 }
             } else {
-                if (HtmlUtils.isHtml(html))
-                    return html.replaceAll($/(?s)<head>.*</head>\n*/$, '').replaceAll($/(<html>|<body>|</body>|</html>)/$, '')
-                else
+                if (HtmlUtils.isHtml(html)) {
+                    // full html => get rid of html, head, body tags
+                    return html.replaceAll($/(?s)<head>.*</head>\n*/$, '')
+                            .replaceAll($/(<html>|<body>|</body>|</html>)/$, '')
+                } else {
+                    // partial html
                     return html
+                }
             }
         } catch (ignored) {
         }
@@ -63,18 +122,19 @@ private static String getString(Transferable t, shouldOutcomeContainHtmlBody = f
         }
     }
 //    println(t.transferDataFlavors.collect(new HashSet<String>()) { it.mimeType.split(';')[0] })
-    c.statusInfo = 'pasteToDetails: error getting clipboard contents'
+    c.statusInfo = "$scriptName: error getting clipboard contents"
     return null
 }
 
 static java.util.List<Node> getNodesFromClipboardXml(String xml) {
-    Node node = ScriptUtils.node()
+    def parser = new XmlSlurper()
+    def mindMap = ScriptUtils.node().mindMap
     try {
-        def parser = new XmlParser()
         return xml.split(MapClipboardController.NODESEPARATOR).collect { String xmlSingleNode ->
             // replace &nbsp; to avoid the error: nbsp was referenced but not declared
-            def xmlRootNode = parser.parseText(xmlSingleNode.replaceAll('&nbsp;', ' '))
-            node.mindMap.node(xmlRootNode.@ID)
+            xmlSingleNode = xmlSingleNode.replaceAll('&nbsp;', ' ')
+            def xmlRootNode = parser.parseText(xmlSingleNode)
+            mindMap.node(xmlRootNode.@ID as String)
         }
     } catch (ignored) {
     }
