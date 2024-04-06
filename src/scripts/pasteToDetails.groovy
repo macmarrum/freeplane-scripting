@@ -58,9 +58,11 @@ private static String getString(Transferable t, boolean isOutcomeToContainHtmlBo
             if (nodeCount == 0)
                 return null
             def listOfTextToIsHtml = new ArrayList<Map.Entry<String, Boolean>>(nodeCount)
+            String text
+            Map.Entry<String, Boolean> entry
             nodes.each {
-                def text = it.text
-                def entry = new AbstractMap.SimpleEntry<String, Boolean>(text, HtmlUtils.isHtml(text))
+                text = it.text
+                entry = new AbstractMap.SimpleEntry<>(text, HtmlUtils.isHtml(text))
                 listOfTextToIsHtml << entry
             }
             def sb = new StringBuilder()
@@ -70,7 +72,8 @@ private static String getString(Transferable t, boolean isOutcomeToContainHtmlBo
                     sb << '<html><body>'
                 listOfTextToIsHtml.eachWithIndex { it, i ->
                     if (it.value) { // isHtml
-                        sb << it.key.replaceAll($/\s*(<html>|<body>|</body>|</html>)\s*/$, '')
+                        sb << it.key.replaceFirst($/(?si)\s*<head>.*</head>\s*/$, '')
+                                .replaceAll($/(?i)\s*(<html>|<body>|</body>|</html>)\s*/$, '')
                         sb << '\n'
                     } else {
                         it.key.split(/\n/).each {
@@ -95,11 +98,11 @@ private static String getString(Transferable t, boolean isOutcomeToContainHtmlBo
     } else if (t.isDataFlavorSupported(DataFlavor.allHtmlFlavor)) {
         try {
             def html = t.getTransferData(DataFlavor.allHtmlFlavor).toString()
-            html = html.replaceFirst($/(?i)^<!DOCTYPE html>\n*/$, '')
+            html = html.replaceFirst($/(?i)^<!DOCTYPE html>\s*/$, '')
             if (isOutcomeToContainHtmlBody) {
                 if (HtmlUtils.isHtml(html)) {
                     // full html => only remove head, as Freeplane doesn't use it
-                    return html.replaceAll($/(?s)\s*<head>.*</head>\s*/$, '')
+                    return html.replaceFirst($/(?si)\s*<head>.*</head>\s*/$, '')
                 } else {
                     // partial html => add tags so that Freeplane can auto-parse html
                     return "<html><body>$html</body></html>"
@@ -107,8 +110,8 @@ private static String getString(Transferable t, boolean isOutcomeToContainHtmlBo
             } else {
                 if (HtmlUtils.isHtml(html)) {
                     // full html => get rid of head (element) and html & body (tags)
-                    return html.replaceAll($/(?s)\s*<head>.*</head>\s*/$, '')
-                            .replaceAll($/\s*(<html>|<body>|</body>|</html>)\s*/$, '')
+                    return html.replaceAll($/(?si)\s*<head>.*</head>\s*/$, '')
+                            .replaceAll($/(?i)\s*(<html>|<body>|</body>|</html>)\s*/$, '')
                 } else {
                     // partial html
                     return html
@@ -120,11 +123,11 @@ private static String getString(Transferable t, boolean isOutcomeToContainHtmlBo
         try {
             def text = t.getTransferData(DataFlavor.stringFlavor).toString()
             // in case the text is HTML code, remove doctype
-            text = text.replaceFirst($/(?i)^<!DOCTYPE html>\n*/$, '')
+            text = text.replaceFirst($/(?i)^<!DOCTYPE html>\s*/$, '')
             if (isOutcomeToContainHtmlBody) {
                 if (HtmlUtils.isHtml(text)) {
                     // full html => only remove head, as Freeplane doesn't use it
-                    return text.replaceAll($/(?s)\s*<head>.*</head>\s*/$, '')
+                    return text.replaceAll($/(?si)\s*<head>.*</head>\s*/$, '')
                 } else {
                     // partial or no html => return as is
                     return text
@@ -133,7 +136,7 @@ private static String getString(Transferable t, boolean isOutcomeToContainHtmlBo
                 if (HtmlUtils.isHtml(text)) {
                     // full html => get rid of head (element) and html & body (tags)
                     return text.replaceAll($/(?s)\s*<head>.*</head>\s*/$, '')
-                            .replaceAll($/\s*(<html>|<body>|</body>|</html>)\s*/$, '')
+                            .replaceAll($/(?i)\s*(<html>|<body>|</body>|</html>)\s*/$, '')
                 } else {
                     // partial or no html => return as is
                     return text
@@ -151,10 +154,10 @@ static java.util.List<Node> getNodesFromClipboardXml(String xml) {
     def parser = new XmlSlurper()
     def mindMap = ScriptUtils.node().mindMap
     try {
-        return xml.split(MapClipboardController.NODESEPARATOR).collect { String xmlSingleNode ->
+        return xml.split(MapClipboardController.NODESEPARATOR).collect { String singleNodeXml ->
             // replace &nbsp; to avoid the error: nbsp was referenced but not declared
-            xmlSingleNode = xmlSingleNode.replaceAll('&nbsp;', ' ')
-            def xmlRootNode = parser.parseText(xmlSingleNode)
+            singleNodeXml = singleNodeXml.replaceAll('&nbsp;', ' ')
+            def xmlRootNode = parser.parseText(singleNodeXml)
             mindMap.node(xmlRootNode.@ID as String)
         }
     } catch (ignored) {
