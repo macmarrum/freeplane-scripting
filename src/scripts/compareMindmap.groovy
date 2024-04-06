@@ -1,6 +1,5 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 /*
- * Copyright (C) 2023  macmarrum
+ * Copyright (C) 2023, 2024  macmarrum (at) outlook (dot) ie
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 
 
 import io.github.macmarrum.freeplane.MindMapComparator
@@ -46,6 +46,10 @@ else {
     if (oldFile) {
         def oldMindMap = c.mapLoader(oldFile).mindMap
         def mindMap = c.mapLoader(node.mindMap.file).unsetMapLocation().withView().mindMap
+        try {
+            mindMap.associatedTemplate = node.mindMap.associatedTemplate
+        } catch (MissingMethodException ignore) {
+        }
         MindMapComparator.compare(oldMindMap, mindMap)
     }
 }
