@@ -98,16 +98,16 @@ private static String getString(Transferable t, boolean isOutcomeToContainHtmlBo
             if (isOutcomeToContainHtmlBody) {
                 if (HtmlUtils.isHtml(html)) {
                     // full html => only remove head, as Freeplane doesn't use it
-                    return html.replaceAll($/(?s)<head>.*</head>/$, '')
+                    return html.replaceAll($/(?s)\s*<head>.*</head>\s*/$, '')
                 } else {
                     // partial html => add tags so that Freeplane can auto-parse html
                     return "<html><body>$html</body></html>"
                 }
             } else {
                 if (HtmlUtils.isHtml(html)) {
-                    // full html => get rid of html, head, body tags
-                    return html.replaceAll($/(?s)<head>.*</head>\n*/$, '')
-                            .replaceAll($/(<html>|<body>|</body>|</html>)/$, '')
+                    // full html => get rid of head (element) and html & body (tags)
+                    return html.replaceAll($/(?s)\s*<head>.*</head>\s*/$, '')
+                            .replaceAll($/\s*(<html>|<body>|</body>|</html>)\s*/$, '')
                 } else {
                     // partial html
                     return html
@@ -117,7 +117,27 @@ private static String getString(Transferable t, boolean isOutcomeToContainHtmlBo
         }
     } else if (t.isDataFlavorSupported(DataFlavor.stringFlavor)) {
         try {
-            return t.getTransferData(DataFlavor.stringFlavor).toString()
+            def text = t.getTransferData(DataFlavor.stringFlavor).toString()
+            // in case the text is HTML code, remove doctype
+            text = text.replaceFirst($/(?i)^<!DOCTYPE html>\n*/$, '')
+            if (isOutcomeToContainHtmlBody) {
+                if (HtmlUtils.isHtml(text)) {
+                    // full html => only remove head, as Freeplane doesn't use it
+                    return text.replaceAll($/(?s)\s*<head>.*</head>\s*/$, '')
+                } else {
+                    // partial or no html => return as is
+                    return text
+                }
+            } else {
+                if (HtmlUtils.isHtml(text)) {
+                    // full html => get rid of head (element) and html & body (tags)
+                    return text.replaceAll($/(?s)\s*<head>.*</head>\s*/$, '')
+                            .replaceAll($/\s*(<html>|<body>|</body>|</html>)\s*/$, '')
+                } else {
+                    // partial or no html => return as is
+                    return text
+                }
+            }
         } catch (ignored) {
         }
     }
