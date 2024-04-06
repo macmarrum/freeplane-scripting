@@ -43,8 +43,9 @@ def node = ScriptUtils.node()
 def isOutcomeToContainTagsHtmlBody = node.format !in ['markdownPatternFormat', 'NO_FORMAT']
 def transferable = Toolkit.defaultToolkit.systemClipboard.getContents(null)
 def text = getString(transferable, isOutcomeToContainTagsHtmlBody, SCRIPT_NAME)
-if (text)
-    node.text = text
+if (text) {
+    ScriptUtils.c().selecteds.each { it.text = text }
+}
 
 private static String getString(Transferable t, boolean isOutcomeToContainHtmlBody, String scriptName) {
     def c = ScriptUtils.c()
