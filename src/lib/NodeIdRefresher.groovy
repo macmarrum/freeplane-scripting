@@ -1,27 +1,28 @@
 /*
-Copyright (C) 2023, 2024  macmarrum
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ * Copyright (C) 2023, 2024  macmarrum (at) outlook (dot) ie
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package io.github.macmarrum.freeplane
 
 import groovy.json.JsonSlurper
 import org.freeplane.api.Node as FN
 
 class NodeIdRefresher {
-    public static REFRESHED_PREFIX = 'freshIdToOriginal_'
-    public static DATETIME_FORMAT = 'yyyy-MM-dd_HH:mm:ss'
-    public static RESTORED_PREFIX = 'restored_'
+    public static refreshedPrefix = 'freshIdToOriginal_'
+    public static datetimeFormat = 'yyyy-MM-dd_HH:mm:ss'
+    public static restoredPrefix = 'restored_'
 
     static refreshAll(FN node) {
         def mm = node.mindMap
@@ -49,8 +50,8 @@ class NodeIdRefresher {
         originalToFreshId.each { k, v -> sb << "\"$v\": \"$k\", \n" }
         sb << '}'
 
-        def now = (new Date()).format(DATETIME_FORMAT)
-        root[REFRESHED_PREFIX + now] = sb
+        def now = (new Date()).format(datetimeFormat)
+        root[refreshedPrefix + now] = sb
     }
 
     static refresh(FN node) {
@@ -58,11 +59,11 @@ class NodeIdRefresher {
         def originalId = node.id
         String freshId = mm.delegate.generateNodeID(null) // it makes sure the generated ID is unique in the map
         node.delegate.setID(freshId)
-        persistSavepointData(mm.root, ["$originalId": freshId])
+        persistSavepointData(mm.root, ["$originalId" as String: freshId])
     }
 
     static Map.Entry<String, Object> getLatestSavepoint(FN root) {
-        def savepoints = root.attributes.findAll { Map.Entry<String, Object> it -> it.key.startsWith(REFRESHED_PREFIX) }
+        def savepoints = root.attributes.findAll { Map.Entry<String, Object> it -> it.key.startsWith(refreshedPrefix) }
         if (savepoints)
             return savepoints.sort().last()
     }
@@ -79,7 +80,7 @@ class NodeIdRefresher {
                 if (originalId)
                     it.delegate.setID(originalId)
             }
-            root[RESTORED_PREFIX + savepoint.key] = savepoint.value
+            root[restoredPrefix + savepoint.key] = savepoint.value
             root.attributes.removeAll(savepoint.key)
         }
     }
