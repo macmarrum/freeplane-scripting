@@ -17,6 +17,7 @@
 //package io.github.macmarrum.freeplane;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 
 public class FreeplaneRemoteClient {
@@ -47,6 +48,14 @@ public class FreeplaneRemoteClient {
             s.shutdownOutput();
             return new String(s.getInputStream().readAllBytes(), encoding);
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String transfer(String text) {
+        try {
+            return transfer(text.getBytes(encoding));
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
