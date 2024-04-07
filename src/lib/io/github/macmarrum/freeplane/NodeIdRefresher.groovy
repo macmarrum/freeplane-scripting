@@ -59,7 +59,7 @@ class NodeIdRefresher {
         def originalId = node.id
         String freshId = mm.delegate.generateNodeID(null) // it makes sure the generated ID is unique in the map
         node.delegate.setID(freshId)
-        persistSavepointData(mm.root, ["$originalId" as String: freshId])
+        persistSavepointData(mm.root, ["$originalId": freshId])
     }
 
     static Map.Entry<String, Object> getLatestSavepoint(FN root) {
