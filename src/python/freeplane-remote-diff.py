@@ -29,16 +29,17 @@ import sys
 import socket
 from pathlib import Path
 from time import sleep
+from typing import Union
 
-address = os.environ.get('FREEPLANE_REMOTE_CONTROL_ADDRESS', '127.0.0.1')
+host = os.environ.get('FREEPLANE_REMOTE_CONTROL_HOST', '127.0.0.1')
 port = int(port) if (port := os.environ.get('FREEPLANE_REMOTE_CONTROL_PORT')) else 48112
 encoding = 'UTF-8'
 
 
-def transfer(data: bytes) -> str:
+def transfer(data: Union[bytes, str]) -> str:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((address, port))
-        s.sendall(data)
+        s.connect((host, port))
+        s.sendall(data.encode(encoding) if isinstance(data, str) else data)
         s.shutdown(socket.SHUT_WR)
         response: list[str] = []
         while response_chunk := s.recv(1024):
@@ -65,7 +66,7 @@ groovy_script = f"""
 import io.github.macmarrum.freeplane.MindMapComparator
 MindMapComparator.compareFiles({oldMindmap}, {newMindmap})
 """
-result = transfer(groovy_script.encode(encoding))
+result = transfer(groovy_script)
 print(result)
 if not result.startswith('ERROR'):
     sleep(30)  # to allow Freeplane to read the files and create a diff mind map before git deletes the temporary files

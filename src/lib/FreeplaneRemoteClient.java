@@ -20,10 +20,26 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 
+/*
+ * This utility is meant to be used from the command line.
+ *
+ * Compile it by running `javac FreeplaneRemoteClient.java`. You'll need JDK (e.g. from https://adoptium.net).
+ * This is needed only once. As a result, `FreeplaneRemoteClient.class` will be created.
+ *
+ * Run the compiled program, passing the text of the Groovy script as the first argument:
+ * `java FreeplaneRemoteClient "ui.showMessage('Hello from FreeplaneRemoteClient', 1)"`
+ * or as stdin:
+ * `echo "ui.showMessage('Hello from FreeplaneRemoteClient - via stdin', 1)" | java FreeplaneRemoteClient`
+ * or from a file (via stdin)
+ *  - on Windows:
+ * `type someFile.groovy | java FreeplaneRemoteClient`
+ *  - on Linux / Mac:
+ * `cat someFile.groovy | java FreeplaneRemoteClient`
+ */
 public class FreeplaneRemoteClient {
 
-    private static final String FREEPLANE_REMOTE_CONTROL_ADDRESS = System.getenv("FREEPLANE_REMOTE_CONTROL_ADDRESS");
-    public static String address = FREEPLANE_REMOTE_CONTROL_ADDRESS != null ? FREEPLANE_REMOTE_CONTROL_ADDRESS : "127.0.0.1";
+    private static final String FREEPLANE_REMOTE_CONTROL_HOST = System.getenv("FREEPLANE_REMOTE_CONTROL_HOST");
+    public static String host = FREEPLANE_REMOTE_CONTROL_HOST != null ? FREEPLANE_REMOTE_CONTROL_HOST : "127.0.0.1";
     public static final String FREEPLANE_REMOTE_CONTROL_PORT = System.getenv("FREEPLANE_REMOTE_CONTROL_PORT");
     public static Integer port = FREEPLANE_REMOTE_CONTROL_PORT != null ? Integer.getInteger(FREEPLANE_REMOTE_CONTROL_PORT) : 48112;
     public static String encoding = "UTF-8";
@@ -43,7 +59,7 @@ public class FreeplaneRemoteClient {
     }
 
     public static String transfer(byte[] data) {
-        try (Socket s = new Socket(address, port)) {
+        try (Socket s = new Socket(host, port)) {
             s.getOutputStream().write(data);
             s.shutdownOutput();
             return new String(s.getInputStream().readAllBytes(), encoding);

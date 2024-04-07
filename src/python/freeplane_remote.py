@@ -17,16 +17,17 @@
 import os
 import sys
 import socket
+from typing import Union
 
-address = os.environ.get('FREEPLANE_REMOTE_CONTROL_ADDRESS', '127.0.0.1')
+host = os.environ.get('FREEPLANE_REMOTE_CONTROL_HOST', '127.0.0.1')
 port = int(port) if (port := os.environ.get('FREEPLANE_REMOTE_CONTROL_PORT')) else 48112
 encoding = 'UTF-8'
 
 
-def transfer(data: bytes) -> str:
+def transfer(data: Union[bytes, str]) -> str:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((address, port))
-        s.sendall(data)
+        s.connect((host, port))
+        s.sendall(data.encode(encoding) if isinstance(data, str) else data)
         s.shutdown(socket.SHUT_WR)
         response: list[str] = []
         while response_chunk := s.recv(1024):
