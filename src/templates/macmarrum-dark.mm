@@ -647,7 +647,7 @@ ol {
 </map_styles>
 </hook>
 <attribute_layout VALUE_WIDTH="107.47826 pt"/>
-<attribute NAME="scriptOnMapOpen" VALUE="if (!node.mindMap.file)&#xa;    io.github.macmarrum.freeplane.NodeIdRefresher.refreshAll(node)&#xa;// i.e. only for mind maps created from the template"/>
+<attribute NAME="scriptOnMapOpen_NodeIdRefresher" VALUE="if (!node.mindMap.file) {&#xa;    // i.e. only for mind maps created from the template&#xa;    io.github.macmarrum.freeplane.NodeIdRefresher.refreshAll(node)&#xa;    node.attributes.removeAll(&apos;scriptOnMapOpen_NodeIdRefresher&apos;)&#xa;}"/>
 <hook NAME="accessories/plugins/AutomaticLayout.properties" VALUE="ALL"/>
 <hook NAME="AutomaticEdgeColor" COUNTER="0" RULE="FOR_LEVELS"/>
 <node TEXT="Showcase" FOLDED="true" POSITION="left" ID="ID_1068881056">
@@ -895,8 +895,7 @@ class Styles {
     }
 }</pre>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 <node TEXT="" ID="ID_433164527">
 <hook NAME="FirstGroupNode"/>
 </node>
