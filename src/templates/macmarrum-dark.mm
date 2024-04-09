@@ -1,6 +1,6 @@
 <map version="freeplane 1.9.13">
 <!--To view this file, download free mind mapping software Freeplane from https://www.freeplane.org -->
-<node TEXT="macmarrum-dark" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1939172785" VGAP_QUANTITY="20 pt" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES" CHILD_NODES_ALIGNMENT="BY_FIRST_NODE"><hook NAME="MapStyle" background="#2b2b2b">
+<node TEXT="macmarrum-dark" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1939172785" VGAP_QUANTITY="20 pt" CHILD_NODES_ALIGNMENT="BY_FIRST_NODE" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES"><hook NAME="MapStyle" background="#2b2b2b">
     <conditional_styles>
         <conditional_style ACTIVE="false" STYLE_REF="?transBg" LAST="false"/>
         <conditional_style ACTIVE="true" STYLE_REF="?bigChildGap" LAST="false">
@@ -652,7 +652,7 @@ ol {
 </map_styles>
 </hook>
 <attribute_layout VALUE_WIDTH="107.47826 pt"/>
-<attribute NAME="scriptOnMapOpen" VALUE="if (!node.mindMap.file) NodeIdRefresher.refreshAll(node)&#xa;// i.e. only for mind maps created from the template"/>
+<attribute NAME="scriptOnMapOpen" VALUE="if (!node.mindMap.file)&#xa;    io.github.macmarrum.freeplane.NodeIdRefresher.refreshAll(node)&#xa;// i.e. only for mind maps created from the template"/>
 <hook NAME="accessories/plugins/AutomaticLayout.properties" VALUE="ALL"/>
 <hook NAME="AutomaticEdgeColor" COUNTER="0" RULE="FOR_LEVELS"/>
 <node TEXT="Showcase" FOLDED="true" POSITION="left" ID="ID_1068881056">
