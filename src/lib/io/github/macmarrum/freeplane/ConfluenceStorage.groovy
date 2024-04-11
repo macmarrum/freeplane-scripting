@@ -26,18 +26,18 @@ import java.text.MessageFormat
 
 class ConfluenceStorage {
 
-    static c = ScriptUtils.c()
+    private static c = ScriptUtils.c()
 
-    static final HILITE1ST = 'hiLite1st'
-    static final KEY_TITLE = 'key:title'
-    static final COLON = ':'
+    public static final HILITE1ST = 'hiLite1st'
+    private static final KEY_TITLE = 'key:title'
+    private static final COLON = ':'
 
-    static style = [
+    private static style = [
             cStorageMarkupRoot : 'cStorageMarkupRoot',
             cStorageMarkupMaker: 'cStorageMarkupMaker',
     ]
 
-    static icon = [
+    private static icon = [
             noEntry                      : 'emoji-26D4',
             eol_chequeredFlag            : 'emoji-1F3C1',
             noSep_cancer                 : 'emoji-264B',
@@ -54,7 +54,7 @@ class ConfluenceStorage {
             noSepAfter_lastQuarterMoon   : 'emoji-1F317',
     ]
 
-    static tbl = [
+    private static tbl = [
             rowCnt: '₵',
             rowNum: '№',
     ]
@@ -88,7 +88,7 @@ class ConfluenceStorage {
         return hasIcon(n, icon.nbsp_gemini) ? content.replaceAll(/ /, '&nbsp;') : content
     }
 
-    static mk = [
+    private static mk = [
             parent      : 'parent',
             table       : 'table',
             list        : 'list',
@@ -143,7 +143,7 @@ class ConfluenceStorage {
         }
     }
 
-    static noSepIcons = [icon.noSepAfter_lastQuarterMoon, icon.noSep_cancer]
+    private static noSepIcons = [icon.noSepAfter_lastQuarterMoon, icon.noSep_cancer]
 
     static String getSpaceSep(Node n) {
         return hasIcon(n, noSepIcons) ? '' : ' '
@@ -176,7 +176,7 @@ class ConfluenceStorage {
         return sb.toString()
     }
 
-    static LinkedHashMap<String, String> pReplacements = [
+    private static LinkedHashMap<String, String> pReplacements = [
             /(?m)(?<=^| )-> /                                                          : '→ ',
             /(?m)(?<=^| )=> /                                                          : '&rArr; ',
             /(?m)(?<=^| )>> /                                                          : '&#8611; ', // >->
@@ -361,10 +361,10 @@ class ConfluenceStorage {
         return result
     }
 
-    static final String clear = 'clear'
-    static final String annotate = 'annotate'
-    static final String none = 'none'
-    static final ArrayList<String> clear_annotate_none = [clear, annotate, none]
+    private static final String clear = 'clear'
+    private static final String annotate = 'annotate'
+    private static final String none = 'none'
+    private static final ArrayList<String> clear_annotate_none = [clear, annotate, none]
 
     static String getTableAnnotateText(Node n) {
         def detailsText = n.details?.text
