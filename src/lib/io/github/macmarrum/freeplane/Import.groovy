@@ -97,7 +97,10 @@ class Import {
                 } else if (value instanceof List) {
                     fromList(value, n)
                 } else if (value !== null) {
-                    def child = n.createChild(value)
+                    def child = n.createChild()
+                    // value can be a number, and createChild() does something strange with a number
+                    // so use setText() instead
+                    child.text = value
                 }
             }
         }
