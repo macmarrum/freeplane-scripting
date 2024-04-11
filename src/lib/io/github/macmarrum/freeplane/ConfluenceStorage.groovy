@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  macmarrum
+ * Copyright (C) 2023, 2024  macmarrum (at) outlook (dot) ie
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ package io.github.macmarrum.freeplane
 
 import groovy.xml.XmlUtil
 import org.freeplane.api.Node
-import org.freeplane.api.Node as FN
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.text.MessageFormat
@@ -60,29 +59,29 @@ class ConfluenceStorage {
             rowNum: '№',
     ]
 
-    static Boolean isMarkupRoot(FN n) {
+    static Boolean isMarkupRoot(Node n) {
         return n.style.name == style.cStorageMarkupRoot
     }
 
-    static Boolean isMarkupMaker(FN n) {
+    static Boolean isMarkupMaker(Node n) {
         return n.style.name == style.cStorageMarkupMaker
     }
 
-    static Boolean hasIcon(FN n, String icon) {
+    static Boolean hasIcon(Node n, String icon) {
         return n.icons.icons.contains(icon)
     }
 
-    static Boolean hasIcon(FN n, List<String> icons) {
+    static Boolean hasIcon(Node n, List<String> icons) {
         return n.icons.icons.any { it in icons }
     }
 
     /**
      * makeMarkup if it's a markup maker, otherwise
-     * First escape xml, if broom present
-     * Only then do pReplacements if doubleCurlyLoop present
-     * and replace each space with nbsp, if gemini present
+     * first escape xml (if broom present)
+     * only then do pReplacements (if doubleCurlyLoop present)
+     * and replace each space with nbsp (if gemini present)
      */
-    static String getContent(FN n) {
+    static String getContent(Node n) {
         String content = isMarkupMaker(n) ? makeMarkup(n) : n.note?.text ?: n.transformedText
         if (hasIcon(n, icon.xmlEscape_broom)) content = XmlUtil.escapeXml(content)
         if (hasIcon(n, icon.replacements_doubleCurlyLoop)) content = _applyReplacements(n, content)
@@ -115,7 +114,7 @@ class ConfluenceStorage {
             format      : 'format',
     ]
 
-    static String makeMarkup(FN n) {
+    static String makeMarkup(Node n) {
         return switch (n.text) {
             case mk.parent -> mkParent(n)
             case mk.table -> mkTable(n)
@@ -146,30 +145,30 @@ class ConfluenceStorage {
 
     static noSepIcons = [icon.noSepAfter_lastQuarterMoon, icon.noSep_cancer]
 
-    static String getSpaceSep(FN n) {
+    static String getSpaceSep(Node n) {
         return hasIcon(n, noSepIcons) ? '' : ' '
     }
 
-    static String getNewLine(FN n) {
+    static String getNewLine(Node n) {
         return hasIcon(n, icon.nl_rightArrowCurvingDown) ? '\n' : ''
     }
 
-    static String getEol(FN n) {
+    static String getEol(Node n) {
         return hasIcon(n, icon.eol_chequeredFlag) ? '\n' : ''
     }
 
-    static String mkParent(FN n) {
+    static String mkParent(Node n) {
         return _execIfChildren(n, { _mkParent(n) })
     }
 
-    static String _execIfChildren(FN n, Closure closure) {
+    static String _execIfChildren(Node n, Closure closure) {
         if (n.children.size() > 0)
             return closure()
         else
             return '<!-- children are missing -->'
     }
 
-    static String _mkParent(FN n) {
+    static String _mkParent(Node n) {
         def nl = getNewLine(n)
         def sb = new StringBuilder()
         n.children.each { sb << mkNode(it) << nl }
@@ -194,7 +193,7 @@ class ConfluenceStorage {
             /(?<=^|[^a-zA-Z0-9])\(([a-z]+)\)(?! )(.+?)(?<! )\(\/\1\)(?=[^a-zA-Z0-9]|$)/: '<span style="color: $1">$2</span>',
     ]
 
-    static String _applyReplacements(FN n, String content) {
+    static String _applyReplacements(Node n, String content) {
         content = content.replaceAll(/\n\+ /, "\n${getSimBullet(n)} ")
         pReplacements.each {
             try {
@@ -207,7 +206,7 @@ class ConfluenceStorage {
         return content.replaceAll(/\n/, "<br />${getNewLine(n)}")
     }
 
-    static StringBuilder mkNode(FN n) {
+    static StringBuilder mkNode(Node n) {
         def result = new StringBuilder()
         if (hasIcon(n, icon.noEntry)) {
             return result
@@ -227,7 +226,7 @@ class ConfluenceStorage {
                     def isP = hasIcon(n, icon.pButton)
                     def sep = getSpaceSep(n)
                     String pContent
-                    if (isP) { // no auto-replacements - getContent will do replacements, if icon is set
+                    if (isP) { // no auto-replacements - getContent will do replacements if icon is set
                         result << '<p>' << nl << getContent(n) << sep
                     } else { // not a heading, not a P, must be a regular node
                         result << getContent(n) << sep
@@ -243,11 +242,11 @@ class ConfluenceStorage {
         }
     }
 
-    static Boolean _isHeading(FN n) {
+    static Boolean _isHeading(Node n) {
         return (n.icons.size() > 0 && n.icons.icons.any { it.startsWith('full-') })
     }
 
-    static StringBuilder _mkHeading(FN n, String nl, String eol) {
+    static StringBuilder _mkHeading(Node n, String nl, String eol) {
         def hIcon = n.icons.icons.find { it.startsWith('full-') }
         def hLevel = hIcon[5..-1]
         def childrenBody = n.children.size() > 0 ? n.children.collect { mkNode(it) }.join('') : ''
@@ -260,7 +259,7 @@ class ConfluenceStorage {
     /**
      * canExcludeMarkupMaker for getFirstChildChain, used by mkCsv – to stop at markupMaker nodes
      */
-    static FN getFirstChildIfNotIgnoreNode(FN n, boolean canExcludeMarkupMaker = true) {
+    static Node getFirstChildIfNotIgnoreNode(Node n, boolean canExcludeMarkupMaker = true) {
         def isMarkupMakerAndCanExcludeIt = isMarkupMaker(n) && canExcludeMarkupMaker
         if (isMarkupMakerAndCanExcludeIt || n.children.size() == 0 || hasIcon(n, icon.stopAtThis_stopSign) || hasIcon(n.children[0], icon.noEntry))
             return null
@@ -268,7 +267,7 @@ class ConfluenceStorage {
             return n.children[0]
     }
 
-    static int _tbl_countFirstChildChain(FN n, int cnt = 0) {
+    static int _tbl_countFirstChildChain(Node n, int cnt = 0) {
         def child = getFirstChildIfNotIgnoreNode(n, false)
         if (child)
             return _tbl_countFirstChildChain(child, ++cnt)
@@ -276,7 +275,7 @@ class ConfluenceStorage {
             return cnt
     }
 
-    static StringBuilder mkTable(FN n) {
+    static StringBuilder mkTable(Node n) {
         def tableAnnotateText = getTableAnnotateText(n)
         def canAnnotate = tableAnnotateText == annotate
         def canClearAnnotations = tableAnnotateText == clear
@@ -295,7 +294,7 @@ class ConfluenceStorage {
         if (canAnnotate || canClearAnnotations)
             n.findAll().drop(1).each { Node it -> if (it.detailsText && (it.details.text.startsWith(tbl.rowCnt) || it.details.text.startsWith(tbl.rowNum))) it.details = null }
         // the first column in each row is technical, therefore it's skipped
-        n.children.each { FN row ->
+        n.children.each { Node row ->
             if (!hasIcon(row, icon.noEntry)) {  // not ignoreNode
                 if (row.children.size() > 1) {  // each child (with descendants) is a column (vertical layout)
                     tableWiki << '<tr>' << nl
@@ -322,8 +321,8 @@ class ConfluenceStorage {
         ROW, COLUMN, NONE
     }
 
-    static void makeTableCellOfEachChildWithDescendantsAndAppendTo(StringBuilder tableWiki, List<FN> children, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
-        children.each { FN child ->
+    static void makeTableCellOfEachChildWithDescendantsAndAppendTo(StringBuilder tableWiki, List<Node> children, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
+        children.each { Node child ->
             if (!hasIcon(child, icon.noEntry)) {
                 tableWiki << makeTableCell(this::mkNode, child, rowNum, colNum, hiLite1st, nl, canAnnotate)
                 colNum++
@@ -331,17 +330,17 @@ class ConfluenceStorage {
         }
     }
 
-    static void mkTableCellOfEachFirstChildInChainAndAppendTo(StringBuilder tableWiki, FN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
+    static void mkTableCellOfEachFirstChildInChainAndAppendTo(StringBuilder tableWiki, Node n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
         tableWiki << makeTableCell(this::getContent, n, rowNum, colNum, hiLite1st, nl, canAnnotate)
         // canExcludeMarkupMaker=false because each cell is basically a top-level node, i.e. can be a cStorageMarkupMaker
-        FN firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, false)
+        Node firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, false)
         if (firstChildIfNotIgnoreNode) {
             colNum++
             mkTableCellOfEachFirstChildInChainAndAppendTo(tableWiki, firstChildIfNotIgnoreNode, rowNum, colNum, hiLite1st, nl, canAnnotate)
         }
     }
 
-    static StringBuilder makeTableCell(Closure method, FN n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
+    static StringBuilder makeTableCell(Closure method, Node n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
         def result = new StringBuilder()
         if (canAnnotate)
             n.details = (new StringBuilder() << tbl.rowNum << colNum).toString()
@@ -367,7 +366,7 @@ class ConfluenceStorage {
     static final String none = 'none'
     static final ArrayList<String> clear_annotate_none = [clear, annotate, none]
 
-    static String getTableAnnotateText(FN n) {
+    static String getTableAnnotateText(Node n) {
         def detailsText = n.details?.text
         if (detailsText in clear_annotate_none)
             return detailsText
@@ -377,7 +376,7 @@ class ConfluenceStorage {
             return markupRootDetailsText
     }
 
-    static StringBuilder mkList(FN n) {
+    static StringBuilder mkList(Node n) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
         def tag = hasIcon(n, icon.ol_keycapHash) ? '<ol>' : '<ul>'
@@ -397,7 +396,7 @@ class ConfluenceStorage {
      *  TODO: consider if mkNode could be used instead, especially now that <div> is used in place of <p>
      *      -- benefits / disadvantages
      */
-    static StringBuilder mkZipList(FN n) {
+    static StringBuilder mkZipList(Node n) {
         def nl = getNewLine(n)
         def bullet = getSimBullet(n)
         int smallerBranchChildrenSize = n.children.collect { branch -> branch.children.size() }.min()
@@ -451,9 +450,9 @@ class ConfluenceStorage {
         return sb
     }
 
-    static List<FN> getFirstChildChain(FN n, List<FN> firstChildChain = null) {
+    static List<Node> getFirstChildChain(Node n, List<Node> firstChildChain = null) {
         if (firstChildChain.is(null))
-            firstChildChain = new LinkedList<FN>()
+            firstChildChain = new LinkedList<Node>()
         firstChildChain.add(n)
         def child = getFirstChildIfNotIgnoreNode(n)
         if (child)
@@ -462,14 +461,14 @@ class ConfluenceStorage {
             return firstChildChain
     }
 
-    static String mkQuote(FN n) {
+    static String mkQuote(Node n) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
         result << '<blockquote>' << nl << mkParent(n) << nl << '</blockquote>'
         return result.toString()
     }
 
-    static String mkLink(FN n) {
+    static String mkLink(Node n) {
         /* make link of the first child with a link */
         def nl = getNewLine(n)
         for (child in n.children.find { it.link }) {
@@ -480,7 +479,7 @@ class ConfluenceStorage {
         return '<!-- a child with a link is missing -->'
     }
 
-    static String getUuid(FN n) {
+    static String getUuid(Node n) {
         // e.g. '649ac91e-33a1-476c-93d2-a30170e197a3'
         def uuid = 'UUID'
         def canGenerate = false
@@ -499,38 +498,38 @@ class ConfluenceStorage {
         }
     }
 
-    static String mkExpand(FN n) {
+    static String mkExpand(Node n) {
         return _execIfChildren(n, {
             _mkMacroRich(n, 'expand', [title: n.details?.text ?: 'Click here to expand...'])
         })
     }
 
-    static String mkDiv(FN n) {
+    static String mkDiv(Node n) {
         return _execIfChildren(n, {
             Map<String, String> params = n.detailsText ? [class: n.details.text] : null
             return _mkMacroRich(n, 'div', params)
         })
     }
 
-    static String mkSection(FN n) {
+    static String mkSection(Node n) {
         return _execIfChildren(n, {
             Map<String, String> params = n.icons.contains(icon.border_unchecked) ? [border: 'true'] : null
             return _mkMacroRich(n, 'section', params)
         })
     }
 
-    static String mkColumn(FN n) {
+    static String mkColumn(Node n) {
         return _execIfChildren(n, {
             Map<String, String> params = n.detailsText ? [width: n.details.text] : null
             return _mkMacroRich(n, 'column', params)
         })
     }
 
-    static String mkCode(FN n) {
+    static String mkCode(Node n) {
         // https://confluence.atlassian.com/doc/code-block-macro-139390.html
         // final LANGUAGES = ['ActionScript', 'AppleScript', 'Bash', 'C#', 'C++', 'CSS', 'ColdFusion', 'Delphi', 'Diff', 'Erlang', 'Groovy', 'HTML and XML', 'Java', 'Java FX', 'JavaScript', 'PHP', 'Plain Text', 'PowerShell', 'Python', 'Ruby', 'SQL', 'Sass', 'Scala', 'Visual Basic', 'YAML']
         final MAX_LANG_SIZE = 12
-        for (child in n.children.find { FN it -> it.children.size() > 0 || it.noteText !== null || it.detailsText !== null }) {
+        for (child in n.children.find { Node it -> it.children.size() > 0 || it.noteText !== null || it.detailsText !== null }) {
             String lang
             String cdata  // get cdata from text, alternatively from children or from note
             String text = child.text
@@ -557,17 +556,17 @@ class ConfluenceStorage {
         return '<!-- a child with children or a note is missing -->'
     }
 
-    static String mkPageInfo(FN n) {
+    static String mkPageInfo(Node n) {
         String infoType = n.detailsText ? n.details.text : 'Title'
         return _mkPageInfo(n, infoType)
     }
 
-    static String _mkPageInfo(FN n, String infoType, String type = 'Flat') {
+    static String _mkPageInfo(Node n, String infoType, String type = 'Flat') {
         /* Page id, Current version, Tiny url, Title, ...  */
         return _mkMacroPlain(n, 'page-info', null, [infoType: infoType, type: type])
     }
 
-    static String _mkMacroPlain(FN n, String macro, String cdata, Map<String, String> parameters = null) {
+    static String _mkMacroPlain(Node n, String macro, String cdata, Map<String, String> parameters = null) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
         result << '<ac:structured-macro ac:name="' << macro << '" ac:schema-version="1" ac:macro-id="' << getUuid(n) << '">' << nl
@@ -581,7 +580,7 @@ class ConfluenceStorage {
         return result.toString()
     }
 
-    static StringBuilder _mkMacroRich(FN n, String macro, Map<String, String> parameters = null, String body = null) {
+    static StringBuilder _mkMacroRich(Node n, String macro, Map<String, String> parameters = null, String body = null) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
         def _body = body ?: _mkParent(n)
@@ -595,7 +594,7 @@ class ConfluenceStorage {
         return result
     }
 
-    static String mkDivExpand(FN n) {
+    static String mkDivExpand(Node n) {
         return _execIfChildren(n, {
             def nl = getNewLine(n)
             def title = n.detailsText ? n.details.text : 'Click here to expand...'
@@ -608,7 +607,7 @@ class ConfluenceStorage {
         })
     }
 
-    static String mkAttachments(FN n) {
+    static String mkAttachments(Node n) {
         def nl = getNewLine(n)
         def canUpload = n['attachmentsUpload'].num0 == 1 ? 'true' : 'false'
         def canOld = n['attachmentsOld'].num0 == 1 ? 'true' : 'false'
@@ -619,20 +618,20 @@ class ConfluenceStorage {
         return result.toString()
     }
 
-    static String mkStyleImport(FN n) {
-        for (child in n.children.find { FN it -> it.text }) {
+    static String mkStyleImport(Node n) {
+        for (child in n.children.find { Node it -> it.text }) {
             return _mkMacroPlain(n, 'style', null, [import: child.text])
         }
         return '<!-- a child with text is missing -->'
     }
 
-    static String mkStyle(FN n) {
+    static String mkStyle(Node n) {
         return _execIfChildren(n, {
             return _mkMacroPlain(n, 'style', _mkParent(n))
         })
     }
 
-    static String mkHtml(FN n) {
+    static String mkHtml(Node n) {
         return _execIfChildren(n, {
             return _mkMacroPlain(n, 'html', _mkParent(n))
         })
@@ -643,8 +642,8 @@ class ConfluenceStorage {
      * To add a border, use icon `unchecked`.
      * To link an image attached in a different page, put `page` attribute with <space key>:<page title>
      */
-    static String mkImage(FN n) {
-        for (child in n.children.find { FN it -> it.text }) {
+    static String mkImage(Node n) {
+        for (child in n.children.find { Node it -> it.text }) {
             def result = new StringBuilder()
             result << '<ac:image '
             if (child.detailsText)
@@ -673,7 +672,7 @@ class ConfluenceStorage {
      * + collects only the first child of each node
      * + uses a comma_space or any string as the separator
      */
-    static StringBuilder mkCsv(FN n) {
+    static StringBuilder mkCsv(Node n) {
         // sep can be defined as the attribute csvSep
         // sep can be defined in details
         // for table cells (details start with №), the default sep is used
@@ -690,7 +689,7 @@ class ConfluenceStorage {
                 sep = n.details.text.startsWith(tbl.rowNum) ? defaultSep : n.details.text
             else
                 sep = defaultSep
-            def cells = new LinkedList<FN>()
+            def cells = new LinkedList<Node>()
             n.children.each { Node it -> if (!hasIcon(it, icon.noEntry)) cells.addAll(getFirstChildChain(it)) }
             def cellsSize = cells.size()
             int i
@@ -710,13 +709,13 @@ class ConfluenceStorage {
             return sb << '<!-- a child is missing -->'
     }
 
-    static String mkWiki(FN n) {
+    static String mkWiki(Node n) {
         return _execIfChildren(n, {
             return _mkMacroPlain(n, 'unmigrated-wiki-markup', _mkParent(n))
         })
     }
 
-    static String mkMarkdown(FN n) {
+    static String mkMarkdown(Node n) {
         return _execIfChildren(n, {
             return _mkMacroPlain(n, 'markdown', _mkParent(n))
         })
@@ -726,15 +725,15 @@ class ConfluenceStorage {
         MESSAGE, STRING;
     }
 
-    static String mkTemplate(FN n) {
+    static String mkTemplate(Node n) {
         return _mkTemplate(n, TemplateType.MESSAGE)
     }
 
-    static String mkFormat(FN n) {
+    static String mkFormat(Node n) {
         return _mkTemplate(n, TemplateType.STRING)
     }
 
-    static String _mkTemplate(FN n, TemplateType templateType) {
+    static String _mkTemplate(Node n, TemplateType templateType) {
         def yesentryChildren = n.children.findAll { !hasIcon(it, icon.noEntry) }
         if (yesentryChildren.size() == 0)
             return '<!-- a child (pattern) is missing -->'
@@ -755,14 +754,14 @@ class ConfluenceStorage {
         }
     }
 
-    static FN createMarkupMaker(FN node, String name) {
+    static Node createMarkupMaker(Node node, String name) {
         def maker = node.createChild(name)
         maker.style.name = style.cStorageMarkupMaker
         c.select(maker)
         return maker
     }
 
-    static createCode(FN node, String language = 'sql', String title = null, boolean showLineNumbers = true, String theme = 'Eclipse', boolean collapse = false, String styleName = '=Code') {
+    static List<Node> createCode(Node node, String language = 'sql', String title = null, boolean showLineNumbers = true, String theme = 'Eclipse', boolean collapse = false, String styleName = '=Code') {
         def n = createMarkupMaker(node, 'code')
         if (title)
             n.details = title
@@ -779,52 +778,58 @@ class ConfluenceStorage {
         } catch (IllegalArgumentException ignored) {
         }
         c.select(code)
+        return [n, code]
     }
 
-    static createDivExpandCode(FN node, String details = 'Expand: SQL Statement', String cssClassName = 'macmarrum-expand', String language = 'sql', boolean showLineNumbers = true, String theme = 'Eclipse') {
+    static List<Node> createDivExpandCode(Node node, String details = 'Expand: SQL Statement', String cssClassName = 'macmarrum-expand', String language = 'sql', boolean showLineNumbers = true, String theme = 'Eclipse') {
         def n = createMarkupMaker(node, 'div-expand')
         n.details = details
         n.link.text = cssClassName
         n.icons.add(icon.nl_rightArrowCurvingDown)
-        createCode(n, language, null, showLineNumbers, theme)
+        def (codeNode, code) = createCode(n, language, null, showLineNumbers, theme)
+        return [n, codeNode, code]
     }
 
-    static createList(FN node) {
+    static Node createList(Node node) {
         def n = createMarkupMaker(node, 'list')
         n.icons.add(icon.nl_rightArrowCurvingDown)
+        return n
     }
 
-    static createLink(FN node) {
-        createMarkupMaker(node, 'link')
+    static Node createLink(Node node) {
+        return createMarkupMaker(node, 'link')
     }
 
-    static createFormat(FN node, String pattern = '%s') {
+    static List<Node> createFormat(Node node, String pattern = '%s') {
         def n = createMarkupMaker(node, 'format')
         def p = n.createChild(pattern)
         c.select(p)
+        return [n, p]
     }
 
-    static createTable(FN node, String styleName = '=Numbering#') {
+    static List<Node> createTable(Node node, String styleName = '=Numbering#') {
         def n = createMarkupMaker(node, 'table')
         n.icons.add(icon.nl_rightArrowCurvingDown)
         n[HILITE1ST] = HiLite1st.COLUMN
         def elem = n.createChild()
         elem.style.name = styleName
         c.select(elem)
+        return [n, elem]
     }
 
-    static createParent(FN node) {
-        createMarkupMaker(node, 'parent')
+    static Node createParent(Node node) {
+        return createMarkupMaker(node, 'parent')
     }
 
-    static createCsv(FN node) {
-        createMarkupMaker(node, 'csv')
+    static Node createCsv(Node node) {
+        return createMarkupMaker(node, 'csv')
     }
 
-    static createImage(FN node) {
+    static List<Node> createImage(Node node) {
         def n = createMarkupMaker(node, 'image')
         def o = n.createChild('filename.png')
         o[KEY_TITLE] = ''
         c.select(o)
+        return [n, o]
     }
 }
