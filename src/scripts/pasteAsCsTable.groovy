@@ -39,7 +39,8 @@ if (text) {
             elem = table.appendChild(elem)
         def cell = elem
         // use tab as a cell delimiter (standard for content copied from a spreadsheet)
-        ln.split('\t').each {
+        // use limit: -1 to keep trailing empty strings
+        ln.split('\t', -1).each {
             cell = cell.createChild(it)
         }
     }
