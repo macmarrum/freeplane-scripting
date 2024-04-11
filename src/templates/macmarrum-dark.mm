@@ -622,26 +622,369 @@ ol {
       &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3d2f2bff&quot;
     </p>
     <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 13&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#52d273b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2d3830&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2d3830ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 14&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#f9556bb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3e2b2d&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3e2b2dff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 15&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e5c452b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3c382b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3c382bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 16&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#46bddfb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2b363a&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2b363aff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 17&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#d349a4b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#372c33&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#372c33ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 18&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e57154b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3d2f2b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3d2f2bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 19&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#52d273b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2d3830&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2d3830ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 20&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#f9556bb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3e2b2d&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3e2b2dff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 21&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e5c452b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3c382b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3c382bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 22&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#46bddfb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2b363a&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2b363aff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 23&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#d349a4b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#372c33&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#372c33ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 24&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e57154b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3d2f2b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3d2f2bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 25&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#52d273b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2d3830&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2d3830ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 26&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#f9556bb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3e2b2d&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3e2b2dff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 27&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e5c452b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3c382b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3c382bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 28&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#46bddfb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2b363a&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2b363aff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 29&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#d349a4b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#372c33&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#372c33ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 30&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e57154b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3d2f2b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3d2f2bff&quot;
+    </p>
+    <p>
       &#xa0;&#xa0;&#xa0;&#xa0;}
     </p>
     <p>
       }
     </p>
   </body>
-</html></richcontent>
+</html>
+</richcontent>
 </stylenode>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,1" ID="ID_771207535" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#52d273" BORDER_COLOR_ALPHA="182"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,2" ID="ID_814211067" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#f9556b" BORDER_COLOR_ALPHA="182"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,3" ID="ID_352058479" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e5c452" BORDER_COLOR_ALPHA="182"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,4" ID="ID_119767224" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#46bddf" BORDER_COLOR_ALPHA="182"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,5" ID="ID_294563152" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#d349a4" BORDER_COLOR_ALPHA="182"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,6" ID="ID_1794312820" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e57154" BORDER_COLOR_ALPHA="182"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,7" ID="ID_759282133" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#52d273" BORDER_COLOR_ALPHA="182"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,8" ID="ID_94638384" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#f9556b" BORDER_COLOR_ALPHA="182"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,9" ID="ID_885575204" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e5c452" BORDER_COLOR_ALPHA="182"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,10" ID="ID_1580706732" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#46bddf" BORDER_COLOR_ALPHA="182"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,11" ID="ID_703695337" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#d349a4" BORDER_COLOR_ALPHA="182"/>
-<stylenode LOCALIZED_TEXT="AutomaticLayout.level,12" ID="ID_1764911274" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e57154" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,1" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#52d273" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,2" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#f9556b" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,3" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e5c452" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,4" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#46bddf" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,5" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#d349a4" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,6" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e57154" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,7" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#52d273" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,8" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#f9556b" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,9" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e5c452" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,10" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#46bddf" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,11" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#d349a4" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,12" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e57154" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,13" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#52d273" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,14" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#f9556b" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,15" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e5c452" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,16" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#46bddf" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,17" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#d349a4" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,18" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e57154" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,19" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#52d273" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,20" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#f9556b" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,21" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e5c452" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,22" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#46bddf" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,23" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#d349a4" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,24" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e57154" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,25" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#52d273" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,26" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#f9556b" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,27" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e5c452" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,28" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#46bddf" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,29" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#d349a4" BORDER_COLOR_ALPHA="182"/>
+<stylenode LOCALIZED_TEXT="AutomaticLayout.level,30" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#e57154" BORDER_COLOR_ALPHA="182"/>
 </stylenode>
 </stylenode>
 </map_styles>
@@ -1033,6 +1376,986 @@ class Styles {
 <hook NAME="SummaryNode"/>
 <hook NAME="AlwaysUnfoldedNode"/>
 <node TEXT="" ID="ID_56709256"/>
+</node>
+<node TEXT="json" FOLDED="true" ID="ID_581637946">
+<attribute NAME="script1" VALUE="import io.github.macmarrum.freeplane.Import&#xa;&#xa;def jsonStr = mindMap.root.style.styleNode.note.text&#xa;Import.fromJsonString(jsonStr, node)&#xa;"/>
+<attribute NAME="script2" VALUE="// first multiply the stylenodes in .mm (no scripting API) to reach Level 30&#xa;def cc = node.children&#xa;def n&#xa;[2, 3, 4].each { x -&gt;&#xa;    (6..11).each { childIdx -&gt;&#xa;        n = node.appendBranch(cc[childIdx])&#xa;        n.text = &quot;Level ${x * 6 + childIdx - 5}&quot;&#xa;    }&#xa;}&#xa;"/>
+<attribute NAME="script3" VALUE="import io.github.macmarrum.freeplane.Export&#xa;&#xa;def s = [details: false, note: false, attributes: false, transformed: false, style: false, icons: false, skip1: true, denullify: true, pretty: true]&#xa;def jsonStr = Export.toJsonString(node, s)&#xa;textUtils.copyToClipboard(jsonStr)&#xa;node.note = jsonStr&#xa;"/>
+<richcontent TYPE="NOTE" CONTENT-TYPE="xml/">
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <p>
+      {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 1&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#52d273b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 18,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2d3830&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2d3830ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 2&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#f9556bb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 16,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3e2b2d&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3e2b2dff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 3&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e5c452b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 14,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3c382b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3c382bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 4&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#46bddfb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 14,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2b363a&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2b363aff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 5&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#d349a4b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 14,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#372c33&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#372c33ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 6&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e57154b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3d2f2b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3d2f2bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 7&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#52d273b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2d3830&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2d3830ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 8&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#f9556bb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3e2b2d&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3e2b2dff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 9&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e5c452b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3c382b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3c382bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 10&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#46bddfb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2b363a&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2b363aff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 11&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#d349a4b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#372c33&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#372c33ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 12&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e57154b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3d2f2b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3d2f2bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 13&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#52d273b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2d3830&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2d3830ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 14&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#f9556bb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3e2b2d&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3e2b2dff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 15&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e5c452b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3c382b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3c382bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 16&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#46bddfb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2b363a&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2b363aff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 17&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#d349a4b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#372c33&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#372c33ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 18&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e57154b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3d2f2b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3d2f2bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 19&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#52d273b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2d3830&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2d3830ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 20&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#f9556bb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3e2b2d&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3e2b2dff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 21&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e5c452b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3c382b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3c382bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 22&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#46bddfb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2b363a&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2b363aff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 23&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#d349a4b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#372c33&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#372c33ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 24&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e57154b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3d2f2b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3d2f2bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 25&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#52d273b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2d3830&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2d3830ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 26&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#f9556bb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3e2b2d&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3e2b2dff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 27&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e5c452b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3c382b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3c382bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 28&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#46bddfb6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#2b363a&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#2b363aff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 29&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#d349a4b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#372c33&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#372c33ff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;},
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&quot;Level 30&quot;: {
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;textColor&quot;: &quot;#e57154b6&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;fontSize&quot;: 12,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColorBlended&quot;: &quot;#3d2f2b&quot;,
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&quot;backgroundColor&quot;: &quot;#3d2f2bff&quot;
+    </p>
+    <p>
+      &#xa0;&#xa0;&#xa0;&#xa0;}
+    </p>
+    <p>
+      }
+    </p>
+  </body>
+</html>
+</richcontent>
+<node TEXT="Level 1" ID="ID_1193987656">
+<node TEXT="textColor" ID="ID_243802326">
+<node TEXT="#52d273b6" ID="ID_427236526"/>
+</node>
+<node TEXT="fontSize" ID="ID_449410889">
+<node TEXT="18" OBJECT="java.lang.Integer|18" ID="ID_1630994407"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1230134456">
+<node TEXT="#2d3830" ID="ID_1395907408"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_60618568">
+<node TEXT="#2d3830ff" ID="ID_1422905980"/>
+</node>
+</node>
+<node TEXT="Level 2" ID="ID_310422927">
+<node TEXT="textColor" ID="ID_1420177238">
+<node TEXT="#f9556bb6" ID="ID_268508729"/>
+</node>
+<node TEXT="fontSize" ID="ID_469007607">
+<node TEXT="16" OBJECT="java.lang.Integer|16" ID="ID_1514531724"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1637914756">
+<node TEXT="#3e2b2d" ID="ID_864098288"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1943192684">
+<node TEXT="#3e2b2dff" ID="ID_601241279"/>
+</node>
+</node>
+<node TEXT="Level 3" ID="ID_1385285197">
+<node TEXT="textColor" ID="ID_658990599">
+<node TEXT="#e5c452b6" ID="ID_1639554933"/>
+</node>
+<node TEXT="fontSize" ID="ID_980911416">
+<node TEXT="14" OBJECT="java.lang.Integer|14" ID="ID_1511554484"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_552817288">
+<node TEXT="#3c382b" ID="ID_492547005"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1208114945">
+<node TEXT="#3c382bff" ID="ID_951575545"/>
+</node>
+</node>
+<node TEXT="Level 4" ID="ID_1984023637">
+<node TEXT="textColor" ID="ID_1362459978">
+<node TEXT="#46bddfb6" ID="ID_1578389408"/>
+</node>
+<node TEXT="fontSize" ID="ID_1495572215">
+<node TEXT="14" OBJECT="java.lang.Integer|14" ID="ID_1408043385"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_590571364">
+<node TEXT="#2b363a" ID="ID_987803065"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_903700765">
+<node TEXT="#2b363aff" ID="ID_1675279513"/>
+</node>
+</node>
+<node TEXT="Level 5" ID="ID_461023773">
+<node TEXT="textColor" ID="ID_1929050831">
+<node TEXT="#d349a4b6" ID="ID_698019721"/>
+</node>
+<node TEXT="fontSize" ID="ID_425963138">
+<node TEXT="14" OBJECT="java.lang.Integer|14" ID="ID_1957182763"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1444129976">
+<node TEXT="#372c33" ID="ID_688436475"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1369676636">
+<node TEXT="#372c33ff" ID="ID_1903744469"/>
+</node>
+</node>
+<node TEXT="Level 6" ID="ID_982192246">
+<node TEXT="textColor" ID="ID_1635713874">
+<node TEXT="#e57154b6" ID="ID_368979107"/>
+</node>
+<node TEXT="fontSize" ID="ID_776107199">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_1403464340"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1664964480">
+<node TEXT="#3d2f2b" ID="ID_1479142658"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1070218995">
+<node TEXT="#3d2f2bff" ID="ID_1166767998"/>
+</node>
+</node>
+<node TEXT="Level 7" ID="ID_205186301">
+<node TEXT="textColor" ID="ID_505188846">
+<node TEXT="#52d273b6" ID="ID_393196978"/>
+</node>
+<node TEXT="fontSize" ID="ID_1092668748">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_904310824"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1317998724">
+<node TEXT="#2d3830" ID="ID_1562010380"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_55033265">
+<node TEXT="#2d3830ff" ID="ID_1830064407"/>
+</node>
+</node>
+<node TEXT="Level 8" ID="ID_695547880">
+<node TEXT="textColor" ID="ID_634684946">
+<node TEXT="#f9556bb6" ID="ID_887608076"/>
+</node>
+<node TEXT="fontSize" ID="ID_1390944476">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_244529545"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1858482951">
+<node TEXT="#3e2b2d" ID="ID_19120788"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1510631318">
+<node TEXT="#3e2b2dff" ID="ID_1016930084"/>
+</node>
+</node>
+<node TEXT="Level 9" ID="ID_1976225240">
+<node TEXT="textColor" ID="ID_1718323380">
+<node TEXT="#e5c452b6" ID="ID_169715779"/>
+</node>
+<node TEXT="fontSize" ID="ID_1554975576">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_1368666803"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1908793893">
+<node TEXT="#3c382b" ID="ID_433694169"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1447451723">
+<node TEXT="#3c382bff" ID="ID_1884553424"/>
+</node>
+</node>
+<node TEXT="Level 10" ID="ID_1178515338">
+<node TEXT="textColor" ID="ID_766286210">
+<node TEXT="#46bddfb6" ID="ID_963415530"/>
+</node>
+<node TEXT="fontSize" ID="ID_1780293396">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_1710217885"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_238286154">
+<node TEXT="#2b363a" ID="ID_1715911962"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_385188959">
+<node TEXT="#2b363aff" ID="ID_1639827895"/>
+</node>
+</node>
+<node TEXT="Level 11" ID="ID_186281590">
+<node TEXT="textColor" ID="ID_971303942">
+<node TEXT="#d349a4b6" ID="ID_1913649777"/>
+</node>
+<node TEXT="fontSize" ID="ID_432400750">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_254153599"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1316485527">
+<node TEXT="#372c33" ID="ID_1714349433"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_569079384">
+<node TEXT="#372c33ff" ID="ID_742885290"/>
+</node>
+</node>
+<node TEXT="Level 12" ID="ID_1263689218">
+<node TEXT="textColor" ID="ID_1681071685">
+<node TEXT="#e57154b6" ID="ID_1107746426"/>
+</node>
+<node TEXT="fontSize" ID="ID_261057758">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_1953293708"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1872637823">
+<node TEXT="#3d2f2b" ID="ID_1656326663"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_466797137">
+<node TEXT="#3d2f2bff" ID="ID_1567724181"/>
+</node>
+</node>
+<node TEXT="Level 13" ID="ID_65013929">
+<node TEXT="textColor" ID="ID_1706019543">
+<node TEXT="#52d273b6" ID="ID_926214681"/>
+</node>
+<node TEXT="fontSize" ID="ID_639824076">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_627987063"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1075765140">
+<node TEXT="#2d3830" ID="ID_489737779"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1027931695">
+<node TEXT="#2d3830ff" ID="ID_420464507"/>
+</node>
+</node>
+<node TEXT="Level 14" ID="ID_284594617">
+<node TEXT="textColor" ID="ID_575263209">
+<node TEXT="#f9556bb6" ID="ID_235304069"/>
+</node>
+<node TEXT="fontSize" ID="ID_450927722">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_844108139"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1198842671">
+<node TEXT="#3e2b2d" ID="ID_697207961"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1677926554">
+<node TEXT="#3e2b2dff" ID="ID_1157067357"/>
+</node>
+</node>
+<node TEXT="Level 15" ID="ID_1519154190">
+<node TEXT="textColor" ID="ID_1423729206">
+<node TEXT="#e5c452b6" ID="ID_502075937"/>
+</node>
+<node TEXT="fontSize" ID="ID_662664167">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_1774115574"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_802255540">
+<node TEXT="#3c382b" ID="ID_524164214"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1210494440">
+<node TEXT="#3c382bff" ID="ID_448386065"/>
+</node>
+</node>
+<node TEXT="Level 16" ID="ID_1628669382">
+<node TEXT="textColor" ID="ID_195418377">
+<node TEXT="#46bddfb6" ID="ID_799134026"/>
+</node>
+<node TEXT="fontSize" ID="ID_270235436">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_1419707167"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1585041728">
+<node TEXT="#2b363a" ID="ID_1731795824"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_583846722">
+<node TEXT="#2b363aff" ID="ID_924696626"/>
+</node>
+</node>
+<node TEXT="Level 17" ID="ID_1449092619">
+<node TEXT="textColor" ID="ID_70012620">
+<node TEXT="#d349a4b6" ID="ID_1333643427"/>
+</node>
+<node TEXT="fontSize" ID="ID_1750968337">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_217995046"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_430727822">
+<node TEXT="#372c33" ID="ID_1709642689"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_106348407">
+<node TEXT="#372c33ff" ID="ID_1664826231"/>
+</node>
+</node>
+<node TEXT="Level 18" ID="ID_288381591">
+<node TEXT="textColor" ID="ID_40249057">
+<node TEXT="#e57154b6" ID="ID_142417873"/>
+</node>
+<node TEXT="fontSize" ID="ID_933158582">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_467393750"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1252144261">
+<node TEXT="#3d2f2b" ID="ID_1892333669"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_802366024">
+<node TEXT="#3d2f2bff" ID="ID_292613027"/>
+</node>
+</node>
+<node TEXT="Level 19" ID="ID_451865493">
+<node TEXT="textColor" ID="ID_581534483">
+<node TEXT="#52d273b6" ID="ID_1172322833"/>
+</node>
+<node TEXT="fontSize" ID="ID_12855556">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_6671479"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1902552226">
+<node TEXT="#2d3830" ID="ID_319760120"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_930302215">
+<node TEXT="#2d3830ff" ID="ID_702170970"/>
+</node>
+</node>
+<node TEXT="Level 20" ID="ID_824646833">
+<node TEXT="textColor" ID="ID_1519159392">
+<node TEXT="#f9556bb6" ID="ID_1957784401"/>
+</node>
+<node TEXT="fontSize" ID="ID_808463404">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_1111405100"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_210743143">
+<node TEXT="#3e2b2d" ID="ID_1116548371"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_160478155">
+<node TEXT="#3e2b2dff" ID="ID_543853111"/>
+</node>
+</node>
+<node TEXT="Level 21" ID="ID_463298078">
+<node TEXT="textColor" ID="ID_17225760">
+<node TEXT="#e5c452b6" ID="ID_1668143729"/>
+</node>
+<node TEXT="fontSize" ID="ID_1707898843">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_729855675"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_161226861">
+<node TEXT="#3c382b" ID="ID_1630520848"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1528105809">
+<node TEXT="#3c382bff" ID="ID_649197396"/>
+</node>
+</node>
+<node TEXT="Level 22" ID="ID_1221396147">
+<node TEXT="textColor" ID="ID_484148835">
+<node TEXT="#46bddfb6" ID="ID_1550078274"/>
+</node>
+<node TEXT="fontSize" ID="ID_168046239">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_736575573"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_30635036">
+<node TEXT="#2b363a" ID="ID_806045901"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1611320277">
+<node TEXT="#2b363aff" ID="ID_1339879380"/>
+</node>
+</node>
+<node TEXT="Level 23" ID="ID_536620065">
+<node TEXT="textColor" ID="ID_1458921223">
+<node TEXT="#d349a4b6" ID="ID_376114392"/>
+</node>
+<node TEXT="fontSize" ID="ID_346117031">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_148155718"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_727141885">
+<node TEXT="#372c33" ID="ID_134116593"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_211870929">
+<node TEXT="#372c33ff" ID="ID_1979797309"/>
+</node>
+</node>
+<node TEXT="Level 24" ID="ID_949394808">
+<node TEXT="textColor" ID="ID_848605736">
+<node TEXT="#e57154b6" ID="ID_97885545"/>
+</node>
+<node TEXT="fontSize" ID="ID_841775728">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_617255279"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_875136254">
+<node TEXT="#3d2f2b" ID="ID_583519441"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1390304014">
+<node TEXT="#3d2f2bff" ID="ID_1371591391"/>
+</node>
+</node>
+<node TEXT="Level 25" ID="ID_192823511">
+<node TEXT="textColor" ID="ID_202938717">
+<node TEXT="#52d273b6" ID="ID_576503833"/>
+</node>
+<node TEXT="fontSize" ID="ID_872235916">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_1703923340"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_426316907">
+<node TEXT="#2d3830" ID="ID_1960571287"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1318082786">
+<node TEXT="#2d3830ff" ID="ID_596080987"/>
+</node>
+</node>
+<node TEXT="Level 26" ID="ID_301124008">
+<node TEXT="textColor" ID="ID_1068920834">
+<node TEXT="#f9556bb6" ID="ID_1362105919"/>
+</node>
+<node TEXT="fontSize" ID="ID_1980921740">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_1252585204"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1994502191">
+<node TEXT="#3e2b2d" ID="ID_579665226"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_338878850">
+<node TEXT="#3e2b2dff" ID="ID_1524628408"/>
+</node>
+</node>
+<node TEXT="Level 27" ID="ID_1953765583">
+<node TEXT="textColor" ID="ID_1258544956">
+<node TEXT="#e5c452b6" ID="ID_326538927"/>
+</node>
+<node TEXT="fontSize" ID="ID_435794670">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_1561432919"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1484078152">
+<node TEXT="#3c382b" ID="ID_497837724"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_1801118447">
+<node TEXT="#3c382bff" ID="ID_132297894"/>
+</node>
+</node>
+<node TEXT="Level 28" ID="ID_1053449230">
+<node TEXT="textColor" ID="ID_1572911342">
+<node TEXT="#46bddfb6" ID="ID_858667140"/>
+</node>
+<node TEXT="fontSize" ID="ID_160317499">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_751227039"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1154225392">
+<node TEXT="#2b363a" ID="ID_1627108856"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_871167719">
+<node TEXT="#2b363aff" ID="ID_1800309766"/>
+</node>
+</node>
+<node TEXT="Level 29" ID="ID_894941413">
+<node TEXT="textColor" ID="ID_363442809">
+<node TEXT="#d349a4b6" ID="ID_1355928426"/>
+</node>
+<node TEXT="fontSize" ID="ID_1824116698">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_305115631"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1641118451">
+<node TEXT="#372c33" ID="ID_1322747313"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_483629914">
+<node TEXT="#372c33ff" ID="ID_608969103"/>
+</node>
+</node>
+<node TEXT="Level 30" ID="ID_598127431">
+<node TEXT="textColor" ID="ID_1771391748">
+<node TEXT="#e57154b6" ID="ID_380111757"/>
+</node>
+<node TEXT="fontSize" ID="ID_1693438347">
+<node TEXT="12" OBJECT="java.lang.Integer|12" ID="ID_1030297903"/>
+</node>
+<node TEXT="backgroundColorBlended" ID="ID_1943810738">
+<node TEXT="#3d2f2b" ID="ID_58528750"/>
+</node>
+<node TEXT="backgroundColor" ID="ID_93850542">
+<node TEXT="#3d2f2bff" ID="ID_1275472789"/>
+</node>
+</node>
 </node>
 </node>
 </node>
