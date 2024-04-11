@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  macmarrum
+ * Copyright (C) 2023, 2024  macmarrum (at) outlook (dot) ie
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  */
 package io.github.macmarrum.freeplane
 
+import groovy.json.JsonGenerator
 import groovy.json.JsonOutput
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
@@ -25,6 +26,7 @@ import javax.swing.JFileChooser
 import javax.swing.JOptionPane
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
+import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 
 class Export {
@@ -51,8 +53,9 @@ class Export {
     public static final String MULTILINE_SINGLE_QUOTE = '\'\'\''
     public static final String MULTILINE_DOUBLE_QUOTE = '"""'
     public static final Pattern RX_TOML_KEY = ~/[A-Za-z0-9_-]+/
-    public static final RUMAR_TOML_INTEGER_SETTINGS = ['version']
-    public static final RUMAR_TOML_STRING_SETTINGS = ['backup_base_dir', 'source_dir', 'backup_base_dir_for_profile', 'archive_format', 'compression_level', 'no_compression_suffixes_default', 'no_compression_suffixes', 'tar_format', 'sha256_comparison_if_same_size', 'file_deduplication', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_week_to_keep', 'number_of_backups_per_month_to_keep']
+    public static final RUMAR_TOML_INTEGER_SETTINGS = ['version', 'tar_format', 'compression_level', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_week_to_keep', 'number_of_backups_per_month_to_keep']
+    public static final RUMAR_TOML_BOOLEAN_SETTINGS = ['checksum_comparison_if_same_size', 'file_deduplication']
+    public static final RUMAR_TOML_STRING_SETTINGS = ['backup_base_dir', 'source_dir', 'backup_base_dir_for_profile', 'archive_format', 'password', 'no_compression_suffixes_default', 'no_compression_suffixes']
     public static final RUMAR_TOML_ARRAY_SETTINGS = ['included_top_dirs', 'excluded_top_dirs', 'included_dirs_as_regex', 'excluded_dirs_as_regex', 'included_files_as_glob', 'excluded_files_as_glob', 'included_files_as_regex', 'excluded_files_as_regex', 'commands_using_filters']
     public static levelStyleToMdHeading = [
             'AutomaticLayout.level.root': '#',
@@ -65,7 +68,7 @@ class Export {
     ]
     public static mdSettings = [h1: MdH1.NODE, details: MdInclude.HLB, note: MdInclude.PLAIN]
     public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip: 0, tail: false, quote: false]
-    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, icons: true, skip1: false, denullify: false, pretty: false]
+    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, icons: true, skip1: false, denullify: false, pretty: false, isoDate: false]
     private static final DETAILS = '@details'
     private static final ATTRIBUTES = '@attributes'
     private static final NOTE = '@note'
@@ -329,7 +332,7 @@ class Export {
         GString profile
         String entries
         List<Node> nChildren
-        def allSettingNames = RUMAR_TOML_INTEGER_SETTINGS + RUMAR_TOML_STRING_SETTINGS + RUMAR_TOML_ARRAY_SETTINGS
+        def allSettingNames = RUMAR_TOML_INTEGER_SETTINGS + RUMAR_TOML_BOOLEAN_SETTINGS + RUMAR_TOML_STRING_SETTINGS + RUMAR_TOML_ARRAY_SETTINGS
         node.children.each { n ->
             nChildren = n.children
             if (nChildren) {
@@ -350,14 +353,14 @@ class Export {
     static GString _toRumarTomlEntry(Node n) {
         def listOfRows = createListOfRows(n, 1)
         def settingNameUncommented = n.text.replaceFirst(/^#/, '')
-        if (settingNameUncommented in RUMAR_TOML_INTEGER_SETTINGS) {
+        if (settingNameUncommented in RUMAR_TOML_INTEGER_SETTINGS || settingNameUncommented in RUMAR_TOML_BOOLEAN_SETTINGS) {
             "${n.text} = ${listOfRows[0]*.text.join(BLANK)}"
         } else if (settingNameUncommented in RUMAR_TOML_STRING_SETTINGS) {
             "${n.text} = ${_quote(listOfRows[0]*.text.join(BLANK))}"
         } else if (settingNameUncommented in RUMAR_TOML_ARRAY_SETTINGS) {
             "${n.text} = [$NL${listOfRows.collect { row -> FOUR_SPACES + _quote(row*.text.join(BLANK)) + COMMA }.join(NL)}$NL]"
         } else {
-            throw IllegalArgumentException("${n.text} not in RUMAR_TOML_STRING_SETTINGS or in RUMAR_TOML_ARRAY_SETTINGS")
+            throw IllegalArgumentException("${n.text} not in RUMAR_TOML_*_SETTINGS in Export.groovy")
         }
     }
 
@@ -386,7 +389,7 @@ class Export {
     }
 
     /**
-     * Export to JSON, with the assumption that each node on the same level has a unique core text,
+     * Export to JSON, in UTF-8 encoding, with the assumption that each node on the same level has a unique core text,
      * because it is used as Key in JSON
      * @param node - the starting node of the branch to be exported -- see also settings.skip1
      * @param settings - a hashMap -- see jsonSettings for default values
@@ -394,10 +397,11 @@ class Export {
      *  - note -- whether to include note;
      *  - attributes -- whether to include attributes;
      *  - transformed -- whether to use transformed text, i.e. after formula/numbering/format evaluation;
-     *  - skip1 -- skip the first node;
-     *  - denullify -- try to avoid `{"Node text": null}` by replacing it with `["Node text"]` where possible;
-     *  - pretty -- use pretty output format
-     * @return JSON representation of the branch
+     *  - skip1 -- whether to skip the first node;
+     *  - denullify -- whether to try to avoid `{"Node text": null}` by replacing it with `"Node text"` where possible;
+     *  - pretty -- whether to use pretty output format;
+     *  - isoDate -- whether to represent dates as ISO_LOCAL_DATE or ISO_LOCAL_DATE_TIME, otherwise as rendered by Freeplane;
+     * @return JSON representation of the branch, in UTF-8 encoding
      */
     static String toJsonString(Node node, HashMap<String, Object> settings = null) {
         settings = !settings ? jsonSettings.clone() : jsonSettings + settings
@@ -408,14 +412,20 @@ class Export {
             // use a wrapper to also denullyfy top-level entries, so that top-level object can be a list
             mapOrList = _toJson_denullify(['x': mapOrList])['x']
         }
-        def jsonPayload = JsonOutput.toJson(mapOrList)
+        def jsonPayload = new JsonGenerator.Options().disableUnicodeEscaping().build().toJson(mapOrList)
         if (settings.pretty)
-            return JsonOutput.prettyPrint(jsonPayload)
+            try {
+                // since 4.0.19
+                def disableUnicodeEscaping = true
+                return JsonOutput.prettyPrint(jsonPayload, disableUnicodeEscaping)
+            } catch (MissingMethodException ignore) {
+                return JsonOutput.prettyPrint(jsonPayload)
+            }
         else
             return jsonPayload
     }
 
-    static HashMap<String, Object> _toJson_getBodyRecursively(Node node, HashMap<String, Object> settings, int level=1) {
+    static HashMap<String, Object> _toJson_getBodyRecursively(Node node, HashMap<String, Object> settings, int level = 1) {
         def details = settings.details ? (settings.transformed ? node.details?.text : HtmlUtils.htmlToPlain(node.detailsText ?: '')) : null
         def note = settings.note ? (settings.transformed ? node.note?.text : HtmlUtils.htmlToPlain(node.noteText ?: '')) : null
         def attributes = settings.attributes ? (settings.transformed ? node.attributes.transformed.map : node.attributes.map) : EMPTY_MAP
@@ -438,8 +448,20 @@ class Export {
                 if (icons)
                     result[ICONS] = icons
             }
-            children.each {Node n ->
-                result["${settings.transformed ? n.transformedText : n.plainText}"] = _toJson_getBodyRecursively(n, settings, level + 1)
+            children.each { Node n ->
+                def key = null
+                if (settings.isoDate || n.isLeaf()) {
+                    def conv = n.to
+                    if (settings.isoDate && conv.isDate()) {
+                        def dtStr = conv.date.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                        key = dtStr.endsWith('T00:00:00') ? dtStr[0..<10] : dtStr
+                    } else if (n.isLeaf() && conv.isNum()) {
+                        key = conv.num
+                    }
+                }
+                if (key === null)
+                    key = "${settings.transformed ? n.transformedText : n.plainText}"
+                result[key] = _toJson_getBodyRecursively(n, settings, level + 1)
             }
             return result
         }
@@ -450,7 +472,8 @@ class Export {
         hashMap.each { k, v ->
             if (v instanceof HashMap) {
                 if (v.every { it.value === null }) {
-                    newHashMap[k] = v.collect { it.key }
+                    def lst = v.collect { it.key }
+                    newHashMap[k] = lst.size() == 1 ? lst[0] : lst
                 } else {
                     newHashMap[k] = _toJson_denullify(v)
                 }
