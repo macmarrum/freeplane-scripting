@@ -300,7 +300,7 @@ class Export {
                 if (newlineReplacement !== null)
                     text = text.replace(NL, newlineReplacement)
                 if ((shouldQuote || text.contains(sep) || text.contains(NL)) && sep != '"')
-                    text = /"$text"/
+                    text = /"${text.replaceAll('"', '""')}"/
                 outputStream.write(text.getBytes(charset))
                 def isLastRow = j == rowSize - 1
                 if (!isLastRow)
