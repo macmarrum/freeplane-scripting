@@ -352,15 +352,18 @@ class Export {
 
     static GString _toRumarTomlEntry(Node n) {
         def listOfRows = createListOfRows(n, 1)
-        def settingNameUncommented = n.text.replaceFirst(/^#/, '')
+        def nText = n.text
+        def isCommented = nText.startsWith(HASH)
+        def settingNameUncommented = isCommented ? nText.drop(1) : nText
         if (settingNameUncommented in RUMAR_TOML_INTEGER_SETTINGS || settingNameUncommented in RUMAR_TOML_BOOLEAN_SETTINGS) {
-            "${n.text} = ${listOfRows[0]*.text.join(BLANK)}"
+            "${nText} = ${listOfRows[0]*.text.join(BLANK)}"
         } else if (settingNameUncommented in RUMAR_TOML_STRING_SETTINGS) {
-            "${n.text} = ${_quote(listOfRows[0]*.text.join(BLANK))}"
+            "${nText} = ${_quote(listOfRows[0]*.text.join(BLANK))}"
         } else if (settingNameUncommented in RUMAR_TOML_ARRAY_SETTINGS) {
-            "${n.text} = [$NL${listOfRows.collect { row -> FOUR_SPACES + _quote(row*.text.join(BLANK)) + COMMA }.join(NL)}$NL]"
+            def _h_ = isCommented ? HASH : BLANK
+            "${nText} = [$NL${listOfRows.collect { row -> _h_ + FOUR_SPACES + _quote(row*.text.join(BLANK)) + COMMA }.join(NL)}$NL$_h_]"
         } else {
-            throw IllegalArgumentException("${n.text} not in RUMAR_TOML_*_SETTINGS in Export.groovy")
+            throw IllegalArgumentException("${nText} not in RUMAR_TOML_*_SETTINGS in Export.groovy")
         }
     }
 
