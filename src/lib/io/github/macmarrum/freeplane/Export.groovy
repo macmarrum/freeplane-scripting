@@ -340,7 +340,7 @@ class Export {
                 if (nTextUncommented in allSettingNames) {
                     text = _toRumarTomlEntry(n)
                 } else {
-                    profile = "[${_quoteTomlKeyIfNeeded(n.text)}]"
+                    profile = "[${_quote(n.text)}]"
                     entries = nChildren.collect { _toRumarTomlEntry(it) }.join(NL)
                     text = "$NL$profile$NL$entries"
                 }
