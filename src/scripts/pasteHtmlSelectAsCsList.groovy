@@ -18,6 +18,7 @@
 
 
 import groovy.xml.XmlParser
+import groovy.xml.XmlUtil
 import io.github.macmarrum.freeplane.ConfluenceStorage
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
@@ -38,7 +39,10 @@ if (text) {
     else {
         def lst = ConfluenceStorage.createList(node)
         select.children().each { groovy.util.Node it ->
-            lst.createChild(it.text().strip())
+            def t = it.text().strip()
+            def n = lst.createChild(t)
+            if (XmlUtil.escapeXml(t) != t)
+                n.icons.add(ConfluenceStorage.icon.xmlEscape_broom)
         }
     }
 }
