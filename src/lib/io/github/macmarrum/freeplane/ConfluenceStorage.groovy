@@ -207,6 +207,12 @@ class ConfluenceStorage {
         return content.replaceAll(/\n/, "<br />${getNewLine(n)}")
     }
 
+    /**
+     * Converts a branch to text (node and its children, recursively).
+     * Adds a sep (space) after regular nodes, unless noSepIcons.
+     * (!) No space after Markup Makers - use eol_chequeredFlag on each (as needed), or nl_rightArrowCurvingDown on mkParent (if used).
+     * Adds a eol (nl) after each elem (except mkParent, to avoid double eol) if eol_chequeredFlag.
+     */
     static StringBuilder mkNode(Node n) {
         def result = new StringBuilder()
         if (hasIcon(n, icon.noEntry)) {
@@ -226,7 +232,6 @@ class ConfluenceStorage {
                 } else {
                     def isP = hasIcon(n, icon.pButton)
                     def sep = getSpaceSep(n)
-                    String pContent
                     if (isP) { // no auto-replacements - getContent will do replacements if icon is set
                         result << '<p>' << nl << getContent(n) << sep
                     } else { // not a heading, not a P, must be a regular node
