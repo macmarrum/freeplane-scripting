@@ -32,12 +32,12 @@ class ConfluenceStorage {
     private static final KEY_TITLE = 'key:title'
     private static final COLON = ':'
 
-    private static style = [
+    public static style = [
             cStorageMarkupRoot : 'cStorageMarkupRoot',
             cStorageMarkupMaker: 'cStorageMarkupMaker',
     ]
 
-    private static icon = [
+    public static icon = [
             noEntry                      : 'emoji-26D4',
             eol_chequeredFlag            : 'emoji-1F3C1',
             noSep_cancer                 : 'emoji-264B',
