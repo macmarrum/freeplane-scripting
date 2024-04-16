@@ -44,12 +44,13 @@ class ConfluenceStorage {
             pButton                      : 'emoji-1F17F',
             nl_rightArrowCurvingDown     : 'emoji-2935',
             ol_keycapHash                : 'emoji-0023-20E3',
+            ol_inputNumbers              : 'emoji-1F522',
             border_unchecked             : 'unchecked',
             nbsp_gemini                  : 'emoji-264A',
             numbers_inputNumbers         : 'emoji-1F522',
             collapse_fastUpButton        : 'emoji-23EB',
             xmlEscape_broom              : 'emoji-1F9F9',
-            replacements_doubleCurlyLoop: 'emoji-27BF',
+            replacements_doubleCurlyLoop : 'emoji-27BF',
             stopAtThis_stopSign          : 'emoji-1F6D1',
             noSepAfter_lastQuarterMoon   : 'emoji-1F317',
     ]
@@ -376,10 +377,12 @@ class ConfluenceStorage {
             return markupRootDetailsText
     }
 
+    private static olIcons = [icon.ol_keycapHash, icon.ol_inputNumbers]
+
     static StringBuilder mkList(Node n) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
-        def tag = hasIcon(n, icon.ol_keycapHash) ? '<ol>' : '<ul>'
+        def tag = hasIcon(n, olIcons) ? '<ol>' : '<ul>'
         result << tag << nl
         String body
         n.children.each {
