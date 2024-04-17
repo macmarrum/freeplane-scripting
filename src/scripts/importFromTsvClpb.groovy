@@ -14,36 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Paste"})
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Import"})
 
 
-import groovy.xml.XmlUtil
-import io.github.macmarrum.freeplane.ConfluenceStorage
+import io.github.macmarrum.freeplane.Export
+import io.github.macmarrum.freeplane.Import
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.awt.*
 import java.awt.datatransfer.DataFlavor
 
+
 def c = ScriptUtils.c()
-def node = ScriptUtils.node()
 def transferable = Toolkit.defaultToolkit.systemClipboard.getContents(null)
 String text
 if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
     text = transferable.getTransferData(DataFlavor.stringFlavor)
 }
 if (text) {
-    def (tableNode, numberNode) = ConfluenceStorage.createTable(node)
-    tableNode[ConfluenceStorage.HILITE1ST] = ConfluenceStorage.HiLite1st.ROW
-    def listOfLines = text.split('\n')
-    listOfLines.eachWithIndex { ln, i ->
-        def cellNode = i > 0 ? tableNode.appendChild(numberNode) : numberNode
-        // use tab as a cell delimiter (standard for content copied from a spreadsheet)
-        // use limit: -1 to keep trailing empty strings
-        ln.split('\t', -1).each { cellText ->
-            cellNode = cellNode.createChild(cellText)
-            if (XmlUtil.escapeXml(cellText) != cellText)
-                cellNode.icons.add(ConfluenceStorage.icon.xmlEscape_broom)
-        }
+    def settings = [
+            sep: Export.TAB,
+    ]
+    c.selecteds.each { n ->
+        Import.fromCsvString(text, n, settings)
     }
-    c.select(tableNode)
+} else {
+    c.statusInfo = 'importFromTsvClpb: no text in clipboard'
 }
