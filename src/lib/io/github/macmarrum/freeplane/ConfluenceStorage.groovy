@@ -757,10 +757,13 @@ class ConfluenceStorage {
                 def firstChildChain = yesentryPatternChildren.collect { getFirstChildChain(it) }.flatten()
                 def contentList = firstChildChain.collect { getContent(it) }
                 def pattern = patternNode.details?.text ?: patternNode.note?.text ?: getContent(patternNode)
+                def result = []
                 if (templateType == TemplateType.MESSAGE)
-                    return MessageFormat.format(pattern, *contentList)
+                    result << MessageFormat.format(pattern, *contentList)
                 else if (templateType == TemplateType.STRING)
-                    return String.format(pattern, *contentList)
+                    result << String.format(pattern, *contentList)
+                result << getSpaceSep(n)
+                return result.join('')
             }
         }
     }
@@ -811,9 +814,11 @@ class ConfluenceStorage {
         return createMarkupMaker(node, 'link')
     }
 
-    static List<Node> createFormat(Node node, String pattern = '%s') {
+    static List<Node> createFormat(Node node, String pattern = '*%s*') {
         def n = createMarkupMaker(node, 'format')
+        n.icons.add(icon.noSepAfter_lastQuarterMoon)
         def p = n.createChild(pattern)
+        p.icons.add(icon.replacements_doubleCurlyLoop)
         c.select(p)
         return [n, p]
     }
