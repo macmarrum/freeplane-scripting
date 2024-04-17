@@ -38,21 +38,21 @@ class ConfluenceStorage {
     ]
 
     public static icon = [
-            noEntry                      : 'emoji-26D4',
-            eol_chequeredFlag            : 'emoji-1F3C1',
-            noSep_cancer                 : 'emoji-264B',
-            pButton                      : 'emoji-1F17F',
-            nl_rightArrowCurvingDown     : 'emoji-2935',
-            ol_keycapHash                : 'emoji-0023-20E3',
-            ol_inputNumbers              : 'emoji-1F522',
-            border_unchecked             : 'unchecked',
-            nbsp_gemini                  : 'emoji-264A',
-            numbers_inputNumbers         : 'emoji-1F522',
-            collapse_fastUpButton        : 'emoji-23EB',
-            xmlEscape_broom              : 'emoji-1F9F9',
-            replacements_doubleCurlyLoop : 'emoji-27BF',
-            stopAtThis_stopSign          : 'emoji-1F6D1',
-            noSepAfter_lastQuarterMoon   : 'emoji-1F317',
+            noEntry                     : 'emoji-26D4',
+            eol_chequeredFlag           : 'emoji-1F3C1',
+            noSep_cancer                : 'emoji-264B',
+            pButton                     : 'emoji-1F17F',
+            nl_rightArrowCurvingDown    : 'emoji-2935',
+            ol_keycapHash               : 'emoji-0023-20E3',
+            ol_inputNumbers             : 'emoji-1F522',
+            border_unchecked            : 'unchecked',
+            nbsp_gemini                 : 'emoji-264A',
+            numbers_inputNumbers        : 'emoji-1F522',
+            collapse_fastUpButton       : 'emoji-23EB',
+            xmlEscape_broom             : 'emoji-1F9F9',
+            replacements_doubleCurlyLoop: 'emoji-27BF',
+            stopAtThis_stopSign         : 'emoji-1F6D1',
+            noSepAfter_lastQuarterMoon  : 'emoji-1F317',
     ]
 
     private static tbl = [
@@ -679,26 +679,29 @@ class ConfluenceStorage {
      * mkCsv is like mkParent but using getContent instead of mkNode (no headings or paragraphs)
      * + collects only the first child of each node
      * + uses a comma_space or any string as the separator
+     * Adds sep (space) after the last item, unless noSepIcons
+     * (!) Caution: mkCsv of mkCsv - noSepIcons on child mkCsv(s) has a double meaning
      */
     static StringBuilder mkCsv(Node n) {
         // sep can be defined as the attribute csvSep
         // sep can be defined in details
         // for table cells (details start with №), the default sep is used
         def sb = new StringBuilder()
-        if (n.children.size() > 0) {
+        def children = n.children
+        if (children.size() > 0) {
             def eol = getEol(n)
             def nl = getNewLine(n)
-            String sep
-            final defaultSep = ', '
-            final csvSep = 'csvSep'
-            if (n[csvSep].text !== null)
-                sep = n[csvSep].text
-            else if (n.detailsText !== null)
-                sep = n.details.text.startsWith(tbl.rowNum) ? defaultSep : n.details.text
-            else
-                sep = defaultSep
+            def defaultSep = ', '
+            def sep = n['csvSep'].text
+            if (sep === null) {
+                def detailsText = n.details?.text
+                if (detailsText === null || detailsText.startsWith(tbl.rowNum))
+                    sep = defaultSep
+                else
+                    sep = detailsText
+            }
             def cells = new LinkedList<Node>()
-            n.children.each { Node it -> if (!hasIcon(it, icon.noEntry)) cells.addAll(getFirstChildChain(it)) }
+            children.each { Node it -> if (!hasIcon(it, icon.noEntry)) cells.addAll(getFirstChildChain(it)) }
             def cellsSize = cells.size()
             int i
             cells.each { Node it ->
