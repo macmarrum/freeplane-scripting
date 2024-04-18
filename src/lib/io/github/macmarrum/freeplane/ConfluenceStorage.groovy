@@ -78,7 +78,8 @@ class ConfluenceStorage {
 
     /**
      * makeMarkup if it's a markup maker, otherwise
-     * first escape xml (if broom present)
+     * take note text if exists, else transformed text and
+     * escape xml (if broom present),
      * only then do pReplacements (if doubleCurlyLoop present)
      * and replace each space with nbsp (if gemini present)
      */
@@ -744,26 +745,28 @@ class ConfluenceStorage {
         return _mkTemplate(n, TemplateType.STRING)
     }
 
+    /**
+     * Uses Pattern from the first child (note or transformed text).
+     * Applies patternNode children (first-child chain only) to the Pattern.
+     * Adds a space after unless noSepIcons.
+     */
     static String _mkTemplate(Node n, TemplateType templateType) {
-        def yesentryChildren = n.children.findAll { !hasIcon(it, icon.noEntry) }
-        if (yesentryChildren.size() == 0)
+        def patternNode = n.children.find { !hasIcon(it, icon.noEntry) }
+        if (!patternNode)
             return '<!-- a child (pattern) is missing -->'
         else {
-            def patternNode = yesentryChildren[0]
-            def yesentryPatternChildren = patternNode.children.findAll { !hasIcon(it, icon.noEntry) }
-            if (yesentryPatternChildren.size() == 0)
+            def yesEntryPatternChildren = patternNode.children.findAll { !hasIcon(it, icon.noEntry) }
+            if (yesEntryPatternChildren.size() == 0)
                 return '<!-- a (yes-entry) child is missing -->'
             else {
-                def firstChildChain = yesentryPatternChildren.collect { getFirstChildChain(it) }.flatten()
+                def firstChildChain = yesEntryPatternChildren.collect { getFirstChildChain(it) }.flatten()
                 def contentList = firstChildChain.collect { getContent(it) }
-                def pattern = patternNode.details?.text ?: patternNode.note?.text ?: getContent(patternNode)
-                def result = []
-                if (templateType == TemplateType.MESSAGE)
-                    result << MessageFormat.format(pattern, *contentList)
-                else if (templateType == TemplateType.STRING)
-                    result << String.format(pattern, *contentList)
-                result << getSpaceSep(n)
-                return result.join('')
+                def pattern = getContent(patternNode) + getSpaceSep(patternNode)
+                return switch (templateType) {
+                    case TemplateType.MESSAGE -> MessageFormat.format(pattern, *contentList)
+                    case TemplateType.STRING -> String.format(pattern, *contentList)
+                    default -> throw new RuntimeException("unknown TemplateType: ${templateType.name()}")
+                }
             }
         }
     }
@@ -816,9 +819,9 @@ class ConfluenceStorage {
 
     static List<Node> createFormat(Node node, String pattern = '*%s*') {
         def n = createMarkupMaker(node, 'format')
-        n.icons.add(icon.noSepAfter_lastQuarterMoon)
         def p = n.createChild(pattern)
         p.icons.add(icon.replacements_doubleCurlyLoop)
+        p.icons.add(icon.noSepAfter_lastQuarterMoon)
         c.select(p)
         return [n, p]
     }
