@@ -490,21 +490,7 @@ class ConfluenceStorage {
 
     static String getUuid(Node n) {
         // e.g. '649ac91e-33a1-476c-93d2-a30170e197a3'
-        def uuid = 'UUID'
-        def canGenerate = false
-        if (!n[uuid])
-            canGenerate = true
-        else if (!n[uuid].text.endsWith(n.id))
-            canGenerate = true
-        if (canGenerate) {
-            def uuidValue = UUID.randomUUID().toString()
-            def result = new StringBuilder()
-            result << uuidValue << '-' << n.id
-            n[uuid] = result.toString()
-            return uuidValue
-        } else {
-            return n[uuid].text[0..35]
-        }
+        return UUID.randomUUID().toString()
     }
 
     static String mkExpand(Node n) {
