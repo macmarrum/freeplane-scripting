@@ -20,6 +20,7 @@ package io.github.macmarrum.freeplane
 
 import groovy.xml.XmlUtil
 import org.freeplane.api.Node
+import org.freeplane.core.util.HtmlUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.text.MessageFormat
@@ -40,7 +41,7 @@ class ConfluenceStorage {
     public static icon = [
             noEntry                     : 'emoji-26D4',
             eol_chequeredFlag           : 'emoji-1F3C1',
-            noSep_cancer                : 'emoji-264B',
+            noCsvSep_cancer             : 'emoji-264B',
             pButton                     : 'emoji-1F17F',
             nl_rightArrowCurvingDown    : 'emoji-2935',
             ol_keycapHash               : 'emoji-0023-20E3',
@@ -52,7 +53,7 @@ class ConfluenceStorage {
             xmlEscape_broom             : 'emoji-1F9F9',
             replacements_doubleCurlyLoop: 'emoji-27BF',
             stopAtThis_stopSign         : 'emoji-1F6D1',
-            noSepAfter_lastQuarterMoon  : 'emoji-1F317',
+            noSpaceAfter_lastQuarterMoon: 'emoji-1F317',
     ]
 
     private static tbl = [
@@ -84,10 +85,18 @@ class ConfluenceStorage {
      * and replace each space with nbsp (if gemini present)
      */
     static String getContent(Node n) {
-        String content = isMarkupMaker(n) ? makeMarkup(n) : n.note?.text ?: n.transformedText
+        String content = isMarkupMaker(n) ? makeMarkup(n) : n.note?.text ?: getTransformedPlainText(n)
         if (hasIcon(n, icon.xmlEscape_broom)) content = XmlUtil.escapeXml(content)
         if (hasIcon(n, icon.replacements_doubleCurlyLoop)) content = _applyReplacements(n, content)
         return hasIcon(n, icon.nbsp_gemini) ? content.replaceAll(/ /, '&nbsp;') : content
+    }
+
+    static String getTransformedPlainText(Node n) {
+        def tt = n.transformedText
+        if (tt && HtmlUtils.isHtml(tt))
+            return HtmlUtils.htmlToPlain(tt, false, true)
+        else
+            return tt
     }
 
     private static mk = [
@@ -145,10 +154,8 @@ class ConfluenceStorage {
         }
     }
 
-    private static noSepIcons = [icon.noSepAfter_lastQuarterMoon, icon.noSep_cancer]
-
-    static String getSpaceSep(Node n) {
-        return hasIcon(n, noSepIcons) ? '' : ' '
+    static String getSpaceAfter(Node n) {
+        return hasIcon(n, icon.noSpaceAfter_lastQuarterMoon) ? '' : ' '
     }
 
     static String getNewLine(Node n) {
@@ -210,7 +217,7 @@ class ConfluenceStorage {
 
     /**
      * Converts a branch to text (node and its children, recursively).
-     * Adds a sep (space) after regular nodes, unless noSepIcons.
+     * Adds a space after regular nodes, unless noSpaceAfter_lastQuarterMoon.
      * (!) No space after Markup Makers - use eol_chequeredFlag on each (as needed), or nl_rightArrowCurvingDown on mkParent (if used).
      * Adds a eol (nl) after each elem (except mkParent, to avoid double eol) if eol_chequeredFlag.
      */
@@ -232,7 +239,7 @@ class ConfluenceStorage {
                     return result
                 } else {
                     def isP = hasIcon(n, icon.pButton)
-                    def sep = getSpaceSep(n)
+                    def sep = getSpaceAfter(n)
                     if (isP) { // no auto-replacements - getContent will do replacements if icon is set
                         result << '<p>' << nl << getContent(n) << sep
                     } else { // not a heading, not a P, must be a regular node
@@ -450,7 +457,7 @@ class ConfluenceStorage {
         final sb = new StringBuilder()
         if (child) {
             sb << getContent(child)
-            if (!hasIcon(child, noSepIcons))
+            if (!hasIcon(child, icon.noSpaceAfter_lastQuarterMoon))
                 sb << sep
             final grandchildsContent = getEachFirstChildsContent(child, sep)
             if (!grandchildsContent.isBlank())
@@ -665,9 +672,8 @@ class ConfluenceStorage {
     /**
      * mkCsv is like mkParent but using getContent instead of mkNode (no headings or paragraphs)
      * + collects only the first child of each node
-     * + uses a comma_space or any string as the separator
-     * Adds sep (space) after the last item, unless noSepIcons
-     * (!) Caution: mkCsv of mkCsv - noSepIcons on child mkCsv(s) has a double meaning
+     * + uses a comma_space or any string as the separator, unless noCsvSep_cancer
+     * Adds space after the last item, unless noSpaceAfter_lastQuarterMoon on mkCsv
      */
     static StringBuilder mkCsv(Node n) {
         // sep can be defined as the attribute csvSep
@@ -676,31 +682,28 @@ class ConfluenceStorage {
         def sb = new StringBuilder()
         def children = n.children
         if (children.size() > 0) {
-            def eol = getEol(n)
             def nl = getNewLine(n)
             def defaultSep = ', '
-            def sep = n['csvSep'].text
-            if (sep === null) {
+            def csvSep = n['csvSep'].text
+            if (csvSep === null) {
                 def detailsText = n.details?.text
                 if (detailsText === null || detailsText.startsWith(tbl.rowNum))
-                    sep = defaultSep
+                    csvSep = defaultSep
                 else
-                    sep = detailsText
+                    csvSep = detailsText
             }
             def cells = new LinkedList<Node>()
             children.each { Node it -> if (!hasIcon(it, icon.noEntry)) cells.addAll(getFirstChildChain(it)) }
-            def cellsSize = cells.size()
-            int i
-            cells.each { Node it ->
+            def lastIdx = cells.size() - 1
+            cells.eachWithIndex { Node it, int i ->
                 sb << getContent(it)
-                if (++i < cellsSize) { // not the last element
-                    if (!hasIcon(it, noSepIcons)) // noSepAfter is missing
-                        sb << sep << nl
-                } else // last item – space if noSepAfter is missing
-                    sb << getSpaceSep(it)
-                sb << getEol(it)
+                if (i < lastIdx) { // not the last element
+                    if (!hasIcon(it, icon.noCsvSep_cancer)) // noCsvSep_cancer is missing
+                        sb << csvSep << nl
+                } else  // last item – space if noSpaceAfter_lastQuarterMoon is missing
+                    sb << getSpaceAfter(it) << getEol(it)
             }
-            sb << eol
+            sb << getEol(n)
             // NB. getContent->makeMarkup->mk***->mkNode adds a trailing space (unless noSepAfter)
             return sb
         } else
@@ -734,7 +737,7 @@ class ConfluenceStorage {
     /**
      * Uses Pattern from the first child (note or transformed text).
      * Applies patternNode children (first-child chain only) to the Pattern.
-     * Adds a space after unless noSepIcons.
+     * Adds a space after unless noSpaceAfter_lastQuarterMoon.
      */
     static String _mkTemplate(Node n, TemplateType templateType) {
         def patternNode = n.children.find { !hasIcon(it, icon.noEntry) }
@@ -747,7 +750,7 @@ class ConfluenceStorage {
             else {
                 def firstChildChain = yesEntryPatternChildren.collect { getFirstChildChain(it) }.flatten()
                 def contentList = firstChildChain.collect { getContent(it) }
-                def pattern = getContent(patternNode) + getSpaceSep(patternNode)
+                def pattern = getContent(patternNode) + getSpaceAfter(patternNode)
                 return switch (templateType) {
                     case TemplateType.MESSAGE -> MessageFormat.format(pattern, *contentList)
                     case TemplateType.STRING -> String.format(pattern, *contentList)
@@ -807,7 +810,7 @@ class ConfluenceStorage {
         def n = createMarkupMaker(node, 'format')
         def p = n.createChild(pattern)
         p.icons.add(icon.replacements_doubleCurlyLoop)
-        p.icons.add(icon.noSepAfter_lastQuarterMoon)
+        p.icons.add(icon.noSpaceAfter_lastQuarterMoon)
         c.select(p)
         return [n, p]
     }
