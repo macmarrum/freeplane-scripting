@@ -24,6 +24,7 @@ import org.freeplane.core.util.HtmlUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.text.MessageFormat
+import java.util.regex.Pattern
 
 class ConfluenceStorage {
 
@@ -185,30 +186,34 @@ class ConfluenceStorage {
         return sb.toString()
     }
 
-    private static LinkedHashMap<String, String> pReplacements = [
-            /(?m)(?<=^| )-> /                                                          : '→ ',
-            /(?m)(?<=^| )=> /                                                          : '&rArr; ',
-            /(?m)(?<=^| )>> /                                                          : '&#8611; ', // >->
-            /(?m)(?<=^| )=- /                                                          : '→ ',
-            /(?m)(?<=^| )== /                                                          : '&#8611; ', // >->
-            /(?m)(?<=^|[^-])---(?=[^-]|$)/                                             : '&mdash;',
-            /(?m)(?<=^|[^-])--(?=[^-]|$)/                                              : '&ndash;',
-            /\{\{([^{]+)\}\}/                                                          : '<code>$1</code>',
-            /`([^`]+)`/                                                                : '<code>$1</code>',
-            /(?<=^|[^a-zA-Z0-9])\*(?! )(.+?)(?<! )\*(?=[^a-zA-Z0-9]|$)/                : '<b>$1</b>',
-            /(?<=^|[^a-zA-Z0-9])_(?! )(.+?)(?<! )_(?=[^a-zA-Z0-9]|$)/                  : '<i>$1</i>',
-            /(?<=^|[^a-zA-Z0-9])-(?! )(.+?)(?<! )-(?=[^a-zA-Z0-9]|$)/                  : '<del>$1</del>',
-            /(?<=^|[^a-zA-Z0-9])\+(?! )(.+?)(?<! )\+(?=[^a-zA-Z0-9]|$)/                : '<ins>$1</ins>',
-            /(?<=^|[^a-zA-Z0-9])\(([a-z]+)\)(?! )(.+?)(?<! )\(\/\1\)(?=[^a-zA-Z0-9]|$)/: '<span style="color: $1">$2</span>',
-    ]
+    private static Map<Pattern, String> pReplacements = new LinkedHashMap<Pattern, String>()
+    static {
+        pReplacements.put(~/(?m)(?<=^| )>>  /, '➔ ')
+        pReplacements.put(~/(?m)^== /, '➔ ')
+        pReplacements.put(~/(?m)(?<=^| )>-> /, '↣ ')
+        pReplacements.put(~/(?m)(?<=^| )-> /, '→ ')
+        pReplacements.put(~/(?m)^=- /, '→ ')
+        pReplacements.put(~/(?m)(?<=^| )=> /, '⇒ ')
+        pReplacements.put(~/(?m)(?<=^|[^-])---(?=[^-]|$)/, '—')
+        pReplacements.put(~/(?m)(?<=^|[^-])--(?=[^-]|$)/, '–')
+        pReplacements.put(~/\{\{([^{]+)}}/, '<code>$1</code>')
+        pReplacements.put(~/`([^`]+)`/, '<code>$1</code>')
+        pReplacements.put(~/(?<=^|[^a-zA-Z0-9])\*(?! )(.+?)(?<! )\*(?=[^a-zA-Z0-9]|$)/, '<b>$1</b>')
+        pReplacements.put(~/(?<=^|[^a-zA-Z0-9])_(?! )(.+?)(?<! )_(?=[^a-zA-Z0-9]|$)/, '<i>$1</i>')
+        pReplacements.put(~/(?<=^|[^a-zA-Z0-9])-(?! )(.+?)(?<! )-(?=[^a-zA-Z0-9]|$)/, '<del>$1</del>')
+        pReplacements.put(~/(?<=^|[^a-zA-Z0-9])\+(?! )(.+?)(?<! )\+(?=[^a-zA-Z0-9]|$)/, '<ins>$1</ins>')
+        pReplacements.put(~/(?<=^|[^a-zA-Z0-9])\(([a-z]+)\)(?! )(.+?)(?<! )\(\/\1\)(?=[^a-zA-Z0-9]|$)/, '<span style="color: $1">$2</span>')
+    }
+
+    private static final RX_PLUS_ = ~/(?m)^\+ /
 
     static String _applyReplacements(Node n, String content) {
-        content = content.replaceAll(/\n\+ /, "\n${getSimBullet(n)} ")
+        content = content.replaceAll(RX_PLUS_, "\n${getSimBullet(n)} ")
         pReplacements.each {
             try {
                 content = content.replaceAll(it.key, it.value)
             } catch (IndexOutOfBoundsException e) {
-                println("** replaceAll(/${it.key}/, /${it.value}/) for '$content'")
+                println("** replaceAll(/${it.key.pattern()}/, /${it.value}/) for '$content'")
                 throw e
             }
         }
