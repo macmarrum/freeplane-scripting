@@ -21,6 +21,7 @@ package io.github.macmarrum.freeplane
 import groovy.xml.XmlUtil
 import org.freeplane.api.Node
 import org.freeplane.core.util.HtmlUtils
+import org.freeplane.plugin.script.FormulaUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.text.MessageFormat
@@ -30,9 +31,14 @@ class ConfluenceStorage {
 
     private static c = ScriptUtils.c()
 
-    public static final HILITE1ST = 'hiLite1st'
-    private static final KEY_TITLE = 'key:title'
-    private static final COLON = ':'
+    public static final String HILITE1ST = 'hiLite1st'
+    private static final String KEY_TITLE = 'key:title'
+    private static final String COLON = ':'
+    private static final String NL = '\n'
+    private static final String TRIPLE_SINGLE_QT = '\'\'\''
+    private static final String BLANK = ''
+    private static final String SPACE = ' '
+    private static final String COMMA_SPACE = ', '
 
     public static style = [
             cStorageMarkupRoot : 'cStorageMarkupRoot',
@@ -92,12 +98,39 @@ class ConfluenceStorage {
         return hasIcon(n, icon.nbsp_gemini) ? content.replaceAll(/ /, '&nbsp;') : content
     }
 
+    /**
+     * Removes (possible) HTML from node.transformedText but keeps newlines (important for <pre>)
+     */
     static String getTransformedPlainText(Node n) {
-        def tt = n.transformedText
-        if (tt && HtmlUtils.isHtml(tt))
-            return HtmlUtils.htmlToPlain(tt, false, true)
+        def transformedText = n.transformedText
+        if (transformedText && HtmlUtils.isHtml(transformedText))
+            return HtmlUtils.htmlToPlain(transformedText, false, true)
         else
-            return tt
+            return transformedText
+    }
+
+    /**
+     * Like node.note.text but doesn't remove newlines (good for <pre>, bad for other tags)
+     */
+    static String getTransformedPlainNote(Node n) {
+        def noteHtml = n.noteText
+        if (noteHtml === null)
+            return null
+        else {
+            def notePlain = HtmlUtils.htmlToPlain(noteHtml, false, false)
+            return FormulaUtils.safeEvalIfScript(n.delegate, notePlain)
+        }
+    }
+
+    /**
+     * Like node.plainNote (unexposed) but doesn't remove newlines (good for <pre>, bad for other tags)
+     */
+    static String getPlainNote(Node n) {
+        def noteHtml = n.noteText
+        if (noteHtml === null)
+            return null
+        else
+            return HtmlUtils.htmlToPlain(noteHtml, false, false)
     }
 
     private static mk = [
@@ -129,6 +162,9 @@ class ConfluenceStorage {
     static String makeMarkup(Node n) {
         return switch (n.text) {
             case mk.parent -> mkParent(n)
+            case mk.csv -> mkCsv(n)
+            case mk.format -> mkFormat(n)
+            case mk.template -> mkTemplate(n)
             case mk.table -> mkTable(n)
             case mk.list -> mkList(n)
             case mk.zip_list -> mkZipList(n)
@@ -144,27 +180,24 @@ class ConfluenceStorage {
             case mk.style -> mkStyle(n)
             case mk.html -> mkHtml(n)
             case mk.image -> mkImage(n)
-            case mk.csv -> mkCsv(n)
             case mk.wiki -> mkWiki(n)
             case mk.markdown -> mkMarkdown(n)
             case mk.section -> mkSection(n)
             case mk.column -> mkColumn(n)
-            case mk.template -> mkTemplate(n)
-            case mk.format -> mkFormat(n)
             default -> "<!-- mk function by that name not found: ${n.text} -->"
         }
     }
 
     static String getSpaceAfter(Node n) {
-        return hasIcon(n, icon.noSpaceAfter_lastQuarterMoon) ? '' : ' '
+        return hasIcon(n, icon.noSpaceAfter_lastQuarterMoon) ? BLANK : SPACE
     }
 
     static String getNewLine(Node n) {
-        return hasIcon(n, icon.nl_rightArrowCurvingDown) ? '\n' : ''
+        return hasIcon(n, icon.nl_rightArrowCurvingDown) ? NL : BLANK
     }
 
     static String getEol(Node n) {
-        return hasIcon(n, icon.eol_chequeredFlag) ? '\n' : ''
+        return hasIcon(n, icon.eol_chequeredFlag) ? NL : BLANK
     }
 
     static String mkParent(Node n) {
@@ -179,10 +212,14 @@ class ConfluenceStorage {
     }
 
     static String _mkParent(Node n) {
-        def nl = getNewLine(n)
         def sb = new StringBuilder()
-        n.children.each { sb << mkNode(it) << nl }
-        sb << getEol(n) // mkNode avoids adding it for mkParent
+        def children = n.children
+        def lastIdx = children.size() - 1
+        children.eachWithIndex { it, i ->
+            sb << mkNode(it)
+            if (i < lastIdx)
+                sb << getNewLine(n)
+        }
         return sb.toString()
     }
 
@@ -233,9 +270,7 @@ class ConfluenceStorage {
         } else {
             def eol = getEol(n)
             if (isMarkupMaker(n)) {
-                result << makeMarkup(n)
-                if (n.text != mk.parent) // avoid double eol
-                    result << eol
+                result << makeMarkup(n) // eol added by markup maker
                 return result
             } else {
                 def nl = getNewLine(n)
@@ -248,8 +283,7 @@ class ConfluenceStorage {
                     if (isP) { // no auto-replacements - getContent will do replacements if icon is set
                         result << '<p>' << nl << getContent(n) << sep
                     } else { // not a heading, not a P, must be a regular node
-                        result << getContent(n) << sep
-                        result << eol
+                        result << getContent(n) << sep << eol
                     }
                     if (!hasIcon(n, icon.stopAtThis_stopSign))
                         n.children.each { result << mkNode(it) }
@@ -268,7 +302,7 @@ class ConfluenceStorage {
     static StringBuilder _mkHeading(Node n, String nl, String eol) {
         def hIcon = n.icons.icons.find { it.startsWith('full-') }
         def hLevel = hIcon[5..-1]
-        def childrenBody = n.children.size() > 0 ? n.children.collect { mkNode(it) }.join('') : ''
+        def childrenBody = n.children.size() > 0 ? n.children.collect { mkNode(it) }.join(BLANK) : BLANK
         def result = new StringBuilder()
         result << '<h' << hLevel << '>' << nl << getContent(n) << nl << '</h' << hLevel << '>' << eol << childrenBody
         return result
@@ -276,22 +310,89 @@ class ConfluenceStorage {
 
 
     /**
-     * canExcludeMarkupMaker for getFirstChildChain, used by mkCsv – to stop at markupMaker nodes
+     * mkCsv is like mkParent but using getContent instead of mkNode (no headings or paragraphs)
+     * + collects only the first child of each node
+     * + uses a comma_space or any string as the separator, unless noCsvSep_cancer
+     * + details-located csvSeps can be triple-single-quoted to preserve trailing space(s)
+     * Adds space after the last item, unless noSpaceAfter_lastQuarterMoon on mkCsv
      */
-    static Node getFirstChildIfNotIgnoreNode(Node n, boolean canExcludeMarkupMaker = true) {
-        def isMarkupMakerAndCanExcludeIt = isMarkupMaker(n) && canExcludeMarkupMaker
-        if (isMarkupMakerAndCanExcludeIt || n.children.size() == 0 || hasIcon(n, icon.stopAtThis_stopSign) || hasIcon(n.children[0], icon.noEntry))
-            return null
-        else
-            return n.children[0]
+    static StringBuilder mkCsv(Node n) {
+        // sep can be defined as the attribute csvSep
+        // sep can be defined in details
+        // for table cells (details start with №), the default sep is used
+        def sb = new StringBuilder()
+        def children = n.children
+        if (children.size() > 0) {
+            def nl = getNewLine(n)
+            def csvSep = n['csvSep'].text
+            if (csvSep === null) {
+                def detailsText = n.details?.text
+                if (detailsText === null || detailsText.startsWith(tbl.rowNum))
+                    csvSep = COMMA_SPACE
+                else if (detailsText.size() > 6 && detailsText.startsWith(TRIPLE_SINGLE_QT) && detailsText.endsWith(TRIPLE_SINGLE_QT))
+                    csvSep = detailsText[3..<-3] // remove surrounding quotes
+                else
+                    csvSep = detailsText
+            }
+            def cells = new LinkedList<Node>()
+            children.each { Node it -> if (!hasIcon(it, icon.noEntry)) cells.addAll(getFirstChildChain(it)) }
+            def lastIdx = cells.size() - 1
+            cells.eachWithIndex { Node it, int i ->
+                sb << getContent(it)
+                if (i < lastIdx) { // not the last element
+                    if (!hasIcon(it, icon.noCsvSep_cancer)) // noCsvSep_cancer is missing
+                        sb << csvSep << nl
+                } else  // last item – space if noSpaceAfter_lastQuarterMoon is missing
+                    sb << getSpaceAfter(it) << getEol(it)
+            }
+            sb << getEol(n)
+            // NB. getContent->makeMarkup->mk***->mkNode adds a trailing space (unless noSepAfter)
+            return sb
+        } else
+            return sb << '<!-- a child is missing -->'
     }
 
-    static int _tbl_countFirstChildChain(Node n, int cnt = 0) {
-        def child = getFirstChildIfNotIgnoreNode(n, false)
-        if (child)
-            return _tbl_countFirstChildChain(child, ++cnt)
-        else
-            return cnt
+    enum TemplateType {
+        MESSAGE, STRING;
+    }
+
+    static String mkTemplate(Node n) {
+        return _mkTemplate(n, TemplateType.MESSAGE)
+    }
+
+    static String mkFormat(Node n) {
+        return _mkTemplate(n, TemplateType.STRING)
+    }
+
+    /**
+     * Uses Pattern from the first child (note or transformed text).
+     * Applies patternNode children (first-child chain only) to the Pattern.
+     * Adds a space after unless noSpaceAfter_lastQuarterMoon.
+     */
+    static String _mkTemplate(Node n, TemplateType templateType) {
+        def patternNode = n.children.find { !hasIcon(it, icon.noEntry) }
+        if (!patternNode)
+            return '<!-- a child (pattern) is missing -->'
+        else {
+            def yesEntryPatternChildren = patternNode.children.findAll { !hasIcon(it, icon.noEntry) }
+            if (yesEntryPatternChildren.size() == 0)
+                return '<!-- a (yes-entry) child is missing -->'
+            else {
+                def firstChildChain = yesEntryPatternChildren.collect { getFirstChildChain(it) }.flatten()
+                def contentList = firstChildChain.collect { getContent(it) }
+                def pattern = getContent(patternNode) + getSpaceAfter(patternNode)
+                def result = switch (templateType) {
+                    case TemplateType.MESSAGE -> MessageFormat.format(pattern, *contentList)
+                    case TemplateType.STRING -> String.format(pattern, *contentList)
+                    default -> throw new RuntimeException("unknown TemplateType: ${templateType.name()}")
+                }
+                return result + getEol(n)
+            }
+        }
+    }
+
+    enum HiLite1st {
+        ROW, COLUMN, NONE
     }
 
     static StringBuilder mkTable(Node n) {
@@ -332,12 +433,8 @@ class ConfluenceStorage {
                 rowNum++
             }
         }
-        tableWiki << '</tbody>' << nl << '</table>'
+        tableWiki << '</tbody>' << nl << '</table>' << getSpaceAfter(n) << getEol(n)
         return tableWiki
-    }
-
-    enum HiLite1st {
-        ROW, COLUMN, NONE
     }
 
     static void makeTableCellOfEachChildWithDescendantsAndAppendTo(StringBuilder tableWiki, List<Node> children, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
@@ -379,10 +476,10 @@ class ConfluenceStorage {
         result << '</' << tag[1..-1] << nl
         return result
     }
-
     private static final String clear = 'clear'
     private static final String annotate = 'annotate'
     private static final String none = 'none'
+
     private static final ArrayList<String> clear_annotate_none = [clear, annotate, none]
 
     static String getTableAnnotateText(Node n) {
@@ -393,6 +490,25 @@ class ConfluenceStorage {
         def markupRootDetailsText = markupRoot.details?.text
         if (markupRootDetailsText in clear_annotate_none)
             return markupRootDetailsText
+    }
+
+    /**
+     * canExcludeMarkupMaker for getFirstChildChain, used by mkCsv – to stop at markupMaker nodes
+     */
+    static Node getFirstChildIfNotIgnoreNode(Node n, boolean canExcludeMarkupMaker = true) {
+        def isMarkupMakerAndCanExcludeIt = isMarkupMaker(n) && canExcludeMarkupMaker
+        if (isMarkupMakerAndCanExcludeIt || n.children.size() == 0 || hasIcon(n, icon.stopAtThis_stopSign) || hasIcon(n.children[0], icon.noEntry))
+            return null
+        else
+            return n.children[0]
+    }
+
+    static int _tbl_countFirstChildChain(Node n, int cnt = 0) {
+        def child = getFirstChildIfNotIgnoreNode(n, false)
+        if (child)
+            return _tbl_countFirstChildChain(child, ++cnt)
+        else
+            return cnt
     }
 
     private static olIcons = [icon.ol_keycapHash, icon.ol_inputNumbers]
@@ -408,7 +524,7 @@ class ConfluenceStorage {
             if (body.trim().size() > 0)
                 result << '<li>' << nl << body << nl << '</li>' << nl
         }
-        result << '</' << tag[1..-1]
+        result << '</' << tag[1..-1] << getSpaceAfter(n) << getEol(n)
         return result
     }
 
@@ -426,9 +542,9 @@ class ConfluenceStorage {
             branch.children.eachWithIndex { levelOneChild, int idx ->
                 if (idx < smallerBranchChildrenSize) {
                     if (!items[idx]) {
-                        items[idx] = new StringBuilder() << bullet << ' '
+                        items[idx] = new StringBuilder() << bullet << SPACE
                     }
-                    items[idx] << getEachFirstChildsContent(levelOneChild, ' ', true)  // skip levelOneChild, which is a numbering
+                    items[idx] << getEachFirstChildsContent(levelOneChild, SPACE, true)  // skip levelOneChild, which is a numbering
                 }
             }
         }
@@ -444,7 +560,7 @@ class ConfluenceStorage {
             if (i < itemsSize - 1)
                 sb << '<br />' << nl
         }
-        sb << nl << '</div>'
+        sb << nl << '</div>' << getSpaceAfter(n) << getEol(n)
         return sb
     }
 
@@ -456,7 +572,7 @@ class ConfluenceStorage {
      * canExcludeMarkupMaker for getFirstChildIfNotIgnoreNode
      * then for getFirstChildChain, used by mkCsv – to stop at markupMaker nodes
      */
-    static StringBuilder getEachFirstChildsContent(n, String sep = ' ', boolean canExcludeMarkupMaker = true) {
+    static StringBuilder getEachFirstChildsContent(n, String sep = SPACE, boolean canExcludeMarkupMaker = true) {
         /* canExcludeMarkupMaker for top-level nodes of mkSomething */
         def child = getFirstChildIfNotIgnoreNode(n, canExcludeMarkupMaker)
         final sb = new StringBuilder()
@@ -485,7 +601,7 @@ class ConfluenceStorage {
     static String mkQuote(Node n) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
-        result << '<blockquote>' << nl << mkParent(n) << nl << '</blockquote>'
+        result << '<blockquote>' << nl << mkParent(n) << '</blockquote>' << getSpaceAfter(n) << getEol(n)
         return result.toString()
     }
 
@@ -494,7 +610,7 @@ class ConfluenceStorage {
         def nl = getNewLine(n)
         for (child in n.children.find { it.link }) {
             def result = new StringBuilder()
-            result << '<a href="' << XmlUtil.escapeXml(child.link.text) << '">' << nl << getContent(child) << nl << '</a>'
+            result << '<a href="' << XmlUtil.escapeXml(child.link.text) << '">' << nl << getContent(child) << nl << '</a>' << getSpaceAfter(n) << getEol(n)
             return result.toString()
         }
         return '<!-- a child with a link is missing -->'
@@ -513,22 +629,9 @@ class ConfluenceStorage {
 
     static String mkDiv(Node n) {
         return _execIfChildren(n, {
-            Map<String, String> params = n.detailsText ? [class: n.details.text] : null
+            def detailsText = n.details?.text
+            Map<String, String> params = detailsText ? [class: detailsText] : null
             return _mkMacroRich(n, 'div', params)
-        })
-    }
-
-    static String mkSection(Node n) {
-        return _execIfChildren(n, {
-            Map<String, String> params = n.icons.contains(icon.border_unchecked) ? [border: 'true'] : null
-            return _mkMacroRich(n, 'section', params)
-        })
-    }
-
-    static String mkColumn(Node n) {
-        return _execIfChildren(n, {
-            Map<String, String> params = n.detailsText ? [width: n.details.text] : null
-            return _mkMacroRich(n, 'column', params)
         })
     }
 
@@ -538,33 +641,42 @@ class ConfluenceStorage {
         final MAX_LANG_SIZE = 12
         for (child in n.children.find { Node it -> it.children.size() > 0 || it.noteText !== null || it.detailsText !== null }) {
             String lang
-            String cdata  // get cdata from text, alternatively from children or from note
-            String text = child.text
+            String cdata  // get cdata from childText, alternatively from children or from note
+            String childText = child.text
             String title
-            if (text.size() > MAX_LANG_SIZE) { // text is not a language name
-                lang = child.details?.text ?: 'none'
-                cdata = text
-                if (n.detailsText) title = n.details.text
+            String childDetailsText = child.details?.text
+            String nDetailsText
+            String childLinkText
+            if (childText.size() > MAX_LANG_SIZE) { // childText is not a language name
+                lang = childDetailsText ?: 'none'
+                cdata = childText
+                if (nDetailsText = n.details?.text)
+                    title = nDetailsText
             } else {
-                lang = child.text ?: 'none'
+                lang = childText ?: 'none'
                 if (child.children.size() > 0)
                     cdata = mkParent(child)
                 else
                     cdata = child.plainNote  // no formula evaluation (unexposed method)
-                if (child.detailsText) title = child.details.text
+                if (childDetailsText)
+                    title = childDetailsText
             }
             def params = [language: lang]
-            if (title) params.title = title
-            if (hasIcon(child, icon.collapse_fastUpButton)) params.collapse = 'true'
-            if (hasIcon(child, icon.numbers_inputNumbers)) params.linenumbers = 'true'
-            if (child.link.text) params.theme = child.link.text
+            if (title)
+                params.title = title
+            if (hasIcon(child, icon.collapse_fastUpButton))
+                params.collapse = 'true'
+            if (hasIcon(child, icon.numbers_inputNumbers))
+                params.linenumbers = 'true'
+            if (childLinkText = child.link.text)  // link is never null
+                params.theme = childLinkText
             return _mkMacroPlain(n, 'code', cdata, params)
         }
         return '<!-- a child with children or a note is missing -->'
     }
 
     static String mkPageInfo(Node n) {
-        String infoType = n.detailsText ? n.details.text : 'Title'
+        String infoType = n.details?.text ?: 'Title'
         return _mkPageInfo(n, infoType)
     }
 
@@ -583,28 +695,28 @@ class ConfluenceStorage {
             }
         if (cdata)
             result << '<ac:plain-text-body>' << nl << '<![CDATA[' << cdata << ']]>' << nl << '</ac:plain-text-body>' << nl
-        result << '</ac:structured-macro>'
+        result << '</ac:structured-macro>' << getSpaceAfter(n) << getEol(n)
         return result.toString()
     }
 
     static StringBuilder _mkMacroRich(Node n, String macro, Map<String, String> parameters = null, String body = null) {
         def nl = getNewLine(n)
         def result = new StringBuilder()
-        def _body = body ?: _mkParent(n)
+        def body_nl = body ? body + nl : _mkParent(n) // mkParent (mkNode) adds nl, if needed
         result << '<ac:structured-macro ac:name="' << macro << '" ac:schema-version="1" ac:macro-id="' << getUuid(n) << '">' << nl
         if (parameters)
             parameters.each {
                 result << '<ac:parameter ac:name="' << it.key << '">' << it.value << '</ac:parameter>' << nl
             }
-        result << '<ac:rich-text-body>' << nl << _body << nl << '</ac:rich-text-body>' << nl
-        result << '</ac:structured-macro>'
+        result << '<ac:rich-text-body>' << nl << body_nl << '</ac:rich-text-body>' << nl
+        result << '</ac:structured-macro>' << getSpaceAfter(n) << getEol(n)
         return result
     }
 
     static String mkDivExpand(Node n) {
         return _execIfChildren(n, {
             def nl = getNewLine(n)
-            def title = n.detailsText ? n.details.text : 'Click here to expand...'
+            def title = n.details?.text ?: 'Click here to expand...'
             def className = n.link.text ?: 'expand-in-a-box'
             def result = new StringBuilder()
             result << '<div class="' << className << '">' << nl
@@ -621,7 +733,7 @@ class ConfluenceStorage {
         def result = new StringBuilder()
         result << '<ac:structured-macro ac:name="attachments" ac:schema-version="1" ac:macro-id="' << getUuid(n) << '">' << nl
         result << '<ac:parameter ac:name="upload">' << canUpload << '</ac:parameter>' << nl
-        result << '<ac:parameter ac:name="old">' << canOld << '</ac:parameter>' << nl << '</ac:structured-macro>'
+        result << '<ac:parameter ac:name="old">' << canOld << '</ac:parameter>' << nl << '</ac:structured-macro>' << getEol(n)
         return result.toString()
     }
 
@@ -650,11 +762,12 @@ class ConfluenceStorage {
      * To link an image attached in a different page, put `page` attribute with <space key>:<page title>
      */
     static String mkImage(Node n) {
+        String detailsText
         for (child in n.children.find { Node it -> it.text }) {
             def result = new StringBuilder()
             result << '<ac:image '
-            if (child.detailsText)
-                result << 'ac:height="' << child.details.text << '" '
+            if (detailsText = child.details?.text)
+                result << 'ac:height="' << detailsText << '" '
             if (hasIcon(child, icon.border_unchecked))
                 result << 'ac:border="true" '
             result << '>'
@@ -668,51 +781,10 @@ class ConfluenceStorage {
                 result << '" />'
                 println("** ConfluenceStorage - mkImage - no `${COLON}` in node['${KEY_TITLE}'].text")
             }
-            result << '</ac:image>'
+            result << '</ac:image>' << getEol(n)
             return result.toString()
         }
         return '<!-- a child with text is missing -->'
-    }
-
-    /**
-     * mkCsv is like mkParent but using getContent instead of mkNode (no headings or paragraphs)
-     * + collects only the first child of each node
-     * + uses a comma_space or any string as the separator, unless noCsvSep_cancer
-     * Adds space after the last item, unless noSpaceAfter_lastQuarterMoon on mkCsv
-     */
-    static StringBuilder mkCsv(Node n) {
-        // sep can be defined as the attribute csvSep
-        // sep can be defined in details
-        // for table cells (details start with №), the default sep is used
-        def sb = new StringBuilder()
-        def children = n.children
-        if (children.size() > 0) {
-            def nl = getNewLine(n)
-            def defaultSep = ', '
-            def csvSep = n['csvSep'].text
-            if (csvSep === null) {
-                def detailsText = n.details?.text
-                if (detailsText === null || detailsText.startsWith(tbl.rowNum))
-                    csvSep = defaultSep
-                else
-                    csvSep = detailsText
-            }
-            def cells = new LinkedList<Node>()
-            children.each { Node it -> if (!hasIcon(it, icon.noEntry)) cells.addAll(getFirstChildChain(it)) }
-            def lastIdx = cells.size() - 1
-            cells.eachWithIndex { Node it, int i ->
-                sb << getContent(it)
-                if (i < lastIdx) { // not the last element
-                    if (!hasIcon(it, icon.noCsvSep_cancer)) // noCsvSep_cancer is missing
-                        sb << csvSep << nl
-                } else  // last item – space if noSpaceAfter_lastQuarterMoon is missing
-                    sb << getSpaceAfter(it) << getEol(it)
-            }
-            sb << getEol(n)
-            // NB. getContent->makeMarkup->mk***->mkNode adds a trailing space (unless noSepAfter)
-            return sb
-        } else
-            return sb << '<!-- a child is missing -->'
     }
 
     static String mkWiki(Node n) {
@@ -727,42 +799,19 @@ class ConfluenceStorage {
         })
     }
 
-    enum TemplateType {
-        MESSAGE, STRING;
+    static String mkSection(Node n) {
+        return _execIfChildren(n, {
+            Map<String, String> params = n.icons.contains(icon.border_unchecked) ? [border: 'true'] : null
+            return _mkMacroRich(n, 'section', params)
+        })
     }
 
-    static String mkTemplate(Node n) {
-        return _mkTemplate(n, TemplateType.MESSAGE)
-    }
-
-    static String mkFormat(Node n) {
-        return _mkTemplate(n, TemplateType.STRING)
-    }
-
-    /**
-     * Uses Pattern from the first child (note or transformed text).
-     * Applies patternNode children (first-child chain only) to the Pattern.
-     * Adds a space after unless noSpaceAfter_lastQuarterMoon.
-     */
-    static String _mkTemplate(Node n, TemplateType templateType) {
-        def patternNode = n.children.find { !hasIcon(it, icon.noEntry) }
-        if (!patternNode)
-            return '<!-- a child (pattern) is missing -->'
-        else {
-            def yesEntryPatternChildren = patternNode.children.findAll { !hasIcon(it, icon.noEntry) }
-            if (yesEntryPatternChildren.size() == 0)
-                return '<!-- a (yes-entry) child is missing -->'
-            else {
-                def firstChildChain = yesEntryPatternChildren.collect { getFirstChildChain(it) }.flatten()
-                def contentList = firstChildChain.collect { getContent(it) }
-                def pattern = getContent(patternNode) + getSpaceAfter(patternNode)
-                return switch (templateType) {
-                    case TemplateType.MESSAGE -> MessageFormat.format(pattern, *contentList)
-                    case TemplateType.STRING -> String.format(pattern, *contentList)
-                    default -> throw new RuntimeException("unknown TemplateType: ${templateType.name()}")
-                }
-            }
-        }
+    static String mkColumn(Node n) {
+        return _execIfChildren(n, {
+            def detailsText = n.details?.text
+            Map<String, String> params = detailsText ? [width: detailsText] : null
+            return _mkMacroRich(n, 'column', params)
+        })
     }
 
     static Node createMarkupMaker(Node node, String name) {
@@ -841,7 +890,7 @@ class ConfluenceStorage {
     static List<Node> createImage(Node node) {
         def n = createMarkupMaker(node, 'image')
         def o = n.createChild('filename.png')
-        o[KEY_TITLE] = ''
+        o[KEY_TITLE] = BLANK
         c.select(o)
         return [n, o]
     }
