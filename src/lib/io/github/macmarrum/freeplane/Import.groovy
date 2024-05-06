@@ -24,7 +24,10 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
 import java.nio.charset.StandardCharsets
 
 import static io.github.macmarrum.freeplane.Export.COMMA
+import static io.github.macmarrum.freeplane.Export.HASH
+import static io.github.macmarrum.freeplane.Export.NL
 import static io.github.macmarrum.freeplane.Export.NodePart
+import static io.github.macmarrum.freeplane.Export.SPACE
 
 class Import {
     private static final DETAILS = '@details'
@@ -190,6 +193,41 @@ class Import {
                 case NodePart.DETAILS -> node.details = text
                 case NodePart.NOTE -> node.note = text
                 default -> node.text = '#ERR!'
+            }
+        }
+    }
+
+    static void fromMarkdownString(String markdown, Node node) {
+        def topNodeLevel = node.getNodeLevel(true)
+        def n = node
+        Node parent
+        String hashes
+        int level
+        String text
+        markdown.split(NL).each { line ->
+            if (line.startsWith(HASH)) {
+                // a heading
+                (hashes, text) = line.split(SPACE, 2)
+                level = hashes.stripTrailing().size()
+                text = text.stripLeading()
+                // find a "level - 1" node, i.e. a parent for the new node
+                if (level == 1)
+                    parent = node
+                else {
+                    // find the last node of (level - 1)
+                    List<Node> lst = node.find { it.getNodeLevel(true) == (topNodeLevel + level - 1) }
+                    if (lst)
+                        parent = lst.last()
+                    else
+                        throw new RuntimeException("Heading ${level} was requested to be imported but no heading ${level - 1} was found to attach it to: ${line}")
+                }
+                n = parent.createChild(text)
+            } else {
+                // not a heading -- import into details of the last heading
+                def detailsText = n.details?.text
+                if (detailsText || line) { // skip empty lines at the beginning
+                    n.details = detailsText ? detailsText + NL + line : line
+                }
             }
         }
     }
