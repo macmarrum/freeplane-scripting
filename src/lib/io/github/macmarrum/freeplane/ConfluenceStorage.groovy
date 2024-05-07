@@ -397,8 +397,8 @@ class ConfluenceStorage {
 
     static StringBuilder mkTable(Node n) {
         def tableAnnotateText = getTableAnnotateText(n)
-        def canAnnotate = tableAnnotateText == annotate
-        def canClearAnnotations = tableAnnotateText == clear
+        def isToAnnotate = tableAnnotateText == annotate
+        def isToClearAnnotations = tableAnnotateText == clear
         def nl = getNewLine(n)
         HiLite1st hiLite1st
         if (n[HILITE1ST]) {
@@ -411,24 +411,23 @@ class ConfluenceStorage {
         def rowNum = 1
         tableWiki << '<table>' << nl << '<colgroup><col /><col /></colgroup>' << nl << '<tbody>' << nl
         // clean up details containing old tbl.rowCnt or tbl.rowNum
-        if (canAnnotate || canClearAnnotations)
+        if (isToAnnotate || isToClearAnnotations)
             n.findAll().drop(1).each { Node it -> if (it.detailsText && (it.details.text.startsWith(tbl.rowCnt) || it.details.text.startsWith(tbl.rowNum))) it.details = null }
         // the first column in each row is technical, therefore it's skipped
-        n.children.each { Node row ->
-            if (!hasIcon(row, icon.noEntry)) {  // not ignoreNode
-                if (row.children.size() > 1) {  // each child (with descendants) is a column (vertical layout)
+        n.children.findAll { !hasIcon(it, icon.noEntry) }.each { Node row ->
+            def rowChildrenYesEntry = row.children.findAll { !hasIcon(it, icon.noEntry) }
+            if (rowChildrenYesEntry.size() > 1) {  // each child (with descendants) is a column (vertical layout)
+                tableWiki << '<tr>' << nl
+                makeTableCellOfEachChildWithDescendantsAndAppendTo(tableWiki, rowChildrenYesEntry, rowNum, colNum, hiLite1st, nl, isToAnnotate)
+                tableWiki << '</tr>' << nl // close the row
+            } else {  // each first-child is a column (horizontal layout)
+                final firstChildChainSize = _tbl_countFirstChildChain(row)
+                if (isToAnnotate)
+                    row.details = (new StringBuilder() << tbl.rowCnt << firstChildChainSize).toString()
+                if (firstChildChainSize > 0) {
                     tableWiki << '<tr>' << nl
-                    makeTableCellOfEachChildWithDescendantsAndAppendTo(tableWiki, row.children, rowNum, colNum, hiLite1st, nl, canAnnotate)
+                    mkTableCellOfEachFirstChildInChainAndAppendTo(tableWiki, rowChildrenYesEntry[0], rowNum, colNum, hiLite1st, nl, isToAnnotate)
                     tableWiki << '</tr>' << nl // close the row
-                } else {  // each first-child is a column (horizontal layout)
-                    final firstChildChainSize = _tbl_countFirstChildChain(row)
-                    if (canAnnotate)
-                        row.details = (new StringBuilder() << tbl.rowCnt << firstChildChainSize).toString()
-                    if (firstChildChainSize > 0) {
-                        tableWiki << '<tr>' << nl
-                        mkTableCellOfEachFirstChildInChainAndAppendTo(tableWiki, row.children[0], rowNum, colNum, hiLite1st, nl, canAnnotate)
-                        tableWiki << '</tr>' << nl // close the row
-                    }
                 }
                 rowNum++
             }
@@ -437,28 +436,26 @@ class ConfluenceStorage {
         return tableWiki
     }
 
-    static void makeTableCellOfEachChildWithDescendantsAndAppendTo(StringBuilder tableWiki, List<Node> children, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
+    static void makeTableCellOfEachChildWithDescendantsAndAppendTo(StringBuilder tableWiki, List<Node> children, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean isToAnnotate) {
         children.each { Node child ->
-            if (!hasIcon(child, icon.noEntry)) {
-                tableWiki << makeTableCell(this::mkNode, child, rowNum, colNum, hiLite1st, nl, canAnnotate)
-                colNum++
-            }
+            tableWiki << makeTableCell(this::mkNode, child, rowNum, colNum, hiLite1st, nl, isToAnnotate)
+            colNum++
         }
     }
 
-    static void mkTableCellOfEachFirstChildInChainAndAppendTo(StringBuilder tableWiki, Node n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
-        tableWiki << makeTableCell(this::getContent, n, rowNum, colNum, hiLite1st, nl, canAnnotate)
+    static void mkTableCellOfEachFirstChildInChainAndAppendTo(StringBuilder tableWiki, Node n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean isToAnnotate) {
+        tableWiki << makeTableCell(this::getContent, n, rowNum, colNum, hiLite1st, nl, isToAnnotate)
         // canExcludeMarkupMaker=false because each cell is basically a top-level node, i.e. can be a cStorageMarkupMaker
         Node firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, false)
         if (firstChildIfNotIgnoreNode) {
             colNum++
-            mkTableCellOfEachFirstChildInChainAndAppendTo(tableWiki, firstChildIfNotIgnoreNode, rowNum, colNum, hiLite1st, nl, canAnnotate)
+            mkTableCellOfEachFirstChildInChainAndAppendTo(tableWiki, firstChildIfNotIgnoreNode, rowNum, colNum, hiLite1st, nl, isToAnnotate)
         }
     }
 
-    static StringBuilder makeTableCell(Closure method, Node n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean canAnnotate) {
+    static StringBuilder makeTableCell(Closure method, Node n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean isToAnnotate) {
         def result = new StringBuilder()
-        if (canAnnotate)
+        if (isToAnnotate)
             n.details = (new StringBuilder() << tbl.rowNum << colNum).toString()
         def tag
         switch (hiLite1st) {
