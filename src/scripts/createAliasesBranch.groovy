@@ -14,11 +14,12 @@ root.findAll().each { Node node ->
         if (node.isGlobal)
             aliasNode.icons.add('bookmark')
         if (node.isEncrypted()) {
-            aliasNode.appendChild(node).link.node = node
+            aliasNode.appendChild(node)
             aliasNode.icons.add('password')
         } else {
             aliasNode.appendAsCloneWithoutSubtree(node)
         }
+        aliasNode.link.node = node
         aliasNode.folded = true
     }
 }
