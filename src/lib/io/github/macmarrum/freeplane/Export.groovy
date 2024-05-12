@@ -36,15 +36,16 @@ class Export {
     public static final String TAB = '\t'
     public static final String NL = '\n'
     public static final String CR = '\r'
+    public static final String BLANK = ''
     public static final String SPACE = ' '
+    public static final String TWO_SPACES = '  '
+    public static final String FOUR_SPACES = '    '
+    public static final String GT_SPACE = '> '
     public static final String HASH = '#'
     public static final Pattern RX_MULTILINE_BEGINING = ~/(?m)^/
-    public static final String GT_SPACE = '> '
-    public static final String FOUR_SPACES = '    '
     public static final Pattern RX_HARD_LINE_BREAK_CANDIDATE = ~/(?<!^|\\|\n)\n(?!\n|$)/
     public static final String BACKSLASH_NL = '\\\\\n'
     public static final Pattern RX_AUTOMATIC_LAYOUT_LEVEL = ~/^AutomaticLayout.level(,|\.)/
-    public static final String BLANK = ''
     public static final String ROOT = 'root'
     public static final String ZERO = '0'
     public static final Integer MIN_LEVEL_CEILING = 999
@@ -53,11 +54,13 @@ class Export {
     public static final String MULTILINE_SINGLE_QUOTE = '\'\'\''
     public static final String MULTILINE_DOUBLE_QUOTE = '"""'
     public static final Pattern RX_TOML_KEY = ~/[A-Za-z0-9_-]+/
+    public static final Pattern RX_MD_LIST_ITEM = ~/\s*(-|\*|\d+\.)\s+\S.*/
+    public static final String MARKDOWN_FORMAT = 'markdownPatternFormat'
     public static final RUMAR_TOML_INTEGER_SETTINGS = ['version', 'tar_format', 'compression_level', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_week_to_keep', 'number_of_backups_per_month_to_keep']
     public static final RUMAR_TOML_BOOLEAN_SETTINGS = ['checksum_comparison_if_same_size', 'file_deduplication']
     public static final RUMAR_TOML_STRING_SETTINGS = ['backup_base_dir', 'source_dir', 'backup_base_dir_for_profile', 'archive_format', 'password', 'no_compression_suffixes_default', 'no_compression_suffixes']
     public static final RUMAR_TOML_ARRAY_SETTINGS = ['included_top_dirs', 'excluded_top_dirs', 'included_dirs_as_regex', 'excluded_dirs_as_regex', 'included_files_as_glob', 'excluded_files_as_glob', 'included_files_as_regex', 'excluded_files_as_regex', 'commands_using_filters']
-    public static levelStyleToMdHeading = [
+    public static final LEVEL_STYLE_TO_HEADING = [
             'AutomaticLayout.level.root': '#',
             'AutomaticLayout.level,1'   : '##',
             'AutomaticLayout.level,2'   : '###',
@@ -66,7 +69,7 @@ class Export {
             'AutomaticLayout.level,5'   : '######',
             'AutomaticLayout.level,6'   : '#######',
     ]
-    public static mdSettings = [h1: MdH1.NODE, details: MdInclude.HLB, note: MdInclude.PLAIN]
+    public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
     public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip: 0, tail: false, quote: false]
     public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, icons: true, skip1: false, denullify: false, pretty: false, isoDate: false]
     private static final DETAILS = '@details'
@@ -147,20 +150,25 @@ class Export {
 
     static String toMarkdownOutputStream(OutputStream outputStream, Node node, HashMap<String, Object> settings = null) {
         settings = !settings ? mdSettings.clone() : mdSettings + settings
-        def nlBytes = NL.getBytes(charset)
-        def spaceBytes = SPACE.getBytes(charset)
+        def bNL = NL.getBytes(charset)
+        def bSPACE = SPACE.getBytes(charset)
         def mdH1 = settings.h1 as MdH1
-        def levelStyleToMdHeadingBytes
+        def ulOlStyles = [settings.ulStyle as String, settings.olStyle as String]
+        def levelStyleToHeading = settings.getOrDefault('levelStyleToHeading', settings.lsToH) as Map<String, String>
+        def bLevelStyleToHeading
         if (mdH1 == MdH1.ROOT) {
-            levelStyleToMdHeadingBytes = levelStyleToMdHeading.collectEntries { k, v -> [k, v.getBytes(charset)] }
+            bLevelStyleToHeading = levelStyleToHeading.collectEntries { k, v -> [k, v.getBytes(charset)] }
         }
         def nodeToStyles = new LinkedHashMap<Node, List<String>>()
-        node.find { it.visible }.each { nodeToStyles[it] = it.style.allActiveStyles }
+        node.find { it.visible }.eachWithIndex { it, i ->
+            if (!(i == 0 && settings.skip1))
+                nodeToStyles[it] = it.style.allActiveStyles
+        }
         Integer minStyleLevelNum = MIN_LEVEL_CEILING
         def nodeToStyleLevelNum = new HashMap<Node, Integer>()
         if (mdH1 == MdH1.NODE) {
             nodeToStyles.each { n, allActiveStyles ->
-                def assignedLevelStyle = allActiveStyles.find { it in levelStyleToMdHeading }
+                def assignedLevelStyle = allActiveStyles.find { it in levelStyleToHeading }
                 if (assignedLevelStyle) {
                     def styleLevelStr = assignedLevelStyle.replaceAll(RX_AUTOMATIC_LAYOUT_LEVEL, BLANK).replace(ROOT, ZERO)
                     def styleLevelNum = styleLevelStr as Integer
@@ -170,16 +178,16 @@ class Export {
                 }
             }
         }
-        nodeToStyles.each { n, allActiveStyles ->
+        nodeToStyles.eachWithIndex { n, allActiveStyles, i ->
+            if (i > 0) outputStream.write(bNL)
             boolean isHeading = false
             switch (mdH1) {
                 case MdH1.ROOT -> {
                     for (def styleName in allActiveStyles) {
-                        if (levelStyleToMdHeadingBytes.containsKey(styleName)) {
+                        if (bLevelStyleToHeading.containsKey(styleName)) {
                             isHeading = true
-                            if (!n.root) outputStream.write(nlBytes)
-                            outputStream.write(levelStyleToMdHeadingBytes[styleName])
-                            outputStream.write(spaceBytes)
+                            outputStream.write(bLevelStyleToHeading[styleName])
+                            outputStream.write(bSPACE)
                             break
                         }
                     }
@@ -188,26 +196,32 @@ class Export {
                     Integer styleLevelNum
                     if (minStyleLevelNum < MIN_LEVEL_CEILING && (styleLevelNum = nodeToStyleLevelNum[n])) {
                         isHeading = true
-                        if (!n.root) outputStream.write(nlBytes)
                         def hashCount = styleLevelNum - minStyleLevelNum + 1
                         assert hashCount > 0
                         outputStream.write((HASH * hashCount).getBytes(charset))
-                        outputStream.write(spaceBytes)
+                        outputStream.write(bSPACE)
                     }
                 }
                 default -> println("** Unexpected mdLevelStyles: ${mdH1}")
             }
-            if (!isHeading) outputStream.write(nlBytes)
-            outputStream.write(n.text.getBytes(charset))
-            outputStream.write(nlBytes)
+            String coreText
+            String indent
+            if (isHeading) {
+                coreText = n.text
+                indent = BLANK
+            } else {
+                (coreText, indent) = _mdGetPossiblyIndentedCoreTextAndIndent(n, ulOlStyles, nodeToStyles)
+            }
+            outputStream.write(coreText.getBytes(charset))
+            outputStream.write(bNL)
 
             // process details and note
             [[settings.details, n.details?.plain], [settings.note, n.note?.plain]].each { tuple ->
-                def (mdInObj, text) = tuple
+                def (String mdInObj, String text) = tuple
                 def mdIn = mdInObj as MdInclude
                 if (mdIn != MdInclude.NONE && text) {
-                    // add details/note as a seprate paragraph
-                    outputStream.write(nlBytes)
+                    // add details/note as a separate paragraph
+                    outputStream.write(bNL)
                     def processedText = switch (mdIn) {
                         case MdInclude.HLB -> _replaceNewLinesWithHardLineBreaks(text)
                         case MdInclude.PLAIN -> text
@@ -216,11 +230,51 @@ class Export {
                         case MdInclude.CODE -> _codeMd(text)
                         default -> '#ERR!'
                     }
+                    if (indent && processedText)
+                        processedText = processedText.split(NL).collect { indent + it }.join(NL)
                     outputStream.write(processedText.getBytes(charset))
-                    outputStream.write(nlBytes)
+                    outputStream.write(bNL)
                 }
             }
         }
+    }
+
+    /**
+     * Special treatment for node-core with a single bullet point
+     * if its format == Markdown or style is in [ulStyle, olStyle] (from settings)
+     *
+     * @return [ possibly indented core text, indent for details/note ]
+     */
+    static List<String> _mdGetPossiblyIndentedCoreTextAndIndent(Node n, List<String> ulOlStyles, Map<Node, List<String>> nodeToStyles) {
+        String possiblyIndentedText
+        int indentLevelForDetailsAndNote = 0
+        def nText = n.text
+        if (!nText) {
+            possiblyIndentedText = nText
+        } else {
+            def (nIsUlBullet, nIsOlBullet) = ulOlStyles.collect { it in nodeToStyles[n] }
+            if ((!nText.contains(NL) && (nIsUlBullet || nIsOlBullet))
+                    || (n.format == MARKDOWN_FORMAT && nText ==~ RX_MD_LIST_ITEM)) {
+                indentLevelForDetailsAndNote++
+                for (def ancestor in n.pathToRoot.reverse().drop(1)) {
+                    // only single-list-item nodes are considered
+                    // i.e. Markdown with more lines won't work
+                    def ancestorText = ancestor.text
+                    if ((!ancestorText.contains(NL) && ulOlStyles.any { it in nodeToStyles[ancestor] })
+                            || (ancestor.format == MARKDOWN_FORMAT && ancestorText ==~ RX_MD_LIST_ITEM))
+                        indentLevelForDetailsAndNote++
+                    else
+                        break
+                }
+                def myIndent = TWO_SPACES * (indentLevelForDetailsAndNote - 1)
+                def ulOlMark = nIsUlBullet ? '* ' : (nIsOlBullet ? '1. ' : BLANK)
+                possiblyIndentedText = myIndent + ulOlMark + nText
+            } else {
+                possiblyIndentedText = nText
+            }
+        }
+        def indentForDetailsAndNote = indentLevelForDetailsAndNote ? TWO_SPACES * indentLevelForDetailsAndNote : BLANK
+        return [possiblyIndentedText, indentForDetailsAndNote]
     }
 
     static String _replaceNewLinesWithHardLineBreaks(String text) {
