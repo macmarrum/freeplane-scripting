@@ -339,7 +339,7 @@ class Export {
      *  np -- NodePart to take the value from;
      *  skip1 -- whether to skip the first node;
      *  tail -- whether to put Separator after the last value;
-     *  quote -- whether to force quotes around each value | defualt: auto-quote when sep or nl in value;
+     *  quote -- whether to force quotes around each value | default: auto-quote when sep or NL or CR in value;
      */
     static void toCsvOutputStream(OutputStream outputStream, Node node, HashMap<String, Object> settings) {
         settings = !settings ? csvSettings.clone() : csvSettings + settings
@@ -368,7 +368,7 @@ class Export {
                 }
                 if (newlineReplacement !== null)
                     text = text.replace(NL, newlineReplacement)
-                if ((shouldQuote || text.contains(sep) || text.contains(NL)) && sep != '"')
+                if ((shouldQuote || text.contains(sep) || text.contains(NL) || text.contains(CR)) && sep != '"')
                     text = /"${text.replaceAll('"', '""')}"/
                 outputStream.write(text.getBytes(charset))
                 def isLastRow = j == rowSize - 1
