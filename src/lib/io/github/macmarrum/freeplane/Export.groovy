@@ -30,36 +30,41 @@ import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 
 class Export {
+    private static final String COMMA = ','
+    private static final String PIPE = '|'
+    private static final String TAB = '\t'
+    private static final String NL = '\n'
+    private static final String CR = '\r'
+    private static final String BLANK = ''
+    private static final String SPACE = ' '
+    private static final String TWO_SPACES = '  '
+    private static final String FOUR_SPACES = '    '
+    private static final String GT_SPACE = '> '
+    private static final String HASH = '#'
+    private static final Pattern RX_MULTILINE_BEGINING = ~/(?m)^/
+    private static final Pattern RX_HARD_LINE_BREAK_CANDIDATE = ~/(?<!^|\\|\n)\n(?!\n|$)/
+    private static final String BACKSLASH_NL = '\\\\\n'
+    private static final Pattern RX_AUTOMATIC_LAYOUT_LEVEL = ~/^AutomaticLayout.level(,|\.)/
+    private static final String ROOT = 'root'
+    private static final String ZERO = '0'
+    private static final Integer MIN_LEVEL_CEILING = 999
+    private static final String SINGLE_QUOTE = '\''
+    private static final String DOUBLE_QUOTE = '"'
+    private static final String MULTILINE_SINGLE_QUOTE = '\'\'\''
+    private static final String MULTILINE_DOUBLE_QUOTE = '"""'
+    private static final Pattern RX_TOML_KEY = ~/[A-Za-z0-9_-]+/
+    private static final Pattern RX_MD_LIST_ITEM = ~/\s*(-|\*|\d+\.)\s+\S.*/
+    private static final String MARKDOWN_FORMAT = 'markdownPatternFormat'
+    private static final RUMAR_TOML_INTEGER_SETTINGS = ['version', 'tar_format', 'compression_level', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_week_to_keep', 'number_of_backups_per_month_to_keep']
+    private static final RUMAR_TOML_BOOLEAN_SETTINGS = ['checksum_comparison_if_same_size', 'file_deduplication']
+    private static final RUMAR_TOML_STRING_SETTINGS = ['backup_base_dir', 'source_dir', 'backup_base_dir_for_profile', 'archive_format', 'password', 'no_compression_suffixes_default', 'no_compression_suffixes']
+    private static final RUMAR_TOML_ARRAY_SETTINGS = ['included_top_dirs', 'excluded_top_dirs', 'included_dirs_as_regex', 'excluded_dirs_as_regex', 'included_files_as_glob', 'excluded_files_as_glob', 'included_files_as_regex', 'excluded_files_as_regex', 'commands_using_filters']
+    private static final String ATTRIBUTES = '@attributes'
+    private static final String DETAILS = '@details'
+    private static final String ICONS = '@icons'
+    private static final String NOTE = '@note'
+    private static final String STYLE = '@style'
     public static Charset charset = StandardCharsets.UTF_8
-    public static final String COMMA = ','
-    public static final String PIPE = '|'
-    public static final String TAB = '\t'
-    public static final String NL = '\n'
-    public static final String CR = '\r'
-    public static final String BLANK = ''
-    public static final String SPACE = ' '
-    public static final String TWO_SPACES = '  '
-    public static final String FOUR_SPACES = '    '
-    public static final String GT_SPACE = '> '
-    public static final String HASH = '#'
-    public static final Pattern RX_MULTILINE_BEGINING = ~/(?m)^/
-    public static final Pattern RX_HARD_LINE_BREAK_CANDIDATE = ~/(?<!^|\\|\n)\n(?!\n|$)/
-    public static final String BACKSLASH_NL = '\\\\\n'
-    public static final Pattern RX_AUTOMATIC_LAYOUT_LEVEL = ~/^AutomaticLayout.level(,|\.)/
-    public static final String ROOT = 'root'
-    public static final String ZERO = '0'
-    public static final Integer MIN_LEVEL_CEILING = 999
-    public static final String SINGLE_QUOTE = '\''
-    public static final String DOUBLE_QUOTE = '"'
-    public static final String MULTILINE_SINGLE_QUOTE = '\'\'\''
-    public static final String MULTILINE_DOUBLE_QUOTE = '"""'
-    public static final Pattern RX_TOML_KEY = ~/[A-Za-z0-9_-]+/
-    public static final Pattern RX_MD_LIST_ITEM = ~/\s*(-|\*|\d+\.)\s+\S.*/
-    public static final String MARKDOWN_FORMAT = 'markdownPatternFormat'
-    public static final RUMAR_TOML_INTEGER_SETTINGS = ['version', 'tar_format', 'compression_level', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_week_to_keep', 'number_of_backups_per_month_to_keep']
-    public static final RUMAR_TOML_BOOLEAN_SETTINGS = ['checksum_comparison_if_same_size', 'file_deduplication']
-    public static final RUMAR_TOML_STRING_SETTINGS = ['backup_base_dir', 'source_dir', 'backup_base_dir_for_profile', 'archive_format', 'password', 'no_compression_suffixes_default', 'no_compression_suffixes']
-    public static final RUMAR_TOML_ARRAY_SETTINGS = ['included_top_dirs', 'excluded_top_dirs', 'included_dirs_as_regex', 'excluded_dirs_as_regex', 'included_files_as_glob', 'excluded_files_as_glob', 'included_files_as_regex', 'excluded_files_as_regex', 'commands_using_filters']
     public static final LEVEL_STYLE_TO_HEADING = [
             'AutomaticLayout.level.root': '#',
             'AutomaticLayout.level,1'   : '##',
@@ -72,14 +77,6 @@ class Export {
     public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
     public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip1: false, tail: false, quote: false]
     public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, icons: true, skip1: false, denullify: false, pretty: false, isoDate: false]
-    private static final DETAILS = '@details'
-    private static final ATTRIBUTES = '@attributes'
-    private static final NOTE = '@note'
-    private static final STYLE = '@style'
-    private static final ICONS = '@icons'
-    private static final UTF8 = StandardCharsets.UTF_8.name()
-    private static final EMPTY_MAP = Collections.emptyMap()
-    private static final EMPTY_LIST = Collections.emptyList()
 
     enum NodePart {
         CORE, DETAILS, NOTE
@@ -500,9 +497,9 @@ class Export {
     static HashMap<String, Object> _toJson_getBodyRecursively(Node node, HashMap<String, Object> settings, int level = 1) {
         def details = settings.details ? (settings.transformed ? node.details?.text : HtmlUtils.htmlToPlain(node.detailsText ?: '')) : null
         def note = settings.note ? (settings.transformed ? node.note?.text : HtmlUtils.htmlToPlain(node.noteText ?: '')) : null
-        def attributes = settings.attributes ? (settings.transformed ? node.attributes.transformed.map : node.attributes.map) : EMPTY_MAP
+        def attributes = settings.attributes ? (settings.transformed ? node.attributes.transformed.map : node.attributes.map) : Collections.emptyMap()
         def style = settings.style ? node.style.name : null
-        def icons = settings.icons ? node.icons.icons : EMPTY_LIST
+        def icons = settings.icons ? node.icons.icons : Collections.emptyList()
         def children = node.children.findAll { it.visible }
         if (!details && !note && !attributes && !style && !icons && !children) {
             return null
