@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023  macmarrum (at) outlook (dot) ie
+ * Copyright (C) 2023, 2024  macmarrum (at) outlook (dot) ie
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,31 +21,36 @@ import groovy.json.JsonSlurper
 import org.freeplane.api.Node
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
+import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
-
-import static io.github.macmarrum.freeplane.Export.COMMA
-import static io.github.macmarrum.freeplane.Export.HASH
-import static io.github.macmarrum.freeplane.Export.NL
-import static io.github.macmarrum.freeplane.Export.NodePart
-import static io.github.macmarrum.freeplane.Export.SPACE
+import java.util.regex.Pattern
 
 class Import {
-    private static final DETAILS = '@details'
-    private static final ATTRIBUTES = '@attributes'
-    private static final NOTE = '@note'
-    private static final STYLE = '@style'
-    private static final ICONS = '@icons'
-    private static final UTF8 = StandardCharsets.UTF_8.name()
-    private static final QT = '"'
-    private static final DOUBLE_QT = '""'
-    private static final RX_DOUBLE_QT = ~/""/
+    private static final String COMMA = ','
+    private static final String DOUBLE_QUOTE = '"'
+    private static final String HASH = '#'
+    private static final String NL = '\n'
+    private static final String SPACE = ' '
+    private static final String TWO_DOUBLE_QUOTES = '""'
+    private static final Pattern RX_TWO_DOUBLE_QUOTES = ~/""/
+    private static final String ATTRIBUTES = '@attributes'
+    private static final String DETAILS = '@details'
+    private static final String ICONS = '@icons'
+    private static final String NOTE = '@note'
+    private static final String STYLE = '@style'
+    public static Charset charset = StandardCharsets.UTF_8
+    public static csvSettings = [sep: COMMA, np: NodePart.CORE]
+
+    enum NodePart {
+        CORE, DETAILS, NOTE
+    }
 
     static String decodeBase64(String base64) {
         return new String(base64.decodeBase64())
     }
 
     static Node fromJsonFile(File file, Node parent = null, Boolean shouldFold = null) {
-        fromJsonString(file.getText(UTF8), parent, shouldFold)
+        fromJsonString(file.getText(charset), parent, shouldFold)
     }
 
     static Node fromJsonStringBase64(String base64, Node parent = null, Boolean shouldFold = null) {
@@ -127,7 +132,7 @@ class Import {
     }
 
     static void fromCsvString(String content, Node node, HashMap<String, Object> settings = null) {
-        def inputStream = new ByteArrayInputStream(content.getBytes(UTF8))
+        def inputStream = new ByteArrayInputStream(content.getBytes(charset))
         fromCsvInputStream(inputStream, node, settings)
     }
 
@@ -136,15 +141,14 @@ class Import {
     }
 
     static void fromCsvInputStream(InputStream inputStream, Node node, HashMap<String, Object> settings) {
-        settings = !settings ? Export.csvSettings.clone() : Export.csvSettings + settings
+        settings = !settings ? csvSettings.clone() : csvSettings + settings
         def sep = settings.sep as String
-        def with1 = settings.with1 as boolean
         def nodePart = settings.getOrDefault('nodePart', settings.np) as NodePart
-        inputStream.eachLine(UTF8) { line -> if (line) _fromCsvLine(line, node, sep, nodePart) }
+        inputStream.eachLine(charset) { line -> if (line) _fromCsvLine(line, node, sep, nodePart) }
     }
 
     static void _fromCsvLine(String line, Node node, String sep = COMMA, NodePart nodePart = NodePart.CORE) {
-        assert sep != QT
+        assert sep != DOUBLE_QUOTE
         def row = new LinkedList<String>()
         def cell = new StringBuilder()
         def isQtOpen = false
@@ -153,9 +157,9 @@ class Import {
             if (isQtOpen) {
                 // ", => end of quoted text
                 // """, => an escaped quote then end of quoted text
-                if (c == QT // a quote
+                if (c == DOUBLE_QUOTE // a quote
                         // preceded by a non-quote or by a double quote
-                        && (i == 0 || line[i - 1] != QT || (i > 1 && line[i - 2..i - 1] == DOUBLE_QT))
+                        && (i == 0 || line[i - 1] != DOUBLE_QUOTE || (i > 1 && line[i - 2..i - 1] == TWO_DOUBLE_QUOTES))
                         // and followed by a sep
                         && (i == endIdx || line[i + 1] == sep)
                 )
@@ -165,15 +169,15 @@ class Import {
             } else {
                 // ," => start of quoted text
                 // ,""" => start of quoted text then an escaped quote
-                if (c == QT // a quote
+                if (c == DOUBLE_QUOTE // a quote
                         // preceded by a sep
                         && (i == 0 || line[i - 1] == sep)
                         // and followed by a non-quote or a double quote
-                        && (i == endIdx || line[i + 1] != QT || (i < endIdx - 2 && line[i + 1..i + 2] == DOUBLE_QT))
+                        && (i == endIdx || line[i + 1] != DOUBLE_QUOTE || (i < endIdx - 2 && line[i + 1..i + 2] == TWO_DOUBLE_QUOTES))
                 )
                     isQtOpen = true
                 else if (c == sep) {
-                    row << cell.replaceAll(RX_DOUBLE_QT, QT)
+                    row << cell.replaceAll(RX_TWO_DOUBLE_QUOTES, DOUBLE_QUOTE)
                     cell.length = 0
                 } else
                     cell << c
@@ -181,7 +185,7 @@ class Import {
         }
         if (isQtOpen)
             throw new IllegalArgumentException("unterminated quote in: ${line}")
-        row << cell.replaceAll(RX_DOUBLE_QT, QT)
+        row << cell.replaceAll(RX_TWO_DOUBLE_QUOTES, DOUBLE_QUOTE)
         _fromCsvRow(row, node, nodePart)
     }
 
