@@ -70,7 +70,7 @@ class Export {
             'AutomaticLayout.level,6'   : '#######',
     ]
     public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
-    public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip: 0, tail: false, quote: false]
+    public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip1: false, tail: false, quote: false]
     public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, icons: true, skip1: false, denullify: false, pretty: false, isoDate: false]
     private static final DETAILS = '@details'
     private static final ATTRIBUTES = '@attributes'
@@ -148,6 +148,20 @@ class Export {
         outputStream.toString(charset)
     }
 
+    /**
+     * Output to Markdown
+     *
+     * @param outputStream  the stream to write to
+     * @param node  the starting node for the export (see also settings.skip1)
+     * @param settings  a hashMap -- see mdSettings for default values =>
+     *  h1 -- where the heading level is counted from when Level Styles are encountered;
+     *  details -- how to treat details in Markdown output;
+     *  note -- how to treat note in Markdown output;
+     *  lsToH -- a mapping of Level-Styles to hashes for headings;
+     *  skip1 -- whether to skip the first node;
+     *  ulStyle -- the style of nodes to be output as ul bullets;
+     *  olStyle -- the style of nodes to be output as ol bullets;
+     */
     static String toMarkdownOutputStream(OutputStream outputStream, Node node, HashMap<String, Object> settings = null) {
         settings = !settings ? mdSettings.clone() : mdSettings + settings
         def bNL = NL.getBytes(charset)
@@ -316,16 +330,16 @@ class Export {
     /**
      * Output to CSV, using any deilmeter as a separator (comma by default)
      *
-     * @param outputStream - the stream to write to
-     * @param node - the starting node for the export (see also settings.skip)
-     * @param settings - a hashMap -- see csvSettings for default values
-     *  - sep, -- separator to use
-     *  - eol, -- end of line to use
-     *  - nl, -- in-value new-line replacement (e.g. CR in place on NL)
-     *  - np, -- NodePart to take the value from
-     *  - skip: 0, -- how many levels to skip (e.g. 1 to consider only child nodes)
-     *  - tail: false, -- whether to put Separator after the last value
-     *  - quote: false -- whether to force quotes around each value - defualt: auto-quote when sep or nl in value
+     * @param outputStream  the stream to write to
+     * @param node  the starting node for the export (see also settings.skip1)
+     * @param settings  a hashMap -- see csvSettings for default values =>
+     *  sep -- separator to use;
+     *  eol -- end of line to use;
+     *  nl -- in-value new-line replacement (e.g. CR in place on NL);
+     *  np -- NodePart to take the value from;
+     *  skip1 -- whether to skip the first node;
+     *  tail -- whether to put Separator after the last value;
+     *  quote -- whether to force quotes around each value | defualt: auto-quote when sep or nl in value;
      */
     static void toCsvOutputStream(OutputStream outputStream, Node node, HashMap<String, Object> settings) {
         settings = !settings ? csvSettings.clone() : csvSettings + settings
@@ -333,9 +347,10 @@ class Export {
         def eol = settings.eol as String
         def newlineReplacement = settings.getOrDefault('newlineReplacement', settings.nl) as String
         def nodePart = settings.getOrDefault('nodePart', settings.np) as NodePart
-        def shouldQuote = settings.quote as Boolean
-        def numOfNodesToIgnore = settings.getOrDefault('numOfNodesToIgnore', settings.skip) as Integer
-        def sepAtRowEnds = settings.getOrDefault('sepAtRowEnds', settings.tail) as Boolean
+        def shouldQuote = settings.quote as boolean
+        def skip1 = settings.skip1 as boolean
+        def numOfNodesToIgnore = skip1 ? 1 : settings.getOrDefault('numOfNodesToIgnore', settings.getOrDefault('skip', 0)) as int
+        def sepAtRowEnds = settings.getOrDefault('sepAtRowEnds', settings.tail) as boolean
         def sepAsBytes = sep.getBytes(charset)
         def rows = createListOfRows(node, numOfNodesToIgnore)
         def rowSizes = rows.collect { it.size() }
