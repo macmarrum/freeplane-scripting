@@ -1,43 +1,20 @@
-/*
- * Copyright (C) 2024  macmarrum (at) outlook (dot) ie
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+// Copyright (C) 2024  macmarrum (at) outlook (dot) ie
+// SPDX-License-Identifier: GPL-3.0-or-later
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Import"})
-
-
-import io.github.macmarrum.freeplane.Export
 import io.github.macmarrum.freeplane.Import
-import org.freeplane.plugin.script.proxy.ScriptUtils
+import org.freeplane.api.Node
 
 import java.awt.*
 import java.awt.datatransfer.DataFlavor
 
-
-def c = ScriptUtils.c()
 def transferable = Toolkit.defaultToolkit.systemClipboard.getContents(null)
 String text
 if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
     text = transferable.getTransferData(DataFlavor.stringFlavor)
 }
 if (text) {
-    def settings = [
-            sep: Export.TAB,
-    ]
-    c.selecteds.each { n ->
-        Import.fromCsvString(text, n, settings)
-    }
+    def settings = [sep: '\t']
+    c.selecteds.each { Node n -> Import.fromCsvString(text, n, settings) }
 } else {
     c.statusInfo = 'importFromTsvClpb: no text in clipboard'
 }
