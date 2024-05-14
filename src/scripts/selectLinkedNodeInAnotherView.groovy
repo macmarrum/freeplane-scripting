@@ -57,22 +57,19 @@ if (targetNode) { // same-map target node
     def mvc = Controller.currentController.mapViewManager as MapViewController
     def thisMapModel = node.mindMap.delegate as MapModel
     def thisMapView = mvc.mapView
-    def otherMapView = mvc.mapViewVector.find {
-        try {
-            it !== thisMapView && it.map === thisMapModel
-        } catch (MissingPropertyException ignore) { // before 1.11.8-pre01
-            it !== thisMapView && it.model === thisMapModel
-        }
-    }
-    if (!otherMapView) { // open another map view if not exists
-        Controller.getCurrentModeController().getMapController().createMapView(thisMapModel)
-        otherMapView = mvc.mapViewVector.find {
+    def findOtherMapView = {
+        mvc.mapViewVector.find {
             try {
                 it !== thisMapView && it.map === thisMapModel
             } catch (MissingPropertyException ignore) { // before 1.11.8-pre01
                 it !== thisMapView && it.model === thisMapModel
             }
         }
+    }
+    def otherMapView = findOtherMapView()
+    if (!otherMapView) { // open another map view if not exists
+        Controller.getCurrentModeController().getMapController().createMapView(thisMapModel)
+        otherMapView = findOtherMapView()
         UITools.showMessage('A new map view has been created', JOptionPane.INFORMATION_MESSAGE)
     }
     otherMapView.select()
