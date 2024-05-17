@@ -818,7 +818,7 @@ class ConfluenceStorage {
         return maker
     }
 
-    static List<Node> createCode(Node node, String language = 'sql', String title = null, boolean showLineNumbers = true, String theme = 'Eclipse', boolean collapse = false, String styleName = '=Code') {
+    static List<Node> createCode(Node node, String language = 'sql', String title = null, boolean showLineNumbers = true, String theme = 'Midnight', boolean collapse = false, String styleName = '=Code') {
         def n = createMarkupMaker(node, 'code')
         if (title)
             n.details = title
@@ -838,7 +838,7 @@ class ConfluenceStorage {
         return [n, code]
     }
 
-    static List<Node> createDivExpandCode(Node node, String details = 'Expand: SQL Statement', String cssClassName = 'macmarrum-expand', String language = 'sql', boolean showLineNumbers = true, String theme = 'Eclipse') {
+    static List<Node> createDivExpandCode(Node node, String details = 'Expand: SQL Statement', String cssClassName = 'macmarrum-expand', String language = 'sql', boolean showLineNumbers = true, String theme = 'Midnight') {
         def n = createMarkupMaker(node, 'div-expand')
         n.details = details
         n.link.text = cssClassName
