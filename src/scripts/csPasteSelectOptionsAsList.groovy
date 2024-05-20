@@ -1,20 +1,6 @@
-/*
- * Copyright (C) 2024  macmarrum (at) outlook (dot) ie
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Paste"})
+// Copyright (C) 2024  macmarrum (at) outlook (dot) ie
+// SPDX-License-Identifier: GPL-3.0-or-later
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/CStorage"})
 
 
 import groovy.xml.XmlParser
@@ -35,7 +21,7 @@ if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 if (text) {
     def select = new XmlParser(false, false).parseText(text)
     if (select.name() != 'select')
-        c.statusInfo = "pasteHtmlSelectAsCsList: expected xml in clipboard with root <select> - found ${select.name()}"
+        c.statusInfo = "csPasteSelectOptionsAsList: expected xml in clipboard with root <select> - found ${select.name()}"
     else {
         def lst = ConfluenceStorage.createList(node)
         select.children().each { groovy.util.Node it ->

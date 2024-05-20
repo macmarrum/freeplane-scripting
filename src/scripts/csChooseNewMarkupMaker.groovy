@@ -1,4 +1,6 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
+// Copyright (C) 2023, 2024  macmarrum (at) outlook (dot) ie
+// SPDX-License-Identifier: GPL-3.0-or-later
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/CStorage"})
 
 import org.freeplane.plugin.script.proxy.ScriptUtils
 import io.github.macmarrum.freeplane.ConfluenceStorage
