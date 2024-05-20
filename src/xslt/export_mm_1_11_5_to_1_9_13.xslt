@@ -37,9 +37,9 @@ whereas the xml passed by Export to the processor has style formatting converted
         </xsl:attribute>
     </xsl:template>
 
-    <!-- translate new layouts to one of their three predecessors -->
+    <!-- translate new layouts to one of their three predecessors (alignment values) -->
     <xsl:template match="@CHILD_NODES_LAYOUT">
-        <xsl:attribute name="CHILD_NODES_LAYOUT">
+        <xsl:attribute name="CHILD_NODES_ALIGNMENT">
             <xsl:choose>
                 <xsl:when test="substring(., string-length() - string-length('AUTO') + 1) = 'AUTO'">AS_PARENT</xsl:when>
                 <xsl:when test="substring(., string-length() - string-length('CENTERED') + 1) = 'CENTERED' or substring(., string-length() - string-length('FLOW') + 1) = 'FLOW'">BY_CENTER</xsl:when>
