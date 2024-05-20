@@ -1,13 +1,15 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Copy"})
+// Copyright (C) 2022-2024  macmarrum (at) outlook (dot) ie
+// SPDX-License-Identifier: GPL-3.0-or-later
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/CStorage"})
+
 import io.github.macmarrum.freeplane.ConfluenceStorage
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
 import org.freeplane.core.util.TextUtils
 import org.freeplane.plugin.script.FreeplaneScriptBaseClass
-import org.freeplane.plugin.script.proxy.ScriptUtils
 
-Node node = ScriptUtils.node()
-Controller c = ScriptUtils.c()
+def node = node as Node
+def c = c as Controller
 
 Node target
 if (node.style.name in ConfluenceStorage.style) // ['cStorageMarkupRoot', 'cStorageMarkupMaker'])
@@ -24,12 +26,12 @@ if (target) {
 }
 
 /*
- * Uses default_browser_command_mac to define the editor -- must be in PATH
+ * Uses _command_after_copying_cstorage_markup to define the editor -- must be in PATH
  */
 static void openInEditorIfDefined(Controller c, Node node, String markup) {
     def config = new FreeplaneScriptBaseClass.ConfigProperties()
-    def default_browser_command_mac = config.getProperty('default_browser_command_mac')
-    if (default_browser_command_mac && default_browser_command_mac != 'open') {
+    def _command_after_copying_cstorage_markup = config.getProperty('_command_after_copying_cstorage_markup')
+    if (_command_after_copying_cstorage_markup && !_command_after_copying_cstorage_markup.startsWith('disable')) {
         File mmFile = node.mindMap.file
         def xmlFileBasename = mmFile.name.replaceFirst(/\.mm$/, '.cStorage')
         def xmlFile = new File(mmFile.parent, xmlFileBasename)
@@ -38,7 +40,7 @@ static void openInEditorIfDefined(Controller c, Node node, String markup) {
                 it << '<!-- vim: set ft=xml: -->\n'
                 it << markup
             }
-            [default_browser_command_mac, xmlFile.path].execute()
+            [_command_after_copying_cstorage_markup, xmlFile.path].execute()
         } catch (RuntimeException e) {
             c.statusInfo = e.message
         }
