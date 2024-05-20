@@ -10,7 +10,7 @@ import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
 
 File mmFile = (node as Node).mindMap.file
-def outputDir = new File(config.getProperty('confluence_storage_output_dir'))
+def outputDir = new File(config.getProperty('_confluence_storage_output_dir'))
 if (!outputDir.exists()) {
     UITools.showMessage("Output Directory \n${outputDir}\ndoesn't exist", JOptionPane.ERROR_MESSAGE)
     return
