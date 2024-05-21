@@ -8,8 +8,8 @@ import org.freeplane.api.Node
 import org.freeplane.core.util.TextUtils
 import org.freeplane.plugin.script.FreeplaneScriptBaseClass
 
-def node = node as Node
-def c = c as Controller
+node = node as Node
+c = c as Controller
 
 Node target
 if (node.style.name in ConfluenceStorage.style) // ['cStorageMarkupRoot', 'cStorageMarkupMaker'])
@@ -20,6 +20,7 @@ else
 if (target) {
     String markup = ConfluenceStorage.makeMarkup(target)
     TextUtils.copyToClipboard(markup)
+    c.statusInfo = 'Confluence-storage markdown copied to clipboard'
     openInEditorIfDefined(c, target, markup)
 } else {
     c.statusInfo = "cannot copy ConfluenceStorage Markup because the node style is not in ${ConfluenceStorage.style*.value}"
