@@ -20,7 +20,7 @@ else
 if (target) {
     String markup = ConfluenceStorage.makeMarkup(target)
     TextUtils.copyToClipboard(markup)
-    c.statusInfo = 'Confluence-storage markdown copied to clipboard'
+    c.statusInfo = 'Confluence-storage markup copied to clipboard'
     openInEditorIfDefined(c, target, markup)
 } else {
     c.statusInfo = "cannot copy ConfluenceStorage Markup because the node style is not in ${ConfluenceStorage.style*.value}"
