@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/CStorage"})
 
-import org.freeplane.plugin.script.proxy.ScriptUtils
+
 import io.github.macmarrum.freeplane.ConfluenceStorage
+import org.freeplane.api.Controller
 
 import javax.swing.*
 
-final c = ScriptUtils.c()
+c = c as Controller
 final title = 'Insert markup maker'
 final action = [
         'list': ConfluenceStorage::createList,

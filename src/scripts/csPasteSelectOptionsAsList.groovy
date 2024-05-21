@@ -6,13 +6,14 @@
 import groovy.xml.XmlParser
 import groovy.xml.XmlUtil
 import io.github.macmarrum.freeplane.ConfluenceStorage
-import org.freeplane.plugin.script.proxy.ScriptUtils
+import org.freeplane.api.Controller
+import org.freeplane.api.Node
 
 import java.awt.*
 import java.awt.datatransfer.DataFlavor
 
-def c = ScriptUtils.c()
-def node = ScriptUtils.node()
+c = c as Controller
+node = node as Node
 def transferable = Toolkit.defaultToolkit.systemClipboard.getContents(null)
 String text
 if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
