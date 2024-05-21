@@ -395,6 +395,10 @@ ol {
 <stylenode TEXT="=Seamless" ID="ID_218573881" BACKGROUND_COLOR="#2b2b2b" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0">
 <arrowlink DESTINATION="ID_218573881"/>
 </stylenode>
+<stylenode TEXT="?clone:branch">
+<icon BUILTIN="emoji-1F33F"/>
+<cloud COLOR="#333300" ALPHA="192" SHAPE="ROUND_RECT"/>
+</stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="right" STYLE="bubble">
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level.root" ID="ID_1659178249" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="10 pt" VGAP_QUANTITY="20 pt">
@@ -952,8 +956,7 @@ ol {
       }
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 </stylenode>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,1" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#52d273" BORDER_COLOR_ALPHA="182"/>
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level,2" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#f9556b" BORDER_COLOR_ALPHA="182"/>
@@ -1934,8 +1937,7 @@ class Styles {
       }
     </p>
   </body>
-</html>
-</richcontent>
+</html></richcontent>
 <node TEXT="Level 1" ID="ID_1193987656">
 <node TEXT="textColor" ID="ID_243802326">
 <node TEXT="#52d273b6" ID="ID_427236526"/>
