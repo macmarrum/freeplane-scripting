@@ -397,7 +397,7 @@ ol {
 </stylenode>
 <stylenode TEXT="?clone:branch">
 <icon BUILTIN="emoji-1F33F"/>
-<cloud COLOR="#333300" ALPHA="192" SHAPE="ROUND_RECT"/>
+<cloud COLOR="#333300" ALPHA="128" SHAPE="ROUND_RECT"/>
 </stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="right" STYLE="bubble">
