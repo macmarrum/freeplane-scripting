@@ -395,10 +395,6 @@ ol {
 <stylenode TEXT="=Seamless" ID="ID_218573881" BACKGROUND_COLOR="#2b2b2b" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0">
 <arrowlink DESTINATION="ID_218573881"/>
 </stylenode>
-<stylenode TEXT="?clone:branch">
-<icon BUILTIN="emoji-1F33F"/>
-<cloud COLOR="#333300" ALPHA="128" SHAPE="ROUND_RECT"/>
-</stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="right" STYLE="bubble">
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level.root" ID="ID_1659178249" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="10 pt" VGAP_QUANTITY="20 pt">
@@ -995,7 +991,6 @@ ol {
 <attribute_layout VALUE_WIDTH="107.47826 pt"/>
 <attribute NAME="scriptOnMapOpen_NodeIdRefresher" VALUE="if (!node.mindMap.file) {&#xa;    // i.e. only for mind maps created from the template&#xa;    io.github.macmarrum.freeplane.NodeIdRefresher.refreshAll(node)&#xa;    node.attributes.removeAll(&apos;scriptOnMapOpen_NodeIdRefresher&apos;)&#xa;}"/>
 <hook NAME="accessories/plugins/AutomaticLayout.properties" VALUE="ALL"/>
-<hook NAME="AutomaticEdgeColor" COUNTER="0" RULE="FOR_LEVELS"/>
 <node TEXT="Showcase" FOLDED="true" POSITION="left" ID="ID_1068881056">
 <node TEXT="1" OBJECT="java.lang.Long|1" ID="ID_1176543057">
 <node TEXT="2" OBJECT="java.lang.Long|2" STYLE_REF="Projects" ID="ID_1355144522">
