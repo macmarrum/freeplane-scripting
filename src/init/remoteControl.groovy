@@ -16,6 +16,8 @@
  */
 // https://github.com/freeplane/freeplane/discussions/792
 
+
+import org.freeplane.core.util.FreeplaneVersion
 import org.freeplane.core.util.LogUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
@@ -27,7 +29,9 @@ import org.freeplane.plugin.script.proxy.ScriptUtils
  */
 final HOST = System.env.FREEPLANE_REMOTE_CONTROL_HOST ?: '127.0.0.1'
 final FREEPLANE_REMOTE_CONTROL_PORT = System.env.FREEPLANE_REMOTE_CONTROL_PORT
-final PORT = FREEPLANE_REMOTE_CONTROL_PORT !== null ? System.env.FREEPLANE_REMOTE_CONTROL_PORT as Integer : 48112
+final ver = FreeplaneVersion.version
+final defaultPort = "48${ver.maj}${ver.mid}" as Integer
+final PORT = FREEPLANE_REMOTE_CONTROL_PORT !== null ? System.env.FREEPLANE_REMOTE_CONTROL_PORT as Integer : defaultPort
 final FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT = System.env.FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT
 
 final SCRIPT_HEADER = '''\
