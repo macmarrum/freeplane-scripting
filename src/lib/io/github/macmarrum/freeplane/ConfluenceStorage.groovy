@@ -242,10 +242,10 @@ class ConfluenceStorage {
         pReplacements.put(~/(?<=^|[^a-zA-Z0-9])\(([a-z]+)\)(?! )(.+?)(?<! )\(\/\1\)(?=[^a-zA-Z0-9]|$)/, '<span style="color: $1">$2</span>')
     }
 
-    private static final RX_PLUS_ = ~/(?m)^\+ /
+    private static final RX_PLUS_ = ~/(?m)^\+(?= )/
 
     static String _applyReplacements(Node n, String content) {
-        content = content.replaceAll(RX_PLUS_, "\n${getSimBullet(n)} ")
+        content = content.replaceAll(RX_PLUS_, getSimBullet(n))
         pReplacements.each {
             try {
                 content = content.replaceAll(it.key, it.value)
