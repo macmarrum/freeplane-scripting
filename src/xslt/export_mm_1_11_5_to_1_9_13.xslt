@@ -52,6 +52,19 @@ whereas the xml passed by Export to the processor has style formatting converted
         </xsl:attribute>
     </xsl:template>
 
+    <!-- Note: Markdown is stored in .mm by Freeplane 1.10.x and 1.11.x as CONTENT-TYPE="plain/markdown" with <text>.
+         Only in case of DETAILS, when quotable chars like ' (&apos;) are there, and when Details are first set to Markdown then to Standard/Text/LaTeX,
+         v1.10.x quotes the chars, whereas v1.11.x doesn't. So when .mm saved by v1.10.x is opened by v1.11.x,
+         the chars aren't unquoted, causing <text> tags themselves to be wrongly interpreted as literal content.
+         To correct it, in v1.10.x run a script to revert the Standard/Text/LaTeX Details from <text> to <html>:
+         c.findAll().each {
+            def d = it.detailsText
+            if (d && it.detailsContentType != 'markdown' && !d.startsWith('<html>')) {
+                it.details = null
+                it.details = d
+            }
+         }
+    -->
     <!-- Freeplane 1.10.7 can work without it, but for the sake of completeness, add CONTENT-TYPE if missing -->
     <xsl:template match="richcontent[@TYPE='DETAILS' and not(@CONTENT-TYPE)]">
         <xsl:copy>
