@@ -26,7 +26,8 @@ class AutoCompletionComboDialog {
         dialog.title = title
         dialog.defaultCloseOperation = JDialog.DISPOSE_ON_CLOSE
         dialog.layout = new FlowLayout(FlowLayout.LEFT, 10, 10)
-        comboBox.prototypeDisplayValue = 'this determines its minimum width'
+        // make width a bit longer than the longest entry
+        comboBox.prototypeDisplayValue = elements.max { it.size() } + 'xxxxx'
         dialog.contentPane.add(comboBox)
         dialog.pack()
         def accb = new AutoCompletionComboBox(this.dialog, this.comboBox, onEntryAccepted)
