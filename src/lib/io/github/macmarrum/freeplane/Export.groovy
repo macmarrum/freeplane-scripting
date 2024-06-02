@@ -22,12 +22,13 @@ import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
 import org.freeplane.core.util.HtmlUtils
 
-import javax.swing.JFileChooser
-import javax.swing.JOptionPane
+import javax.swing.*
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
+
+import static org.freeplane.core.util.ColorUtils.colorToRGBAString
 
 class Export {
     private static final String COMMA = ','
@@ -60,10 +61,14 @@ class Export {
     private static final RUMAR_TOML_STRING_SETTINGS = ['backup_base_dir', 'source_dir', 'backup_base_dir_for_profile', 'archive_format', 'password', 'no_compression_suffixes_default', 'no_compression_suffixes']
     private static final RUMAR_TOML_ARRAY_SETTINGS = ['included_top_dirs', 'excluded_top_dirs', 'included_dirs_as_regex', 'excluded_dirs_as_regex', 'included_files_as_glob', 'excluded_files_as_glob', 'included_files_as_regex', 'excluded_files_as_regex', 'commands_using_filters']
     private static final String ATTRIBUTES = '@attributes'
+    private static final String BACKGROUND_COLOR = '@backgroundColor'
+    private static final String CORE = '@core'
     private static final String DETAILS = '@details'
     private static final String ICONS = '@icons'
+    private static final String LINK = '@link'
     private static final String NOTE = '@note'
     private static final String STYLE = '@style'
+    private static final String TEXT_COLOR = '@textColor'
     public static Charset charset = StandardCharsets.UTF_8
     public static final LEVEL_STYLE_TO_HEADING = [
             'AutomaticLayout.level.root': '#',
@@ -76,7 +81,7 @@ class Export {
     ]
     public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
     public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip1: false, tail: false, quote: false]
-    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, icons: true, skip1: false, denullify: false, pretty: false, isoDate: false]
+    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, format: true, icons: true, link: true, skip1: false, denullify: false, pretty: false, isoDate: false, forceId: false]
 
     enum NodePart {
         CORE, DETAILS, NOTE
@@ -148,9 +153,9 @@ class Export {
     /**
      * Output to Markdown
      *
-     * @param outputStream  the stream to write to
-     * @param node  the starting node for the export (see also settings.skip1)
-     * @param settings  a hashMap -- see mdSettings for default values =>
+     * @param outputStream the stream to write to
+     * @param node the starting node for the export (see also settings.skip1)
+     * @param settings a hashMap -- see mdSettings for default values =>
      *  h1 -- where the heading level is counted from when Level Styles are encountered;
      *  details -- how to treat details in Markdown output;
      *  note -- how to treat note in Markdown output;
@@ -327,9 +332,9 @@ class Export {
     /**
      * Output to CSV, using any deilmeter as a separator (comma by default)
      *
-     * @param outputStream  the stream to write to
-     * @param node  the starting node for the export (see also settings.skip1)
-     * @param settings  a hashMap -- see csvSettings for default values =>
+     * @param outputStream the stream to write to
+     * @param node the starting node for the export (see also settings.skip1)
+     * @param settings a hashMap -- see csvSettings for default values =>
      *  sep -- separator to use;
      *  eol -- end of line to use;
      *  nl -- in-value new-line replacement (e.g. CR in place on NL);
@@ -465,11 +470,16 @@ class Export {
      *  - details -- whether to include details;
      *  - note -- whether to include note;
      *  - attributes -- whether to include attributes;
+     *  - link -- whether to include link;
      *  - transformed -- whether to use transformed text, i.e. after formula/numbering/format evaluation;
+     *  - style -- whether to include the individually-assigned style;
+     *  - format -- whether to include formatting: backgroundColor, textColor;
+     *  - icons -- whether to include icons;
      *  - skip1 -- whether to skip the first node;
      *  - denullify -- whether to try to avoid `{"Node text": null}` by replacing it with `"Node text"` where possible;
      *  - pretty -- whether to use pretty output format;
      *  - isoDate -- whether to represent dates as ISO_LOCAL_DATE or ISO_LOCAL_DATE_TIME, otherwise as rendered by Freeplane;
+     *  - forceId -- whether to force the usage of node IDs as JSON keys (used regardless in case of non-unique siblings) and @core for core value;
      * @return JSON representation of the branch, in UTF-8 encoding
      */
     static String toJsonString(Node node, HashMap<String, Object> settings = null) {
@@ -494,49 +504,75 @@ class Export {
             return jsonPayload
     }
 
-    static HashMap<String, Object> _toJson_getBodyRecursively(Node node, HashMap<String, Object> settings, int level = 1) {
+    static HashMap<Object, Object> _toJson_getBodyRecursively(Node node, HashMap<String, Object> settings, int level = 1, core = null) {
         def details = settings.details ? (settings.transformed ? node.details?.text : HtmlUtils.htmlToPlain(node.detailsText ?: '')) : null
         def note = settings.note ? (settings.transformed ? node.note?.text : HtmlUtils.htmlToPlain(node.noteText ?: '')) : null
         def attributes = settings.attributes ? (settings.transformed ? node.attributes.transformed.map : node.attributes.map) : Collections.emptyMap()
+        URI link = settings.link ? node.link.uri : null
         def style = settings.style ? node.style.name : null
+        def backgroundColor = settings.format && node.style.isBackgroundColorSet() ? colorToRGBAString(node.style.backgroundColor) : null
+        def textColor = settings.format && node.style.isTextColorSet() ? colorToRGBAString(node.style.textColor) : null
         def icons = settings.icons ? node.icons.icons : Collections.emptyList()
         def children = node.children.findAll { it.visible }
-        if (!details && !note && !attributes && !style && !icons && !children) {
+        if (core === null && !details && !note && !attributes && !link && !style && !backgroundColor && !textColor && !icons && !children) {
             return null
         } else {
             def result = [:]
             if (!(level == 1 && settings.skip1)) {
+                if (core !== null)
+                    result[CORE] = core
                 if (details)
                     result[DETAILS] = details
                 if (note)
                     result[NOTE] = note
                 if (attributes)
                     result[ATTRIBUTES] = attributes
+                if (link)
+                    result[LINK] = link.toString()
                 if (style)
                     result[STYLE] = style
                 if (icons)
                     result[ICONS] = icons
+                if (backgroundColor)
+                    result[BACKGROUND_COLOR] = backgroundColor
+                if (textColor)
+                    result[TEXT_COLOR] = textColor
             }
-            children.each { Node n ->
-                def key = null
-                if (settings.isoDate || n.isLeaf()) {
-                    def conv = n.to
-                    if (settings.isoDate && conv.isDate()) {
-                        def dtStr = conv.date.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                        key = dtStr.endsWith('T00:00:00') ? dtStr[0..<10] : dtStr
-                    } else if (n.isLeaf() && conv.isNum()) {
-                        key = conv.num
-                    }
-                }
-                if (key === null)
-                    key = "${settings.transformed ? n.transformedText : n.plainText}"
-                result[key] = _toJson_getBodyRecursively(n, settings, level + 1)
+            def childToCalcCore = new HashMap<Node, Object>(); children.each { childToCalcCore.put(it, _toJson_calcCore(it, settings)) }
+            // use ID if `forceId: true` or core is not unique among children
+            def useIdForChildren = settings.forceId || (children && children.size() != new HashSet<Object>(childToCalcCore.values()).size())
+            Object childCore
+            Object key
+            Object atCore
+            children.each { Node childNode ->
+                childCore = childToCalcCore[childNode]
+                assert childCore !== null
+                // put core value either as key or as @core
+                key = useIdForChildren ? childNode.id : childCore
+                atCore = useIdForChildren ? childCore : null
+                result[key] = _toJson_getBodyRecursively(childNode, settings, level + 1, atCore)
             }
             return result
         }
     }
 
-    static HashMap<String, Object> _toJson_denullify(HashMap<String, Object> hashMap) {
+    static _toJson_calcCore(Node node, Map<String, Object> settings) {
+        def core = null
+        if (settings.isoDate || node.isLeaf()) {
+            def conv = node.to
+            if (settings.isoDate && conv.isDate()) {
+                def dtStr = conv.date.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                core = dtStr.endsWith('T00:00:00') ? dtStr[0..<10] : dtStr
+            } else if (node.isLeaf() && conv.isNum()) {
+                core = conv.num
+            }
+        }
+        if (core === null)
+            core = settings.transformed ? node.transformedText : node.plainText
+        return core
+    }
+
+    static HashMap<Object, Object> _toJson_denullify(HashMap<String, Object> hashMap) {
         def newHashMap = [:]
         hashMap.each { k, v ->
             if (v instanceof HashMap) {

@@ -34,10 +34,14 @@ class Import {
     private static final String TWO_DOUBLE_QUOTES = '""'
     private static final Pattern RX_TWO_DOUBLE_QUOTES = ~/""/
     private static final String ATTRIBUTES = '@attributes'
+    private static final String BACKGROUND_COLOR = '@backgroundColor'
+    private static final String CORE = '@core'
     private static final String DETAILS = '@details'
     private static final String ICONS = '@icons'
+    private static final String LINK = '@link'
     private static final String NOTE = '@note'
     private static final String STYLE = '@style'
+    private static final String TEXT_COLOR = '@textColor'
     public static Charset charset = StandardCharsets.UTF_8
     public static csvSettings = [sep: COMMA, np: NodePart.CORE]
 
@@ -88,29 +92,36 @@ class Import {
 
     static void _fromJsonMapRecursively(Map<String, Object> jMap, Node node) {
         jMap.each { key, value ->
-            if (key == DETAILS && value !instanceof Map && value !instanceof List) {
+            def isValueString = value instanceof String
+            def isValueMap = !isValueString && value instanceof Map
+            def isValueList = !isValueString && !isValueMap && value instanceof List
+            if (key == CORE && isValueString) {
+                node.text = value
+            } else if (key == DETAILS && isValueString) {
                 node.details = value
-            } else if (key == NOTE && value !instanceof Map && value !instanceof List) {
+            } else if (key == NOTE && isValueString) {
                 node.note = value
-            } else if (key == ATTRIBUTES && value instanceof Map) {
+            } else if (key == ATTRIBUTES && isValueMap) {
                 value.each { attrName, attrValue -> node[attrName as String] = attrValue }
-            } else if (key == STYLE && value instanceof String) {
+            } else if (key == LINK && isValueString) {
+                node.link.uri = new URI(value as String)
+            } else if (key == STYLE && isValueString) {
                 node.style.name = value
-            } else if (key == ICONS && value instanceof List) {
+            } else if (key == ICONS && isValueList) {
                 node.icons.addAll(value)
-            } else if (value instanceof Map) {
+            } else if (key == BACKGROUND_COLOR && isValueString) {
+                node.style.backgroundColorCode = value
+            } else if (key == TEXT_COLOR && isValueString) {
+                node.style.textColorCode = value
+            } else if (isValueMap) {
                 def n = node.createChild(key)
                 _fromJsonMapRecursively(value as Map, n)
-            } else if (value instanceof List) {
+            } else if (isValueList) {
                 def n = node.createChild(key)
                 _fromJsonList(value, n)
             } else {
                 def n = node.createChild(key)
-                if (value instanceof Map) {
-                    _fromJsonMapRecursively(value as Map, n)
-                } else if (value instanceof List) {
-                    _fromJsonList(value, n)
-                } else if (value !== null) {
+                if (value !== null) {
                     def child = n.createChild()
                     // value can be a number, and createChild() does something strange with a number
                     // so use setText() instead
