@@ -54,7 +54,7 @@ class Import {
     }
 
     static Node fromJsonFile(File file, Node parent = null, Boolean shouldFold = null) {
-        fromJsonString(file.getText(charset), parent, shouldFold)
+        fromJsonString(file.getText(charset.name()), parent, shouldFold)
     }
 
     static Node fromJsonStringBase64(String base64, Node parent = null, Boolean shouldFold = null) {
@@ -155,7 +155,7 @@ class Import {
         settings = !settings ? csvSettings.clone() : csvSettings + settings
         def sep = settings.sep as String
         def nodePart = settings.getOrDefault('nodePart', settings.np) as NodePart
-        inputStream.eachLine(charset) { line -> if (line) _fromCsvLine(line, node, sep, nodePart) }
+        inputStream.eachLine(charset.name()) { line -> if (line) _fromCsvLine(line, node, sep, nodePart) }
     }
 
     static void _fromCsvLine(String line, Node node, String sep = COMMA, NodePart nodePart = NodePart.CORE) {
