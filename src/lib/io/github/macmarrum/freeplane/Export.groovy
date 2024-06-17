@@ -459,7 +459,7 @@ class Export {
 
     static void toJsonFile(File file, Node node, HashMap<String, Object> settings = null) {
         def jsonStr = toJsonString(node, settings)
-        file.setText(jsonStr, charset)
+        file.setText(jsonStr, charset.name())
     }
 
     /**
