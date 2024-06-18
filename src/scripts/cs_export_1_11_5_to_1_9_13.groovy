@@ -18,12 +18,14 @@ c = c as Controller
 def mmFile = node.mindMap.file
 String _confluence_storage_output_dir = config.getProperty('_confluence_storage_output_dir', 'ask')
 def outputDir = (_confluence_storage_output_dir == 'ask') ? askForDirectory(mmFile) : new File(_confluence_storage_output_dir)
+if (outputDir === null)
+    return
 if (!outputDir.exists()) {
-    UITools.showMessage("Output Directory \n${outputDir}\ndoesn't exist", JOptionPane.ERROR_MESSAGE)
+    UITools.showMessage("Output directory \n${outputDir}\ndoesn't exist", JOptionPane.ERROR_MESSAGE)
     return
 }
 if (outputDir == mmFile.parentFile) {
-    UITools.showMessage("Output Directory is the same as mind-map parent \n${outputDir}", JOptionPane.ERROR_MESSAGE)
+    UITools.showMessage("Output directory is the same as mind-map directory \n${outputDir}", JOptionPane.ERROR_MESSAGE)
     return
 }
 def outputFile = new File(outputDir, mmFile.name)
