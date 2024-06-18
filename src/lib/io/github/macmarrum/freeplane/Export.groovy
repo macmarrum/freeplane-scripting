@@ -484,9 +484,10 @@ class Export {
      */
     static String toJsonString(Node node, HashMap<String, Object> settings = null) {
         settings = !settings ? jsonSettings.clone() : jsonSettings + settings
-        def mapOrList = _toJson_getBodyRecursively(node, settings)
+        def core = _toJson_calcCore(node, settings)
+        def mapOrList = _toJson_getBodyRecursively(node, settings, 1, settings.forceId ? core : null)
         if (!settings.skip1)
-            mapOrList = ["${settings.transformed ? node.transformedText : node.plainText}": mapOrList]
+            mapOrList = [(settings.forceId ? node.id : core): mapOrList]
         if (settings.denullify) {
             // use a wrapper to also denullyfy top-level entries, so that top-level object can be a list
             mapOrList = _toJson_denullify(['x': mapOrList])['x']
