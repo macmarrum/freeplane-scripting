@@ -44,12 +44,10 @@ if (dt) {
     def cal = dt.toCalendar()
     def hour = cal.get(Calendar.HOUR_OF_DAY)
     def minute = cal.get(Calendar.MINUTE)
-    println("${hour}:${minute}")
     if (hour != HOUR || minute != MINUTE) {
-        def message = "A reminder already exists for ${hour}:${sprintf('%02d', minute)}. Replace it with ${HOUR}:${sprintf('%02d', MINUTE)}"
+        def message = "A reminder already exists for ${hour}:${sprintf('%02d', minute)}. Replace it with ${HOUR}:${sprintf('%02d', MINUTE)}?"
         def title = 'Confirm reminder time update'
         def answer = UITools.showConfirmDialog(node.delegate as NodeModel, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
-        println("answer: $answer")
         if (answer == JOptionPane.YES_OPTION) {
             def script = r.script
             r.createOrReplace(withMyTime(dt), r.periodUnit, r.period)
