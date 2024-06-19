@@ -4,12 +4,26 @@
  */
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Create"})
 
+import groovy.transform.Field
 import org.freeplane.api.Node
+import org.freeplane.core.ui.components.UITools
 import org.freeplane.core.util.MenuUtils
+import org.freeplane.features.map.NodeModel
+
+import javax.swing.JOptionPane
+
+// default values
+@Field final static HOUR = 9
+@Field final static MINUTE = 0
+@Field final static PERIOD_UNIT = 'DAY'
+@Field final static PERIOD = 1
+
 
 def node = node as Node
 
-static Date withMyTime(Date dt = null, int hour = 9, int minute = 0) {
+static Date withMyTime(Date dt = null, Integer hour = null, Integer minute = null) {
+    hour = hour ?: HOUR
+    minute = minute ?: MINUTE
     Calendar cal
     if (dt)
         cal = dt.toCalendar()
@@ -27,10 +41,22 @@ static Date withMyTime(Date dt = null, int hour = 9, int minute = 0) {
 def r = node.reminder
 def dt = r.remindAt
 if (dt) {
-    def script = r.script
-    r.createOrReplace(withMyTime(dt), r.periodUnit, r.period)
-    r.script = script
+    def cal = dt.toCalendar()
+    def hour = cal.get(Calendar.HOUR_OF_DAY)
+    def minute = cal.get(Calendar.MINUTE)
+    println("${hour}:${minute}")
+    if (hour != HOUR || minute != MINUTE) {
+        def message = "A reminder already exists for ${hour}:${sprintf('%02d', minute)}. Replace it with ${HOUR}:${sprintf('%02d', MINUTE)}"
+        def title = 'Confirm reminder time update'
+        def answer = UITools.showConfirmDialog(node.delegate as NodeModel, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE)
+        println("answer: $answer")
+        if (answer == JOptionPane.YES_OPTION) {
+            def script = r.script
+            r.createOrReplace(withMyTime(dt), r.periodUnit, r.period)
+            r.script = script
+        }
+    }
 } else {
-    r.createOrReplace(withMyTime(), 'DAY', 1)
+    r.createOrReplace(withMyTime(), PERIOD_UNIT, PERIOD)
 }
 MenuUtils.executeMenuItems(['TimeManagementAction'])
