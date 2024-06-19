@@ -13,10 +13,10 @@ import org.freeplane.features.map.NodeModel
 import javax.swing.JOptionPane
 
 // default values
-@Field final static HOUR = 9
-@Field final static MINUTE = 0
-@Field final static PERIOD_UNIT = 'DAY'
-@Field final static PERIOD = 1
+@Field final static Integer HOUR = 9
+@Field final static Integer MINUTE = 0
+@Field final static String PERIOD_UNIT = 'DAY'
+@Field final static Integer PERIOD = 1
 
 
 def node = node as Node
