@@ -21,14 +21,17 @@ import groovy.json.JsonOutput
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
 import org.freeplane.core.util.HtmlUtils
-import org.freeplane.plugin.script.proxy.ConvertibleDate
-import org.freeplane.plugin.script.proxy.ConvertibleNumber
-import org.freeplane.plugin.script.proxy.ConvertibleText
+import org.freeplane.core.util.Hyperlink
+import org.freeplane.core.util.TextUtils
+import org.freeplane.features.format.FormattedDate
+import org.freeplane.features.format.FormattedFormula
+import org.freeplane.features.format.FormattedNumber
+import org.freeplane.plugin.script.FreeplaneScriptBaseClass
 
 import javax.swing.*
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
-import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.regex.Pattern
 
 import static org.freeplane.core.util.ColorUtils.colorToRGBAString
@@ -58,6 +61,7 @@ class Export {
     private static final String MULTILINE_DOUBLE_QUOTE = '"""'
     private static final Pattern RX_TOML_KEY = ~/[A-Za-z0-9_-]+/
     private static final Pattern RX_MD_LIST_ITEM = ~/\s*(-|\*|\d+\.)\s+\S.*/
+    private static final Pattern RX_FORMULA = ~/^=(?!=).+/
     private static final String MARKDOWN_FORMAT = 'markdownPatternFormat'
     private static final RUMAR_TOML_INTEGER_SETTINGS = ['version', 'tar_format', 'compression_level', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_week_to_keep', 'number_of_backups_per_month_to_keep']
     private static final RUMAR_TOML_BOOLEAN_SETTINGS = ['checksum_comparison_if_same_size', 'file_deduplication']
@@ -72,7 +76,20 @@ class Export {
     private static final String NOTE = '@note'
     private static final String STYLE = '@style'
     private static final String TEXT_COLOR = '@textColor'
+    private static final String DATE_TYPE = '<Date>'
+    private static final String NUM_TYPE = '<Num>'
+    private static final String TEXT_TYPE = '<Text>'
+    private static final String STANDARD_FORMAT = 'STANDARD_FORMAT'
+    private static final String STANDARD_NUMBER_FORMAT = '#0.####'
+    private static final String AUTO_FORMAT = 'AUTO_FORMAT'
     public static Charset charset = StandardCharsets.UTF_8
+    private static final TextUtils textUtils = new TextUtils()
+    private static final FreeplaneScriptBaseClass fsbc = new FreeplaneScriptBaseClass() {
+        @Override
+        Object run() {
+            return null
+        }
+    }
     public static final LEVEL_STYLE_TO_HEADING = [
             'AutomaticLayout.level.root': '#',
             'AutomaticLayout.level,1'   : '##',
@@ -84,10 +101,14 @@ class Export {
     ]
     public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
     public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip1: false, tail: false, quote: false]
-    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, format: true, icons: true, link: true, skip1: false, denullify: false, pretty: false, isoDate: false, forceId: false]
+    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, formatting: true, icons: true, link: true, skip1: false, denullify: false, pretty: false, format: false, dateFmt: DateFmt.DISPLAYED, forceId: false]
 
     enum NodePart {
         CORE, DETAILS, NOTE
+    }
+
+    enum DateFmt {
+        DISPLAYED, ISO, ISO_LOCAL
     }
 
     /**
@@ -476,21 +497,22 @@ class Export {
      *  - link -- whether to include link;
      *  - transformed -- whether to use transformed text, i.e. after formula/numbering/format evaluation;
      *  - style -- whether to include the individually-assigned style;
-     *  - format -- whether to include formatting: backgroundColor, textColor;
+     *  - formatting -- whether to include formatting: backgroundColor, textColor;
      *  - icons -- whether to include icons;
      *  - skip1 -- whether to skip the first node;
      *  - denullify -- whether to try to avoid `{"Node text": null}` by replacing it with `"Node text"` where possible;
      *  - pretty -- whether to use pretty output format;
-     *  - isoDate -- whether to represent dates as ISO_LOCAL_DATE or ISO_LOCAL_DATE_TIME, otherwise as rendered by Freeplane;
+     *  - dateFormat -- how to format values of type Date: DISPLAYED, ISO_LOCAL, ISO;
      *  - forceId -- whether to force the usage of node IDs as JSON keys (used regardless in case of non-unique siblings) and @core for core value;
      * @return JSON representation of the branch, in UTF-8 encoding
      */
     static String toJsonString(Node node, HashMap<String, Object> settings = null) {
         settings = !settings ? jsonSettings.clone() : jsonSettings + settings
+        def forceId = settings.forceId as boolean
         def core = _toJson_calcCore(node, settings)
-        def mapOrList = _toJson_getBodyRecursively(node, settings, 1, settings.forceId ? core : null)
+        def mapOrList = _toJson_getBodyRecursively(node, settings, 1, forceId || core instanceof List ? core : null)
         if (!settings.skip1)
-            mapOrList = [(settings.forceId ? node.id : core): mapOrList]
+            mapOrList = [(settings.forceId || core instanceof List ? node.id : core): mapOrList]
         if (settings.denullify) {
             // use a wrapper to also denullyfy top-level entries, so that top-level object can be a list
             mapOrList = _toJson_denullify(['x': mapOrList])['x']
@@ -510,12 +532,15 @@ class Export {
 
     static HashMap<Object, Object> _toJson_getBodyRecursively(Node node, HashMap<String, Object> settings, int level = 1, core = null) {
         def details = settings.details ? (settings.transformed ? node.details?.text : HtmlUtils.htmlToPlain(node.detailsText ?: '')) : null
+        def detailsContentType = settings.details && settings.format ? node.detailsContentType : null
         def note = settings.note ? (settings.transformed ? node.note?.text : HtmlUtils.htmlToPlain(node.noteText ?: '')) : null
-        def attributes = settings.attributes ? (settings.transformed ? _toJson_transformedAttrMap(node) : node.attributes.map) : Collections.emptyMap()
+        def noteContentType = settings.note && settings.format ? node.noteContentType : null
+        def attributes = _toJson_getAttributes(node, settings)
         URI link = settings.link ? node.link.uri : null
         def style = settings.style ? node.style.name : null
-        def backgroundColor = settings.format && node.style.isBackgroundColorSet() ? colorToRGBAString(node.style.backgroundColor) : null
-        def textColor = settings.format && node.style.isTextColorSet() ? colorToRGBAString(node.style.textColor) : null
+        def formatting = settings.formatting as boolean
+        def backgroundColor = formatting && node.style.isBackgroundColorSet() ? colorToRGBAString(node.style.backgroundColor) : null
+        def textColor = formatting && node.style.isTextColorSet() ? colorToRGBAString(node.style.textColor) : null
         def icons = settings.icons ? node.icons.icons : Collections.emptyList()
         def children = node.children.findAll { it.visible }
         if (core === null && !details && !note && !attributes && !link && !style && !backgroundColor && !textColor && !icons && !children) {
@@ -526,9 +551,9 @@ class Export {
                 if (core !== null)
                     result[CORE] = core
                 if (details)
-                    result[DETAILS] = details
+                    result[DETAILS] = !settings.format || detailsContentType == AUTO_FORMAT ? details : [details, detailsContentType]
                 if (note)
-                    result[NOTE] = note
+                    result[NOTE] = !settings.format || noteContentType == AUTO_FORMAT ? note : [note, noteContentType]
                 if (attributes)
                     result[ATTRIBUTES] = attributes
                 if (link)
@@ -542,8 +567,7 @@ class Export {
                 if (textColor)
                     result[TEXT_COLOR] = textColor
             }
-            def childToCalcCore = new HashMap<Node, Object>()
-            children.each { childToCalcCore.put(it, _toJson_calcCore(it, settings)) }
+            def childToCalcCore = new HashMap<Node, Object>(); children.each { childToCalcCore.put(it, _toJson_calcCore(it, settings)) }
             // use ID if `forceId: true` or core is not unique among children
             def useIdForChildren = settings.forceId || (children && children.size() != new HashSet<Object>(childToCalcCore.values()).size())
             Object childCore
@@ -553,41 +577,100 @@ class Export {
                 childCore = childToCalcCore[childNode]
                 assert childCore !== null
                 // put core value either as key or as @core
-                key = useIdForChildren ? childNode.id : childCore
-                atCore = useIdForChildren ? childCore : null
+                key = useIdForChildren || childCore instanceof List ? childNode.id : childCore
+                atCore = useIdForChildren || childCore instanceof List ? childCore : null
                 result[key] = _toJson_getBodyRecursively(childNode, settings, level + 1, atCore)
             }
             return result
         }
     }
 
-    static _toJson_transformedAttrMap(Node node) {
-        // JsonGenerator considers ConvertibleText and -Number as Date and errors out. This avoids it
-        return node.attributes.transformed.map.collectEntries { k, v ->
-            if (v instanceof ConvertibleText)
-                v = v.text
-            else if (v instanceof ConvertibleNumber)
-                v = v.num
-            else if (v instanceof ConvertibleDate)
-                v = v.date
-            return [k, v]
+    static _toJson_calcCore(Node node, Map<String, Object> settings) {
+        def plainText = node.plainText
+        def format = node.format
+        if (!(plainText =~ RX_FORMULA)) {
+            def conv = node.to
+            if (conv.isNum()) {
+                return !settings.format || format == STANDARD_FORMAT ? conv.num : [conv.num, NUM_TYPE, format]
+            } else if (conv.isDate()) {
+                def pattern = (conv.date as FormattedDate).pattern
+                def isStdPattern = pattern in [textUtils.defaultDateFormat.toPattern(), textUtils.defaultDateTimeFormat.toPattern()]
+                def value = toDateString(conv.date, settings.dateFmt as DateFmt, node)
+                return !settings.format || format == STANDARD_FORMAT && isStdPattern ? [value, DATE_TYPE] : [value, DATE_TYPE, isStdPattern ? format : pattern]
+            }
+        }
+        // a formula or text
+        def value = settings.transformed ? node.transformedText : plainText
+        return !settings.format || format == STANDARD_FORMAT ? value : [value, TEXT_TYPE, format]
+    }
+
+    /**
+     *
+     * @param date
+     * @param dateFmt settings.dateFmt
+     * @param node pass {@code null} in case of attributes
+     * @return
+     */
+    static String toDateString(Date date, DateFmt dateFmt, Node node) {
+        // Freeplane stores dates as FormattedDate, which extends Date and holds a text (originally entered),
+        // and a format (SimpleDateFormat), which is used for attributes; for nodes, Styles are used, because they bring their own format.
+        // node.to converts date to ConvertibleDate: this.date holds FormattedDate; this.text holds date formatted always as yyyy-MM-dd'T'HH:mmZ (probably never used)
+        // ConvertibleDate.getDate() returns FormattedDate whose toString() returns df.format(date),
+        // where – in case of nodes – df is apparently the Default Date Format from settings
+        // and in case of attributes, is the actual format
+        return switch (dateFmt) {
+            case DateFmt.ISO_LOCAL -> toIsoLocalDate(date)
+            case DateFmt.ISO -> date.toOffsetDateTime().toString()
+            case DateFmt.DISPLAYED -> node ? fsbc.format(date, node.format) : date.toString()
         }
     }
 
-    static _toJson_calcCore(Node node, Map<String, Object> settings) {
-        def core = null
-        if (settings.isoDate || node.isLeaf()) {
-            def conv = node.to
-            if (settings.isoDate && conv.isDate()) {
-                def dtStr = conv.date.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                core = dtStr.endsWith('T00:00:00') ? dtStr[0..<10] : dtStr
-            } else if (node.isLeaf() && conv.isNum()) {
-                core = conv.num
+    /**
+     * ISO LOCAL date or date/time representation. Time is stripped if 00:00:00.000
+     */
+    static String toIsoLocalDate(Date date) {
+        def localDateTime = date.toLocalDateTime()
+        return localDateTime.truncatedTo(ChronoUnit.DAYS) == localDateTime ? localDateTime.toLocalDate() : localDateTime
+    }
+
+    static List<List> _toJson_getAttributes(Node node, Map<String, Object> settings) {
+        def attributes = settings.transformed ? node.attributes.transformed : node.attributes
+        def dateFmt = settings.dateFmt as DateFmt
+        def list = new ArrayList<List>(attributes.size())
+        attributes.each { Map.Entry entry ->
+            def entryList = new ArrayList<Object>(3)
+            entryList << entry.key
+            if (entry.value instanceof FormattedDate) {
+                def value = entry.value as FormattedDate
+                entryList << toDateString(value, dateFmt, null)
+                entryList << DATE_TYPE
+                if (settings.format)
+                    entryList << value.pattern
+            } else if (entry.value instanceof Hyperlink || entry.value instanceof URI) {
+                entryList << entry.value.toString()
+                entryList << "<${entry.value.class.simpleName}>".toString()
+            } else if (entry.value instanceof FormattedNumber) {
+                def value = (entry.value as FormattedNumber)
+                def format = value.pattern
+                entryList << value.number
+                if (settings.format && format != STANDARD_NUMBER_FORMAT) {
+                    entryList << NUM_TYPE
+                    entryList << format
+                }
+            } else if (entry.value instanceof FormattedFormula) {
+                def value = entry.value as FormattedFormula
+                def format = value.pattern
+                entryList << value.object
+                if (settings.format && format != STANDARD_FORMAT) {
+                    entryList << TEXT_TYPE
+                    entryList << format
+                }
+            } else {
+                entryList << entry.value
             }
+            list << entryList
         }
-        if (core === null)
-            core = settings.transformed ? node.transformedText : node.plainText
-        return core
+        return list
     }
 
     static HashMap<Object, Object> _toJson_denullify(HashMap<String, Object> hashMap) {
