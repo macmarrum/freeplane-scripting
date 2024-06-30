@@ -25,13 +25,31 @@ import javax.swing.*
  * Therefore it's important to operate on IStyles rather than on their String representations
  */
 
+static findSinglesAndCloneLeaders(Iterable<Node> nodes) {
+    if (nodes.size() == 1)
+        return nodes
+    def singlesAndLeaders = new LinkedList<Node>()
+    def subtrees = new HashSet<Node>()
+    def clones = new HashSet<Node>()
+    nodes.each { Node n ->
+        if (n !in subtrees) { // not a tree clone or a clone leader
+            def nodesSharingContentAndSubtree = n.nodesSharingContentAndSubtree
+            subtrees.addAll(nodesSharingContentAndSubtree)
+            if (n !in clones) { // not a content clone or a clone leader
+                singlesAndLeaders << n
+                clones.addAll(n.nodesSharingContent - nodesSharingContentAndSubtree)
+            }
+        }
+    }
+    return singlesAndLeaders
+}
+
 def node = node as Node
 def c = c as Controller
-
-def selectedNodes = c.selecteds
+def selectedSinglesAndCloneLeaders = findSinglesAndCloneLeaders(c.selecteds)
 
 List<IStyle> currentConditionalStyles
-if (selectedNodes.size() == 1) {
+if (selectedSinglesAndCloneLeaders.size() == 1) {
     def ncsItems = node.conditionalStyles.collect()
     currentConditionalStyles = new ArrayList<IStyle>(ncsItems.size())
     ncsItems.each {
@@ -55,7 +73,7 @@ stylesForComboBox.eachWithIndex { style, i ->
 
 def onEntryAccepted = { JComboBox<String> comboBox ->
     def style = stylesForComboBox[comboBox.selectedIndex]
-    selectedNodes.each { Node n ->
+    selectedSinglesAndCloneLeaders.each { Node n ->
         def ncs = n.conditionalStyles
         if (!ncs.find { it.active && it.always && (it as AConditionalStyleProxy).style == style && !it.last }) {
             // use NodeConditionalStyleProxy to add iStyle,

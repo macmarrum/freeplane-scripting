@@ -22,9 +22,27 @@ import javax.swing.*
  * Therefore it's important to operate on IStyles rather than on their String representations
  */
 
-def c = c as Controller
+static findSinglesAndCloneLeaders(Iterable<Node> nodes) {
+    if (nodes.size() == 1)
+        return nodes
+    def singlesAndLeaders = new LinkedList<Node>()
+    def subtrees = new HashSet<Node>()
+    def clones = new HashSet<Node>()
+    nodes.each { Node n ->
+        if (n !in subtrees) { // not a tree clone or a clone leader
+            def nodesSharingContentAndSubtree = n.nodesSharingContentAndSubtree
+            subtrees.addAll(nodesSharingContentAndSubtree)
+            if (n !in clones) { // not a content clone or a clone leader
+                singlesAndLeaders << n
+                clones.addAll(n.nodesSharingContent - nodesSharingContentAndSubtree)
+            }
+        }
+    }
+    return singlesAndLeaders
+}
 
-def selectedNodes = c.selecteds
+def c = c as Controller
+def selectedSinglesAndCloneLeaders = findSinglesAndCloneLeaders(c.selecteds)
 
 def stylesForComboBox = new LinkedList<IStyle>()
 def styleNamesForComboBox = new LinkedList<String>()
@@ -32,7 +50,7 @@ def styleNamesForComboBox = new LinkedList<String>()
 IStyle style
 String displayName
 
-selectedNodes.each { Node n ->
+selectedSinglesAndCloneLeaders.each { Node n ->
     n.conditionalStyles.each { ConditionalStyle it ->
         if (it.active && it.always && !it.last) {
             style = (it as AConditionalStyleProxy).style
@@ -46,7 +64,7 @@ selectedNodes.each { Node n ->
 def onEntryAccepted = { JComboBox<String> comboBox ->
     int idx = styleNamesForComboBox.indexOf(comboBox.selectedItem)
     style = stylesForComboBox[idx]
-    selectedNodes.each { Node n ->
+    selectedSinglesAndCloneLeaders.each { Node n ->
         def ncs = n.conditionalStyles
         ncs.find { ConditionalStyle it ->
             it.active && it.always && (it as AConditionalStyleProxy).style == style && !it.last
@@ -59,7 +77,7 @@ def onEntryAccepted = { JComboBox<String> comboBox ->
 if (styleNamesForComboBox.isEmpty()) {
     UITools.showMessage('No condi styles to remove', JOptionPane.WARNING_MESSAGE)
 } else {
-    def uniqueStyleNamesForComboBox = selectedNodes.size() == 1 ? styleNamesForComboBox : new TreeSet<String>(styleNamesForComboBox)
+    def uniqueStyleNamesForComboBox = selectedSinglesAndCloneLeaders.size() == 1 ? styleNamesForComboBox : new TreeSet<String>(styleNamesForComboBox)
     SwingUtilities.invokeLater {
         new AutoCompletionComboDialog(UITools.currentFrame, 'Remove style', uniqueStyleNamesForComboBox.toArray(new String[0]), onEntryAccepted)
     }

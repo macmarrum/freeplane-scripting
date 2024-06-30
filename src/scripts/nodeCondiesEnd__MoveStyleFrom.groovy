@@ -10,13 +10,31 @@ import org.freeplane.api.ConditionalStyles
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
 
-def c = c as Controller
+static findSinglesAndCloneLeaders(Iterable<Node> nodes) {
+    if (nodes.size() == 1)
+        return nodes
+    def singlesAndLeaders = new LinkedList<Node>()
+    def subtrees = new HashSet<Node>()
+    def clones = new HashSet<Node>()
+    nodes.each { Node n ->
+        if (n !in subtrees) { // not a tree clone or a clone leader
+            def nodesSharingContentAndSubtree = n.nodesSharingContentAndSubtree
+            subtrees.addAll(nodesSharingContentAndSubtree)
+            if (n !in clones) { // not a content clone or a clone leader
+                singlesAndLeaders << n
+                clones.addAll(n.nodesSharingContent - nodesSharingContentAndSubtree)
+            }
+        }
+    }
+    return singlesAndLeaders
+}
 
+def c = c as Controller
 ConditionalStyles conditionalStyles
 List<ConditionalStyle> nodeCondies
 ConditionalStyle nodeCondi
 int i
-c.selecteds.each { Node selectedNode ->
+findSinglesAndCloneLeaders(c.selecteds).each { Node selectedNode ->
     conditionalStyles = selectedNode.conditionalStyles
     nodeCondies = conditionalStyles.collect()
     for (i = nodeCondies.size() - 1; i >= 0; i--) {
