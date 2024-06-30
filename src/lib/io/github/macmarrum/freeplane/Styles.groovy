@@ -8,6 +8,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
+import org.freeplane.core.ui.components.UITools
 import org.freeplane.core.util.MenuUtils
 import org.freeplane.core.util.TextUtils
 import org.freeplane.plugin.script.proxy.ScriptUtils
@@ -145,6 +146,265 @@ class Styles {
                 n.style.font.size = fontSize
             }
         }
+    }
+
+    static void clearAlsRootNote() {
+        def als0 = c.selected.mindMap.root.style.styleNode
+        als0.note = null
+    }
+
+    /**
+     * Sets the standard ALS settings (JSON) that can be used by restoreAls* methods
+     */
+    static void setStandardAlsJsonToAlsRootNote() {
+        def als0 = c.selected.mindMap.root.style.styleNode
+        if (als0.note) {
+            UITools.showMessage('ALS Root already has a note.\nDelete it first.', 0)
+            return
+        }
+        als0.note = '''\
+{
+    "Level 1": {
+        "backgroundColor": "#2d3830ff",
+        "backgroundColorSeeThrough": "#366c4433",
+        "border.color": "#52d273b6",
+        "font.size": 18,
+        "textColor": "#46a25e",
+        "textColorSeeThrough": "#52d273b6"
+    },
+    "Level 2": {
+        "backgroundColor": "#3e2b2dff",
+        "backgroundColorSeeThrough": "#8b2c3933",
+        "border.color": "#f9556bb6",
+        "font.size": 16,
+        "textColor": "#be4858",
+        "textColorSeeThrough": "#f9556bb6"
+    },
+    "Level 3": {
+        "backgroundColor": "#3c382bff",
+        "backgroundColorSeeThrough": "#84702d33",
+        "border.color": "#e5c452b6",
+        "font.size": 14,
+        "textColor": "#af9846",
+        "textColorSeeThrough": "#e5c452b6"
+    },
+    "Level 5": {
+        "backgroundColor": "#2b363aff",
+        "backgroundColorSeeThrough": "#2c657633",
+        "border.color": "#46bddfb6",
+        "font.size": 14,
+        "textColor": "#3e93ab",
+        "textColorSeeThrough": "#46bddfb6"
+    },
+    "Level 4": {
+        "backgroundColor": "#372c33ff",
+        "backgroundColorSeeThrough": "#68305533",
+        "border.color": "#d349a4b6",
+        "font.size": 14,
+        "textColor": "#a24081",
+        "textColorSeeThrough": "#d349a4b6"
+    },
+    "Level 6": {
+        "backgroundColor": "#3d2f2bff",
+        "backgroundColorSeeThrough": "#87412f33",
+        "border.color": "#e57154b6",
+        "font.size": 12,
+        "textColor": "#af5c48",
+        "textColorSeeThrough": "#e57154b6"
+    },
+    "Level 7": {
+        "backgroundColor": "#2d3830ff",
+        "backgroundColorSeeThrough": "#366c4433",
+        "border.color": "#52d273b6",
+        "font.size": 12,
+        "textColor": "#46a25e",
+        "textColorSeeThrough": "#52d273b6"
+    },
+    "Level 8": {
+        "backgroundColor": "#3e2b2dff",
+        "backgroundColorSeeThrough": "#8b2c3933",
+        "border.color": "#f9556bb6",
+        "font.size": 12,
+        "textColor": "#be4858",
+        "textColorSeeThrough": "#f9556bb6"
+    },
+    "Level 9": {
+        "backgroundColor": "#3c382bff",
+        "backgroundColorSeeThrough": "#84702d33",
+        "border.color": "#e5c452b6",
+        "font.size": 12,
+        "textColor": "#af9846",
+        "textColorSeeThrough": "#e5c452b6"
+    },
+    "Level 11": {
+        "backgroundColor": "#2b363aff",
+        "backgroundColorSeeThrough": "#2c657633",
+        "border.color": "#46bddfb6",
+        "font.size": 12,
+        "textColor": "#3e93ab",
+        "textColorSeeThrough": "#46bddfb6"
+    },
+    "Level 10": {
+        "backgroundColor": "#372c33ff",
+        "backgroundColorSeeThrough": "#68305533",
+        "border.color": "#d349a4b6",
+        "font.size": 12,
+        "textColor": "#a24081",
+        "textColorSeeThrough": "#d349a4b6"
+    },
+    "Level 12": {
+        "backgroundColor": "#3d2f2bff",
+        "backgroundColorSeeThrough": "#87412f33",
+        "border.color": "#e57154b6",
+        "font.size": 12,
+        "textColor": "#af5c48",
+        "textColorSeeThrough": "#e57154b6"
+    },
+    "Level 13": {
+        "backgroundColor": "#2d3830ff",
+        "backgroundColorSeeThrough": "#366c4433",
+        "border.color": "#52d273b6",
+        "font.size": 12,
+        "textColor": "#46a25e",
+        "textColorSeeThrough": "#52d273b6"
+    },
+    "Level 14": {
+        "backgroundColor": "#3e2b2dff",
+        "backgroundColorSeeThrough": "#8b2c3933",
+        "border.color": "#f9556bb6",
+        "font.size": 12,
+        "textColor": "#be4858",
+        "textColorSeeThrough": "#f9556bb6"
+    },
+    "Level 15": {
+        "backgroundColor": "#3c382bff",
+        "backgroundColorSeeThrough": "#84702d33",
+        "border.color": "#e5c452b6",
+        "font.size": 12,
+        "textColor": "#af9846",
+        "textColorSeeThrough": "#e5c452b6"
+    },
+    "Level 17": {
+        "backgroundColor": "#2b363aff",
+        "backgroundColorSeeThrough": "#2c657633",
+        "border.color": "#46bddfb6",
+        "font.size": 12,
+        "textColor": "#3e93ab",
+        "textColorSeeThrough": "#46bddfb6"
+    },
+    "Level 16": {
+        "backgroundColor": "#372c33ff",
+        "backgroundColorSeeThrough": "#68305533",
+        "border.color": "#d349a4b6",
+        "font.size": 12,
+        "textColor": "#a24081",
+        "textColorSeeThrough": "#d349a4b6"
+    },
+    "Level 18": {
+        "backgroundColor": "#3d2f2bff",
+        "backgroundColorSeeThrough": "#87412f33",
+        "border.color": "#e57154b6",
+        "font.size": 12,
+        "textColor": "#af5c48",
+        "textColorSeeThrough": "#e57154b6"
+    },
+    "Level 19": {
+        "backgroundColor": "#2d3830ff",
+        "backgroundColorSeeThrough": "#366c4433",
+        "border.color": "#52d273b6",
+        "font.size": 12,
+        "textColor": "#46a25e",
+        "textColorSeeThrough": "#52d273b6"
+    },
+    "Level 20": {
+        "backgroundColor": "#3e2b2dff",
+        "backgroundColorSeeThrough": "#8b2c3933",
+        "border.color": "#f9556bb6",
+        "font.size": 12,
+        "textColor": "#be4858",
+        "textColorSeeThrough": "#f9556bb6"
+    },
+    "Level 21": {
+        "backgroundColor": "#3c382bff",
+        "backgroundColorSeeThrough": "#84702d33",
+        "border.color": "#e5c452b6",
+        "font.size": 12,
+        "textColor": "#af9846",
+        "textColorSeeThrough": "#e5c452b6"
+    },
+    "Level 23": {
+        "backgroundColor": "#2b363aff",
+        "backgroundColorSeeThrough": "#2c657633",
+        "border.color": "#46bddfb6",
+        "font.size": 12,
+        "textColor": "#3e93ab",
+        "textColorSeeThrough": "#46bddfb6"
+    },
+    "Level 22": {
+        "backgroundColor": "#372c33ff",
+        "backgroundColorSeeThrough": "#68305533",
+        "border.color": "#d349a4b6",
+        "font.size": 12,
+        "textColor": "#a24081",
+        "textColorSeeThrough": "#d349a4b6"
+    },
+    "Level 24": {
+        "backgroundColor": "#3d2f2bff",
+        "backgroundColorSeeThrough": "#87412f33",
+        "border.color": "#e57154b6",
+        "font.size": 12,
+        "textColor": "#af5c48",
+        "textColorSeeThrough": "#e57154b6"
+    },
+    "Level 25": {
+        "backgroundColor": "#2d3830ff",
+        "backgroundColorSeeThrough": "#366c4433",
+        "border.color": "#52d273b6",
+        "font.size": 12,
+        "textColor": "#46a25e",
+        "textColorSeeThrough": "#52d273b6"
+    },
+    "Level 26": {
+        "backgroundColor": "#3e2b2dff",
+        "backgroundColorSeeThrough": "#8b2c3933",
+        "border.color": "#f9556bb6",
+        "font.size": 12,
+        "textColor": "#be4858",
+        "textColorSeeThrough": "#f9556bb6"
+    },
+    "Level 27": {
+        "backgroundColor": "#3c382bff",
+        "backgroundColorSeeThrough": "#84702d33",
+        "border.color": "#e5c452b6",
+        "font.size": 12,
+        "textColor": "#af9846",
+        "textColorSeeThrough": "#e5c452b6"
+    },
+    "Level 29": {
+        "backgroundColor": "#2b363aff",
+        "backgroundColorSeeThrough": "#2c657633",
+        "border.color": "#46bddfb6",
+        "font.size": 12,
+        "textColor": "#3e93ab",
+        "textColorSeeThrough": "#46bddfb6"
+    },
+    "Level 28": {
+        "backgroundColor": "#372c33ff",
+        "backgroundColorSeeThrough": "#68305533",
+        "border.color": "#d349a4b6",
+        "font.size": 12,
+        "textColor": "#a24081",
+        "textColorSeeThrough": "#d349a4b6"
+    },
+    "Level 30": {
+        "backgroundColor": "#3d2f2bff",
+        "backgroundColorSeeThrough": "#87412f33",
+        "border.color": "#e57154b6",
+        "font.size": 12,
+        "textColor": "#af5c48",
+        "textColorSeeThrough": "#e57154b6"
+    }
+}'''
     }
 
     /**
