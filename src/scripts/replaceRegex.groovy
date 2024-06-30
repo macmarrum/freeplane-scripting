@@ -5,14 +5,14 @@ import org.freeplane.core.ui.components.UITools
 import org.freeplane.features.map.NodeModel
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
-final String default_browser_command_windows_nt = "default_browser_command_windows_nt"
+final String default_browser_command_windows_9x = "default_browser_command_windows_9x"
 final resourceController = ResourceController.getResourceController()
 final c = ScriptUtils.c()
 final NodeModel nodeModel = c.selected.delegate
-final String initialValue = resourceController.getProperty(default_browser_command_windows_nt)
+final String initialValue = resourceController.getProperty(default_browser_command_windows_9x)
 String input = UITools.showInputDialog(nodeModel, 'Replace Regex\nE.g. /pattern/replacement/g\nNB Special characters <([{\\^-=$!|]})?*+.>', initialValue)
 if (input !== null) {
-    resourceController.setProperty(default_browser_command_windows_nt, input)
+    resourceController.setProperty(default_browser_command_windows_9x, input)
     final token = input[0]
     final tokenCount = input.count(token)
     if (tokenCount != 3) {
