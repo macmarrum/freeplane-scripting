@@ -244,6 +244,9 @@ ol {
 <stylenode TEXT="=Pin" ID="ID_225003551" COLOR="#e5c453" BORDER_COLOR_LIKE_EDGE="false">
 <icon BUILTIN="emoji-1F4CC"/>
 </stylenode>
+<stylenode TEXT="=Link" BACKGROUND_COLOR="#0e0e0e">
+<icon BUILTIN="emoji-1F517"/>
+</stylenode>
 <stylenode TEXT="^Table" BACKGROUND_COLOR="#323232" BACKGROUND_ALPHA="0" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="0 pt" SHAPE_VERTICAL_MARGIN="0 pt" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#323232" BORDER_COLOR_ALPHA="0" VGAP_QUANTITY="0 pt">
 <edge STYLE="hide_edge"/>
 <richcontent TYPE="NOTE">
