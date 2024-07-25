@@ -9,19 +9,19 @@ import org.freeplane.core.util.TextUtils
 
 def node = node as Node
 def settings = [
-        details: false,
-        note: false,
-        attributes: false,
-        transformed: false,
-        style: false,
-        format: false,
-        icons: false,
-        link: false,
+//        details: true,
+//        note: true,
+//        attributes: true,
+//        transformed: true,
+//        style: true,
+//        format: true,
+//        icons: true,
+//        link: true,
         skip1: true,
         denullify: true,
         pretty: true,
-        isoDate: false,
-        forceId: false
+//        isoDate: false,
+//        forceId: false
 ]
 def text = Export.toJsonString(node, settings)
 TextUtils.copyToClipboard(text)
