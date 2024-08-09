@@ -84,7 +84,7 @@ class Export {
     ]
     public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
     public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip1: false, tail: false, quote: false]
-    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, format: true, icons: true, link: true, skip1: false, denullify: false, pretty: false, isoDate: false, forceId: false]
+    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, formatting: true, icons: true, link: true, skip1: false, denullify: false, pretty: false, isoDate: false, forceId: false]
 
     enum NodePart {
         CORE, DETAILS, NOTE
@@ -476,7 +476,7 @@ class Export {
      *  - link -- whether to include link;
      *  - transformed -- whether to use transformed text, i.e. after formula/numbering/format evaluation;
      *  - style -- whether to include the individually-assigned style;
-     *  - format -- whether to include formatting: backgroundColor, textColor;
+     *  - formatting -- whether to include formatting: backgroundColor, textColor;
      *  - icons -- whether to include icons;
      *  - skip1 -- whether to skip the first node;
      *  - denullify -- whether to try to avoid `{"Node text": null}` by replacing it with `"Node text"` where possible;
@@ -514,8 +514,8 @@ class Export {
         def attributes = settings.attributes ? (settings.transformed ? _toJson_transformedAttrMap(node) : node.attributes.map) : Collections.emptyMap()
         URI link = settings.link ? node.link.uri : null
         def style = settings.style ? node.style.name : null
-        def backgroundColor = settings.format && node.style.isBackgroundColorSet() ? colorToRGBAString(node.style.backgroundColor) : null
-        def textColor = settings.format && node.style.isTextColorSet() ? colorToRGBAString(node.style.textColor) : null
+        def backgroundColor = settings.formatting && node.style.isBackgroundColorSet() ? colorToRGBAString(node.style.backgroundColor) : null
+        def textColor = settings.formatting && node.style.isTextColorSet() ? colorToRGBAString(node.style.textColor) : null
         def icons = settings.icons ? node.icons.icons : Collections.emptyList()
         def children = node.children.findAll { it.visible }
         if (core === null && !details && !note && !attributes && !link && !style && !backgroundColor && !textColor && !icons && !children) {
