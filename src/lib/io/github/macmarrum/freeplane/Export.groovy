@@ -27,6 +27,9 @@ import org.freeplane.features.format.FormattedDate
 import org.freeplane.features.format.FormattedFormula
 import org.freeplane.features.format.FormattedNumber
 import org.freeplane.plugin.script.FreeplaneScriptBaseClass
+import org.freeplane.plugin.script.proxy.ConvertibleDate
+import org.freeplane.plugin.script.proxy.ConvertibleNumber
+import org.freeplane.plugin.script.proxy.ConvertibleText
 
 import javax.swing.*
 import java.nio.charset.Charset
@@ -567,7 +570,8 @@ class Export {
                 if (textColor)
                     result[TEXT_COLOR] = textColor
             }
-            def childToCalcCore = new HashMap<Node, Object>(); children.each { childToCalcCore.put(it, _toJson_calcCore(it, settings)) }
+            def childToCalcCore = new HashMap<Node, Object>();
+            children.each { childToCalcCore.put(it, _toJson_calcCore(it, settings)) }
             // use ID if `forceId: true` or core is not unique among children
             def useIdForChildren = settings.forceId || (children && children.size() != new HashSet<Object>(childToCalcCore.values()).size())
             Object childCore
@@ -634,9 +638,11 @@ class Export {
     }
 
     static List<List> _toJson_getAttributes(Node node, Map<String, Object> settings) {
+        // TODO: transformed attributes loose format information -> use raw attribute's format
         def attributes = settings.transformed ? node.attributes.transformed : node.attributes
         def dateFmt = settings.dateFmt as DateFmt
         def list = new ArrayList<List>(attributes.size())
+        // Formatted* is available only for raw values (non-transformed)
         attributes.each { Map.Entry entry ->
             def entryList = new ArrayList<Object>(3)
             entryList << entry.key
@@ -650,21 +656,33 @@ class Export {
                 entryList << entry.value.toString()
                 entryList << "<${entry.value.class.simpleName}>".toString()
             } else if (entry.value instanceof FormattedNumber) {
-                def value = (entry.value as FormattedNumber)
-                def format = value.pattern
+                def value = entry.value as FormattedNumber
                 entryList << value.number
+                def format = value.pattern
                 if (settings.format && format != STANDARD_NUMBER_FORMAT) {
                     entryList << NUM_TYPE
                     entryList << format
                 }
             } else if (entry.value instanceof FormattedFormula) {
                 def value = entry.value as FormattedFormula
-                def format = value.pattern
                 entryList << value.object
+                def format = value.pattern
                 if (settings.format && format != STANDARD_FORMAT) {
                     entryList << TEXT_TYPE
                     entryList << format
                 }
+//            } else if (entry.value instanceof FormattedObject) {
+//                // Attributes don't keep pattern -- it's merged with text, so regular entry.value is sufficient
+//                def value = entry.value as FormattedObject
+//                def format = value.pattern
+//                entryList << value.object
+//                if (settings.format) {
+//                    entryList << format
+//                }
+            } else if (entry.value instanceof ConvertibleText) {
+                entryList << entry.value.text
+            } else if (entry.value instanceof ConvertibleNumber) {
+                entryList << entry.value.num
             } else {
                 entryList << entry.value
             }
