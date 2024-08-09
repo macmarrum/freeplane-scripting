@@ -21,6 +21,9 @@ import groovy.json.JsonOutput
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
 import org.freeplane.core.util.HtmlUtils
+import org.freeplane.plugin.script.proxy.ConvertibleDate
+import org.freeplane.plugin.script.proxy.ConvertibleNumber
+import org.freeplane.plugin.script.proxy.ConvertibleText
 
 import javax.swing.*
 import java.nio.charset.Charset
@@ -45,7 +48,7 @@ class Export {
     private static final Pattern RX_MULTILINE_BEGINING = ~/(?m)^/
     private static final Pattern RX_HARD_LINE_BREAK_CANDIDATE = ~/(?<!^|\\|\n)\n(?!\n|$)/
     private static final String BACKSLASH_NL = '\\\\\n'
-    private static final Pattern RX_AUTOMATIC_LAYOUT_LEVEL = ~/^AutomaticLayout.level(,|\.)/
+    private static final Pattern RX_AUTOMATIC_LAYOUT_LEVEL = ~/^AutomaticLayout.level([,.])/
     private static final String ROOT = 'root'
     private static final String ZERO = '0'
     private static final Integer MIN_LEVEL_CEILING = 999
@@ -508,7 +511,7 @@ class Export {
     static HashMap<Object, Object> _toJson_getBodyRecursively(Node node, HashMap<String, Object> settings, int level = 1, core = null) {
         def details = settings.details ? (settings.transformed ? node.details?.text : HtmlUtils.htmlToPlain(node.detailsText ?: '')) : null
         def note = settings.note ? (settings.transformed ? node.note?.text : HtmlUtils.htmlToPlain(node.noteText ?: '')) : null
-        def attributes = settings.attributes ? (settings.transformed ? node.attributes.transformed.map : node.attributes.map) : Collections.emptyMap()
+        def attributes = settings.attributes ? (settings.transformed ? _toJson_transformedAttrMap(node) : node.attributes.map) : Collections.emptyMap()
         URI link = settings.link ? node.link.uri : null
         def style = settings.style ? node.style.name : null
         def backgroundColor = settings.format && node.style.isBackgroundColorSet() ? colorToRGBAString(node.style.backgroundColor) : null
@@ -539,7 +542,8 @@ class Export {
                 if (textColor)
                     result[TEXT_COLOR] = textColor
             }
-            def childToCalcCore = new HashMap<Node, Object>(); children.each { childToCalcCore.put(it, _toJson_calcCore(it, settings)) }
+            def childToCalcCore = new HashMap<Node, Object>()
+            children.each { childToCalcCore.put(it, _toJson_calcCore(it, settings)) }
             // use ID if `forceId: true` or core is not unique among children
             def useIdForChildren = settings.forceId || (children && children.size() != new HashSet<Object>(childToCalcCore.values()).size())
             Object childCore
@@ -554,6 +558,19 @@ class Export {
                 result[key] = _toJson_getBodyRecursively(childNode, settings, level + 1, atCore)
             }
             return result
+        }
+    }
+
+    static _toJson_transformedAttrMap(Node node) {
+        // JsonGenerator considers ConvertibleText and -Number as Date and errors out. This avoids it
+        return node.attributes.transformed.map.collectEntries { k, v ->
+            if (v instanceof ConvertibleText)
+                v = v.text
+            else if (v instanceof ConvertibleNumber)
+                v = v.num
+            else if (v instanceof ConvertibleDate)
+                v = v.date
+            return [k, v]
         }
     }
 
