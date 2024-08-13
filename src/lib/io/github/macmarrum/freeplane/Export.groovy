@@ -638,13 +638,14 @@ class Export {
     }
 
     static List<List> _toJson_getAttributes(Node node, Map<String, Object> settings) {
-        // TODO: transformed attributes loose format information -> use raw attribute's format
-        def attributes = settings.transformed ? node.attributes.transformed : node.attributes
+        // Note: transformed attributes loose format information -> use raw attribute's format
         def dateFmt = settings.dateFmt as DateFmt
-        def list = new ArrayList<List>(attributes.size())
-        // Formatted* is available only for raw values (non-transformed)
+        def attributes = node.attributes
+        def attributeKeyToCount = [:]
+        def attributesList = new ArrayList<ArrayList<Object>>(attributes.size())
         attributes.each { Map.Entry entry ->
-            def entryList = new ArrayList<Object>(3)
+            attributeKeyToCount.compute(entry.key) { key, value -> value ? ++value : 1 }
+            def entryList = new ArrayList<Object>(4)
             entryList << entry.key
             if (entry.value instanceof FormattedDate) {
                 def value = entry.value as FormattedDate
@@ -686,9 +687,26 @@ class Export {
             } else {
                 entryList << entry.value
             }
-            list << entryList
+            attributesList << entryList
         }
-        return list
+        // Use transformed value if requested
+        if (settings.transformed) {
+            attributes.transformed.eachWithIndex { Map.Entry entry, int i ->
+                def value = entry.value
+                if (value != attributesList[i][1]) {
+                    if (value instanceof ConvertibleText)
+                        value = value.text
+                    else if (value instanceof ConvertibleNumber)
+                        value = value.num
+                    else if (value instanceof FormattedDate) {
+                        def v = entry.value as FormattedDate
+                        value = toDateString(v, dateFmt, null)
+                        attributesList[i][1] = value
+                    }
+                }
+            }
+        }
+        return attributesList
     }
 
     static HashMap<Object, Object> _toJson_denullify(HashMap<String, Object> hashMap) {
