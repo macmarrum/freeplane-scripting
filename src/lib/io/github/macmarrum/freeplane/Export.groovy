@@ -79,11 +79,7 @@ class Export {
     private static final String NOTE = '@note'
     private static final String STYLE = '@style'
     private static final String TEXT_COLOR = '@textColor'
-    private static final String DATE_TYPE = '<Date>'
-    private static final String NUM_TYPE = '<Num>'
-    private static final String TEXT_TYPE = '<Text>'
     private static final String STANDARD_FORMAT = 'STANDARD_FORMAT'
-    private static final String STANDARD_NUMBER_FORMAT = '#0.####'
     private static final String AUTO_FORMAT = 'AUTO_FORMAT'
     public static Charset charset = StandardCharsets.UTF_8
     private static final TextUtils textUtils = new TextUtils()
@@ -514,9 +510,10 @@ class Export {
         settings = !settings ? jsonSettings.clone() : jsonSettings + settings
         def forceId = settings.forceId as boolean
         def core = _toJson_calcCore(node, settings)
-        def mapOrList = _toJson_getBodyRecursively(node, settings, 1, forceId || core instanceof List ? core : null)
+        def useAtCore = forceId || core instanceof List
+        def mapOrList = _toJson_getBodyRecursively(node, settings, 1, useAtCore ? core : null)
         if (!settings.skip1)
-            mapOrList = [(settings.forceId || core instanceof List ? node.id : core): mapOrList]
+            mapOrList = [(useAtCore ? node.id : core): mapOrList]
         if (settings.denullify) {
             // use a wrapper to also denullyfy top-level entries, so that top-level object can be a list
             mapOrList = _toJson_denullify(['x': mapOrList])['x']
@@ -596,17 +593,20 @@ class Export {
         if (!(plainText =~ RX_FORMULA)) {
             def conv = node.to
             if (conv.isNum()) {
-                return !settings.format || format == STANDARD_FORMAT ? conv.num : [conv.num, NUM_TYPE, format]
+                // always return a list, to indicate that @core must be used and avoid serialization to String (JSON keys must be String)
+                def num = conv.num
+                return !settings.format || format == STANDARD_FORMAT ? [num] : [num, node.object.class.simpleName, format]
             } else if (conv.isDate()) {
-                def pattern = (conv.date as FormattedDate).pattern
-                def isStdPattern = pattern in [textUtils.defaultDateFormat.toPattern(), textUtils.defaultDateTimeFormat.toPattern()]
-                def value = toDateString(conv.date, settings.dateFmt as DateFmt, node.format)
-                return !settings.format || format == STANDARD_FORMAT && isStdPattern ? [value, DATE_TYPE] : [value, DATE_TYPE, isStdPattern ? format : pattern]
+                def date = conv.date
+                def pattern = (date as FormattedDate).pattern
+                def value = toDateString(date, settings.dateFmt as DateFmt, format)
+                // a date can be formatted twice: with node.format and (default) date pattern, so both are provided
+                return !settings.format ? value : [value, node.object.class.simpleName, format, pattern]
             }
         }
         // a formula or text
         def value = settings.transformed ? node.transformedText : plainText
-        return !settings.format || format == STANDARD_FORMAT ? value : [value, TEXT_TYPE, format]
+        return !settings.format || format == STANDARD_FORMAT ? value : [value, node.object.class.simpleName, format]
     }
 
     /**
