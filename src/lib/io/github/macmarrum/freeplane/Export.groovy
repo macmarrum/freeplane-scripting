@@ -26,8 +26,8 @@ import org.freeplane.core.util.TextUtils
 import org.freeplane.features.format.FormattedDate
 import org.freeplane.features.format.FormattedFormula
 import org.freeplane.features.format.FormattedNumber
+import org.freeplane.features.format.FormattedObject
 import org.freeplane.plugin.script.FreeplaneScriptBaseClass
-import org.freeplane.plugin.script.proxy.ConvertibleDate
 import org.freeplane.plugin.script.proxy.ConvertibleNumber
 import org.freeplane.plugin.script.proxy.ConvertibleText
 
@@ -505,7 +505,8 @@ class Export {
      *  - skip1 -- whether to skip the first node;
      *  - denullify -- whether to try to avoid `{"Node text": null}` by replacing it with `"Node text"` where possible;
      *  - pretty -- whether to use pretty output format;
-     *  - dateFormat -- how to format values of type Date: DISPLAYED, ISO_LOCAL, ISO;
+     *  - dateFmt -- how to format values of type Date: DISPLAYED, ISO_LOCAL, ISO;
+     *  - format -- whether to include node/attribute format, details/note content type;
      *  - forceId -- whether to force the usage of node IDs as JSON keys (used regardless in case of non-unique siblings) and @core for core value;
      * @return JSON representation of the branch, in UTF-8 encoding
      */
@@ -599,7 +600,7 @@ class Export {
             } else if (conv.isDate()) {
                 def pattern = (conv.date as FormattedDate).pattern
                 def isStdPattern = pattern in [textUtils.defaultDateFormat.toPattern(), textUtils.defaultDateTimeFormat.toPattern()]
-                def value = toDateString(conv.date, settings.dateFmt as DateFmt, node)
+                def value = toDateString(conv.date, settings.dateFmt as DateFmt, node.format)
                 return !settings.format || format == STANDARD_FORMAT && isStdPattern ? [value, DATE_TYPE] : [value, DATE_TYPE, isStdPattern ? format : pattern]
             }
         }
@@ -612,10 +613,10 @@ class Export {
      *
      * @param date
      * @param dateFmt settings.dateFmt
-     * @param node pass {@code null} in case of attributes
+     * @param pattern format used for display
      * @return
      */
-    static String toDateString(Date date, DateFmt dateFmt, Node node) {
+    static String toDateString(Date date, DateFmt dateFmt, String pattern) {
         // Freeplane stores dates as FormattedDate, which extends Date and holds a text (originally entered),
         // and a format (SimpleDateFormat), which is used for attributes; for nodes, Styles are used, because they bring their own format.
         // node.to converts date to ConvertibleDate: this.date holds FormattedDate; this.text holds date formatted always as yyyy-MM-dd'T'HH:mmZ (probably never used)
@@ -625,7 +626,7 @@ class Export {
         return switch (dateFmt) {
             case DateFmt.ISO_LOCAL -> toIsoLocalDate(date)
             case DateFmt.ISO -> date.toOffsetDateTime().toString()
-            case DateFmt.DISPLAYED -> node ? fsbc.format(date, node.format) : date.toString()
+            case DateFmt.DISPLAYED -> pattern ? fsbc.format(date, pattern) : date.toString()
         }
     }
 
@@ -637,76 +638,106 @@ class Export {
         return localDateTime.truncatedTo(ChronoUnit.DAYS) == localDateTime ? localDateTime.toLocalDate() : localDateTime
     }
 
-    static List<List> _toJson_getAttributes(Node node, Map<String, Object> settings) {
+    /** Gets attributes in the simplest possible format: a map or a list of lists – if there is more
+     * than one attribute with the same name or any of the node's attributes has a pattern.
+     * An attribute can be a string, number or date and can have a pattern (can be formatted).
+     * A formula can result in a string, number or date.
+     * The value of a transformed attribute (evaluated formula) returned by the API is raw;
+     * NB. Date is represented as Date#toString(). To get the value as displayed by Freeplane, one needs to apply
+     * the pattern for the non-transformed attribute if such pattern is present.
+     */
+    static Object _toJson_getAttributes(Node node, Map<String, Object> settings) {
         // Note: transformed attributes loose format information -> use raw attribute's format
         def dateFmt = settings.dateFmt as DateFmt
         def attributes = node.attributes
         def attributeKeyToCount = [:]
-        def attributesList = new ArrayList<ArrayList<Object>>(attributes.size())
+        def attributesList = new ArrayList<List<Object>>(attributes.size())
         attributes.each { Map.Entry entry ->
             attributeKeyToCount.compute(entry.key) { key, value -> value ? ++value : 1 }
             def entryList = new ArrayList<Object>(4)
             entryList << entry.key
             if (entry.value instanceof FormattedDate) {
                 def value = entry.value as FormattedDate
-                entryList << toDateString(value, dateFmt, null)
-                entryList << DATE_TYPE
-                if (settings.format)
-                    entryList << value.pattern
+                entryList << toDateString(value, dateFmt, value.pattern)
+                entryList << value.class.simpleName
+                entryList << value.pattern
             } else if (entry.value instanceof Hyperlink || entry.value instanceof URI) {
                 entryList << entry.value.toString()
-                entryList << "<${entry.value.class.simpleName}>".toString()
+                entryList << entry.value.class.simpleName
             } else if (entry.value instanceof FormattedNumber) {
                 def value = entry.value as FormattedNumber
                 entryList << value.number
-                def format = value.pattern
-                if (settings.format && format != STANDARD_NUMBER_FORMAT) {
-                    entryList << NUM_TYPE
-                    entryList << format
-                }
+                entryList << value.class.simpleName
+                entryList << value.pattern
             } else if (entry.value instanceof FormattedFormula) {
+                // formula can result in a string, number or date
                 def value = entry.value as FormattedFormula
                 entryList << value.object
-                def format = value.pattern
-                if (settings.format && format != STANDARD_FORMAT) {
-                    entryList << TEXT_TYPE
-                    entryList << format
-                }
-//            } else if (entry.value instanceof FormattedObject) {
-//                // Attributes don't keep pattern -- it's merged with text, so regular entry.value is sufficient
-//                def value = entry.value as FormattedObject
-//                def format = value.pattern
-//                entryList << value.object
-//                if (settings.format) {
-//                    entryList << format
-//                }
-            } else if (entry.value instanceof ConvertibleText) {
-                entryList << entry.value.text
-            } else if (entry.value instanceof ConvertibleNumber) {
-                entryList << entry.value.num
+                entryList << value.class.simpleName
+                entryList << value.pattern
+            } else if (entry.value instanceof FormattedObject) {
+                // occurs when a number-with-format attrib is set a text value
+                def value = entry.value as FormattedObject
+                entryList << value.object
+                entryList << value.class.simpleName
+                entryList << value.pattern
             } else {
                 entryList << entry.value
             }
             attributesList << entryList
         }
         // Use transformed value if requested
+        // Convertible is the result of a formula accessing another attribute's value: node['key']
+        // FormattedDate is when accessing another attribute's value which is a date (but not a formula)
         if (settings.transformed) {
             attributes.transformed.eachWithIndex { Map.Entry entry, int i ->
                 def value = entry.value
-                if (value != attributesList[i][1]) {
-                    if (value instanceof ConvertibleText)
+                def entryList = attributesList[i]
+                if (value != entryList[1]) {
+                    def entryListSize = entryList.size()
+                    if (value instanceof ConvertibleText) {
                         value = value.text
-                    else if (value instanceof ConvertibleNumber)
+                    } else if (value instanceof ConvertibleNumber) {
                         value = value.num
-                    else if (value instanceof FormattedDate) {
-                        def v = entry.value as FormattedDate
-                        value = toDateString(v, dateFmt, null)
-                        attributesList[i][1] = value
+                    } else if (value instanceof Date) {
+                        // this covers ConvertibleDate and FormattedDate
+                        String pattern = null
+                        if (value instanceof FormattedDate) {
+                            // Freeplane displays the result of an evaluated formula using a date pattern from upstream
+                            pattern = value.pattern
+                            if (settings.format) {
+                                if (entryListSize < 3) {
+                                    // reflect the type of the original formula (i.e. String)
+                                    attributesList[i][2] = entryList[1].class.simpleName
+                                }
+                                attributesList[i][3] = pattern
+                            }
+                        } else if (entryListSize >= 4) {
+                            pattern = entryList[3]
+                        }
+                        value = toDateString(value, dateFmt, pattern)
                     }
+                    // update value
+                    attributesList[i][1] = value
                 }
             }
         }
-        return attributesList
+        // remove type and pattern if not requested
+        if (!settings.format) {
+            attributesList.each { entryList ->
+                def size = entryList.size()
+                if (size >= 4)
+                    entryList.remove(3)
+                if (size >= 3)
+                    entryList.remove(2)
+            }
+        }
+        // Use a (simple) map if format not requested and no duplicate keys
+        if (!settings.format && attributeKeyToCount.values().every { it == 1 }) {
+            return attributesList.collectEntries()
+        } else {
+            return attributesList
+        }
     }
 
     static HashMap<Object, Object> _toJson_denullify(HashMap<String, Object> hashMap) {
