@@ -275,7 +275,7 @@ class ConfluenceStorage {
 
     private static Map<Pattern, String> pReplacements = new LinkedHashMap<Pattern, String>()
     static {
-        pReplacements.put(~/(?m)(?<=^| )>>  /, '➔ ')
+        pReplacements.put(~/(?m)(?<=^| )>> /, '➔ ')
         pReplacements.put(~/(?m)^== /, '➔ ')
         pReplacements.put(~/(?m)(?<=^| )>-> /, '↣ ')
         pReplacements.put(~/(?m)(?<=^| )-> /, '→ ')
