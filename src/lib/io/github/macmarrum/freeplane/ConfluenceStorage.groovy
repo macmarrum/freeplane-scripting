@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023, 2024  macmarrum (at) outlook (dot) ie
+ * Copyright (C) 2022-2024  macmarrum (at) outlook (dot) ie
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,21 @@ package io.github.macmarrum.freeplane
 import groovy.xml.XmlUtil
 import org.freeplane.api.Node
 import org.freeplane.core.util.HtmlUtils
+import org.freeplane.core.util.TextUtils
 import org.freeplane.plugin.script.FormulaUtils
+import org.freeplane.plugin.script.FreeplaneScriptBaseClass
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.text.MessageFormat
 import java.util.regex.Pattern
 
 class ConfluenceStorage {
+
+    enum Flavor {
+        CS, MD
+    }
+
+    public static Flavor flavor = Flavor.CS
 
     private static c = ScriptUtils.c()
 
@@ -170,20 +178,62 @@ class ConfluenceStorage {
             case mk.zip_list -> mkZipList(n)
             case mk.quote -> mkQuote(n)
             case mk.link -> mkLink(n)
-            case mk.expand -> mkExpand(n)
-            case mk.div -> mkDiv(n)
-            case mk.code -> mkCode(n)
-            case mk.page_info -> mkPageInfo(n)
-            case mk.div_expand -> mkDivExpand(n)
-            case mk.attachments -> mkAttachments(n)
-            case mk.style_import -> mkStyleImport(n)
-            case mk.style -> mkStyle(n)
-            case mk.html -> mkHtml(n)
-            case mk.image -> mkImage(n)
-            case mk.wiki -> mkWiki(n)
-            case mk.markdown -> mkMarkdown(n)
-            case mk.section -> mkSection(n)
-            case mk.column -> mkColumn(n)
+            case mk.expand -> switch (flavor) {
+                case Flavor.CS -> mkExpand(n)
+                case Flavor.MD -> mkExpandMd(n)
+            }
+            case mk.div -> switch (flavor) {
+                case Flavor.CS -> mkDiv(n)
+                case Flavor.MD -> mkDivMd(n)
+            }
+            case mk.code -> switch (flavor) {
+                case Flavor.CS -> mkCode(n)
+                case Flavor.MD -> mkCodeMd(n)
+            }
+            case mk.page_info -> switch (flavor) {
+                case Flavor.CS -> mkPageInfo(n)
+                case Flavor.MD -> mkPageInfoMd(n)
+            }
+            case mk.div_expand -> switch (flavor) {
+                case Flavor.CS -> mkDivExpand(n)
+                case Flavor.MD -> mkDivExpandMd(n)
+            }
+            case mk.attachments -> switch (flavor) {
+                case Flavor.CS -> mkAttachments(n)
+                case Flavor.MD -> mkAttachmentsMd(n)
+            }
+            case mk.style_import -> switch (flavor) {
+                case Flavor.CS -> mkStyleImport(n)
+                case Flavor.MD -> mkStyleImportMd(n)
+            }
+            case mk.style -> switch (flavor) {
+                case Flavor.CS -> mkStyle(n)
+                case Flavor.MD -> mkStyleMd(n)
+            }
+            case mk.html -> switch (flavor) {
+                case Flavor.CS -> mkHtml(n)
+                case Flavor.MD -> mkHtmlMd(n)
+            }
+            case mk.image -> switch (flavor) {
+                case Flavor.CS -> mkImage(n)
+                case Flavor.MD -> mkImageMd(n)
+            }
+            case mk.wiki -> switch (flavor) {
+                case Flavor.CS -> mkWiki(n)
+                case Flavor.MD -> mkWikiMd(n)
+            }
+            case mk.markdown -> switch (flavor) {
+                case Flavor.CS -> mkMarkdown(n)
+                case Flavor.MD -> mkMarkdownMd(n)
+            }
+            case mk.section -> switch (flavor) {
+                case Flavor.CS -> mkSection(n)
+                case Flavor.MD -> mkSectionMd(n)
+            }
+            case mk.column -> switch (flavor) {
+                case Flavor.CS -> mkColumn(n)
+                case Flavor.MD -> mkColumnMd(n)
+            }
             default -> "<!-- mk function by that name not found: ${n.text} -->"
         }
     }
@@ -409,7 +459,10 @@ class ConfluenceStorage {
         def tableWiki = new StringBuilder()
         def colNum = 1
         def rowNum = 1
-        tableWiki << '<table>' << nl << '<colgroup><col /><col /></colgroup>' << nl << '<tbody>' << nl
+        tableWiki << '<table>' << nl
+        switch (flavor) {
+            case Flavor.CS -> tableWiki << '<colgroup><col /><col /></colgroup>' << nl << '<tbody>' << nl
+        }
         // clean up details containing old tbl.rowCnt or tbl.rowNum
         if (isToAnnotate || isToClearAnnotations)
             n.findAll().drop(1).each { Node it -> if (it.detailsText && (it.details.text.startsWith(tbl.rowCnt) || it.details.text.startsWith(tbl.rowNum))) it.details = null }
@@ -432,7 +485,10 @@ class ConfluenceStorage {
                 rowNum++
             }
         }
-        tableWiki << '</tbody>' << nl << '</table>' << getSpaceAfter(n) << getEol(n)
+        switch (flavor) {
+            case Flavor.CS -> tableWiki << '</tbody>' << nl
+        }
+        tableWiki << '</table>' << getSpaceAfter(n) << getEol(n)
         return tableWiki
     }
 
@@ -624,12 +680,36 @@ class ConfluenceStorage {
         })
     }
 
+    static String mkExpandMd(Node n) {
+        def nl = getNewLine(n)
+        def sb = new StringBuilder()
+        sb << '<details>' << nl
+        sb << '<summary>' << (n.details?.text ?: 'Click here to expand...') << '</summary>' << NL
+        sb << _mkParent(n) // mkParent (mkNode) adds nl, if needed
+        sb << '</details>' << getSpaceAfter(n) << getEol(n)
+        return sb.toString()
+    }
+
     static String mkDiv(Node n) {
         return _execIfChildren(n, {
             def detailsText = n.details?.text
             Map<String, String> params = detailsText ? [class: detailsText] : null
             return _mkMacroRich(n, 'div', params)
         })
+    }
+
+    static String mkDivMd(Node n) {
+        def nl = getNewLine(n)
+        def sb = new StringBuilder()
+        def detailsText = n.details?.text
+        sb << '<div'
+        if (detailsText) {
+            sb << ' class="' << detailsText << '"'
+        }
+        sb << '>' << nl
+        sb << _mkParent(n) // mkParent (mkNode) adds nl, if needed
+        sb << nl << '</div>' << getSpaceAfter(n) << getEol(n)
+        return sb.toString()
     }
 
     static String mkCode(Node n) {
@@ -672,9 +752,55 @@ class ConfluenceStorage {
         return '<!-- a child with children or a note is missing -->'
     }
 
+    static String mkCodeMd(Node n) {
+        final MAX_LANG_SIZE = 12
+        for (child in n.children.find { Node it -> it.children.size() > 0 || it.noteText !== null || it.detailsText !== null }) {
+            String lang
+            String cdata  // get cdata from childText, alternatively from children or from note
+            String childText = child.text
+            String title = 'Code'
+            String childDetailsText = child.details?.text
+            String nDetailsText
+            String childLinkText
+            if (childText.size() > MAX_LANG_SIZE) { // childText is not a language name
+                lang = childDetailsText ?: 'none'
+                cdata = childText
+                if (nDetailsText = n.details?.text)
+                    title = nDetailsText
+            } else {
+                lang = childText ?: 'none'
+                if (child.children.size() > 0)
+                    cdata = mkParent(child)
+                else
+                    cdata = child.plainNote  // no formula evaluation (unexposed method)
+                if (childDetailsText)
+                    title = childDetailsText
+            }
+            def sb = new StringBuilder()
+            def isToBeCollapsed = hasIcon(child, icon.collapse_fastUpButton)
+            if (isToBeCollapsed) {
+                sb << '<details>' << '<summary>' << title << '</summary>' << NL
+            }
+            sb << NL
+            sb << '```' << lang << NL
+            sb << cdata << NL // mkParent (mkNode) adds nl, if needed
+            sb << '```' << NL
+            if (isToBeCollapsed) {
+                sb << '</details>' << getSpaceAfter(n) << getEol(n)
+            }
+            return sb.toString()
+        }
+        return '<!-- a child with children or a note is missing -->'
+    }
+
     static String mkPageInfo(Node n) {
         String infoType = n.details?.text ?: 'Title'
         return _mkPageInfo(n, infoType)
+    }
+
+    static String mkPageInfoMd(Node n) {
+        String infoType = n.details?.text ?: 'Title'
+        return "<!-- ${mk.page_info} ${infoType} -->🯄${getSpaceAfter(n)}${getEol(n)}".toString()
     }
 
     static String _mkPageInfo(Node n, String infoType, String type = 'Flat') {
@@ -723,6 +849,10 @@ class ConfluenceStorage {
         })
     }
 
+    static String mkDivExpandMd(Node n) {
+        return mkExpandMd(n)
+    }
+
     static String mkAttachments(Node n) {
         def nl = getNewLine(n)
         def canUpload = n['attachmentsUpload'].num0 == 1 ? 'true' : 'false'
@@ -734,11 +864,19 @@ class ConfluenceStorage {
         return result.toString()
     }
 
+    static String mkAttachmentsMd(Node n) {
+        return "<!-- ${mk.attachments} -->${getSpaceAfter(n)}${getEol(n)}".toString()
+    }
+
     static String mkStyleImport(Node n) {
         for (child in n.children.find { Node it -> it.text }) {
             return _mkMacroPlain(n, 'style', null, [import: child.text])
         }
         return '<!-- a child with text is missing -->'
+    }
+
+    static String mkStyleImportMd(Node n) {
+        return "<!-- ${mk.style_import} -->${getSpaceAfter(n)}${getEol(n)}".toString()
     }
 
     static String mkStyle(Node n) {
@@ -747,10 +885,18 @@ class ConfluenceStorage {
         })
     }
 
+    static String mkStyleMd(Node n) {
+        return "<!-- ${mk.style} -->${getSpaceAfter(n)}${getEol(n)}".toString()
+    }
+
     static String mkHtml(Node n) {
         return _execIfChildren(n, {
             return _mkMacroPlain(n, 'html', _mkParent(n))
         })
+    }
+
+    static String mkHtmlMd(Node n) {
+        return mkParent(n)
     }
 
     /**
@@ -784,16 +930,36 @@ class ConfluenceStorage {
         return '<!-- a child with text is missing -->'
     }
 
+    static String mkImageMd(Node n) {
+        return _wrapIntoCode(n, mkImage(n), 'XML')
+    }
+
+    static String _wrapIntoCode(Node n, String body, String lang = 'none') {
+        def sb = new StringBuilder()
+        sb << NL
+        sb << '```' << lang << NL
+        sb << body.replaceFirst(/\n+$/, '') << NL
+        sb << '```' << getEol(n)
+    }
+
     static String mkWiki(Node n) {
         return _execIfChildren(n, {
             return _mkMacroPlain(n, 'unmigrated-wiki-markup', _mkParent(n))
         })
     }
 
+    static String mkWikiMd(Node n) {
+        return _wrapIntoCode(n, mkParent(n), 'Markdown')
+    }
+
     static String mkMarkdown(Node n) {
         return _execIfChildren(n, {
             return _mkMacroPlain(n, 'markdown', _mkParent(n))
         })
+    }
+
+    static String mkMarkdownMd(Node n) {
+        return mkParent(n)
     }
 
     static String mkSection(Node n) {
@@ -803,12 +969,20 @@ class ConfluenceStorage {
         })
     }
 
+    static String mkSectionMd(Node n) {
+        return _wrapIntoCode(n, mkSection(n), 'XML')
+    }
+
     static String mkColumn(Node n) {
         return _execIfChildren(n, {
             def detailsText = n.details?.text
             Map<String, String> params = detailsText ? [width: detailsText] : null
             return _mkMacroRich(n, 'column', params)
         })
+    }
+
+    static String mkColumnMd(Node n) {
+        return _wrapIntoCode(n, mkColumn(n), 'XML')
     }
 
     static Node createMarkupMaker(Node node, String name) {
@@ -890,5 +1064,44 @@ class ConfluenceStorage {
         o[KEY_TITLE] = BLANK
         c.select(o)
         return [n, o]
+    }
+
+    static void copyMarkup(Node n) {
+        Node target
+        if (style.containsKey(n.style.name)) // ['cStorageMarkupRoot', 'cStorageMarkupMaker']
+            target = n
+        else
+            target = n.pathToRoot.reverse().find { it.style.name == style.cStorageMarkupRoot }
+
+        if (target) {
+            String markup = makeMarkup(target)
+            TextUtils.copyToClipboard(markup)
+            c.statusInfo = 'Confluence-storage markup copied to clipboard'
+            openInEditorIfDefined(target, markup)
+        } else {
+            c.statusInfo = "cannot copy ConfluenceStorage Markup because the node style is not in ${style*.value}"
+        }
+    }
+
+    /*
+     * Uses _command_after_copying_cstorage_markup to define the editor -- must be in PATH
+     */
+    static void openInEditorIfDefined(Node node, String markup) {
+        def config = new FreeplaneScriptBaseClass.ConfigProperties()
+        def _command_after_copying_cstorage_markup = config.getProperty('_command_after_copying_cstorage_markup')
+        if (_command_after_copying_cstorage_markup && !_command_after_copying_cstorage_markup.startsWith('disable')) {
+            File mmFile = node.mindMap.file
+            def xmlFileBasename = mmFile.name.replaceFirst(/\.mm$/, '.cStorage')
+            def xmlFile = new File(mmFile.parent, xmlFileBasename)
+            try {
+                xmlFile.withWriter('UTF-8') {
+                    it << '<!-- vim: set ft=xml: -->\n'
+                    it << markup
+                }
+                [_command_after_copying_cstorage_markup, xmlFile.path].execute()
+            } catch (RuntimeException e) {
+                c.statusInfo = e.message
+            }
+        }
     }
 }
