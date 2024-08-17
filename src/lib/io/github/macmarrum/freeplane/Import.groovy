@@ -19,17 +19,30 @@ package io.github.macmarrum.freeplane
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import org.freeplane.api.Node
+import org.freeplane.core.util.Hyperlink
+import org.freeplane.core.util.LogUtils
+import org.freeplane.features.format.FormattedDate
+import org.freeplane.features.format.FormattedFormula
+import org.freeplane.features.format.FormattedNumber
+import org.freeplane.features.format.FormattedObject
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.regex.Pattern
 
 class Import {
+    private static final String COLON = ':'
     private static final String COMMA = ','
     private static final String DOUBLE_QUOTE = '"'
     private static final String HASH = '#'
     private static final String NL = '\n'
+    private static final String PLUS = '+'
     private static final String SPACE = ' '
     private static final String TWO_DOUBLE_QUOTES = '""'
     private static final Pattern RX_TWO_DOUBLE_QUOTES = ~/""/
@@ -42,6 +55,12 @@ class Import {
     private static final String NOTE = '@note'
     private static final String STYLE = '@style'
     private static final String TEXT_COLOR = '@textColor'
+    private static final String HYPERLINK = Hyperlink.class.simpleName
+    private static final String URI_ = URI.class.simpleName
+    private static final String FORMATTED_DATE = FormattedDate.class.simpleName
+    private static final String FORMATTED_NUMBER = FormattedNumber.class.simpleName
+    private static final String FORMATTED_FORMULA = FormattedFormula.class.simpleName
+    private static final String FORMATTED_OBJECT = FormattedObject.class.simpleName
     public static Charset charset = StandardCharsets.UTF_8
     public static csvSettings = [sep: COMMA, np: NodePart.CORE]
 
@@ -93,41 +112,197 @@ class Import {
     static void _fromJsonMapRecursively(Map<String, Object> jMap, Node node) {
         jMap.each { key, value ->
             def isValueString = value instanceof String
-            def isValueMap = !isValueString && value instanceof Map
-            def isValueList = !isValueString && !isValueMap && value instanceof List
-            if (key == CORE && isValueString) {
-                node.text = value
-            } else if (key == DETAILS && isValueString) {
-                node.details = value
-            } else if (key == NOTE && isValueString) {
-                node.note = value
-            } else if (key == ATTRIBUTES && isValueMap) {
-                value.each { attrName, attrValue -> node[attrName as String] = attrValue }
-            } else if (key == LINK && isValueString) {
-                node.link.uri = new URI(value as String)
-            } else if (key == STYLE && isValueString) {
-                node.style.name = value
-            } else if (key == ICONS && isValueList) {
-                node.icons.addAll(value)
-            } else if (key == BACKGROUND_COLOR && isValueString) {
-                node.style.backgroundColorCode = value
-            } else if (key == TEXT_COLOR && isValueString) {
-                node.style.textColorCode = value
-            } else if (isValueMap) {
-                def n = node.createChild(key)
-                _fromJsonMapRecursively(value as Map, n)
-            } else if (isValueList) {
-                def n = node.createChild(key)
-                _fromJsonList(value, n)
-            } else {
-                def n = node.createChild(key)
-                if (value !== null) {
-                    def child = n.createChild()
-                    // value can be a number, and createChild() does something strange with a number
-                    // so use setText() instead
-                    child.text = value
+            def isValueStrOrNum = isValueString || value instanceof Number
+            def isValueMap = !isValueStrOrNum && value instanceof Map
+            def isValueList = !isValueStrOrNum && !isValueMap && value instanceof List
+            switch (key) {
+                case CORE -> {
+                    if (isValueStrOrNum)
+                        node.object = value
+                    else if (isValueList)
+                        _fromJson_setCoreFromList(value as List, node)
+                    else
+                        throw new IllegalArgumentException("${node.id}: got ${CORE} of type ${value.class.simpleName} - expected String, Number, List")
+                }
+                case DETAILS -> {
+                    if (isValueString)
+                        node.details = value
+                    else if (isValueList) {
+                        node.details = value[0]
+                        node.detailsContentType = value[1]
+                    } else
+                        throw new IllegalArgumentException("${node.id}: got ${DETAILS} of type ${value.class.simpleName} - expected String, List")
+                }
+                case NOTE -> {
+                    if (isValueString)
+                        node.note = value
+                    else if (isValueList) {
+                        node.note = value[0]
+                        node.noteContentType = value[1]
+                    } else
+                        throw new IllegalArgumentException("${node.id}: got ${NOTE} of type ${value.class.simpleName} - expected String, List")
+                }
+                case ATTRIBUTES -> {
+                    if (isValueMap)
+                        value.each { String aName, aValue -> node.attributes.add(aName, aValue) }
+                    else if (isValueList)
+                        value.each { List<Object> l -> _fromJson_setAttributeFromList(node, l) }
+                    else
+                        throw new IllegalArgumentException("${node.id}: got ${ATTRIBUTES} of type ${value.class.simpleName} - expected Map, List")
+                }
+                case LINK -> {
+                    if (isValueString)
+                        node.link.uri = new URI(value as String)
+                    else
+                        throw new IllegalArgumentException("${node.id}: got ${LINK} of type ${value.class.simpleName} - expected String")
+                }
+                case STYLE -> {
+                    if (isValueString) {
+                        try {
+                            node.style.name = value
+                        } catch (IllegalArgumentException e) {
+                            LogUtils.severe("${node.id} ${STYLE}: ${e}")
+                        }
+                    } else
+                        throw new IllegalArgumentException("${node.id}: got ${STYLE} of type ${value.class.simpleName} - expected String")
+                }
+                case ICONS -> {
+                    if (isValueList)
+                        node.icons.addAll(value as List<String>)
+                    else
+                        throw new IllegalArgumentException("${node.id}: got ${STYLE} of type ${value.class.simpleName} - expected List<String>")
+                }
+                case BACKGROUND_COLOR -> {
+                    if (isValueString)
+                        node.style.backgroundColorCode = value
+                    else
+                        throw new IllegalArgumentException("${node.id}: got ${BACKGROUND_COLOR} of type ${value.class.simpleName} - expected String")
+                }
+                case TEXT_COLOR -> {
+                    if (isValueString)
+                        node.style.textColorCode = value
+                    else
+                        throw new IllegalArgumentException("${node.id}: got ${TEXT_COLOR} of type ${value.class.simpleName} - expected String")
+                }
+                default -> {
+                    def n = node.createChild(key)
+                    if (isValueMap)
+                        _fromJsonMapRecursively(value as Map, n)
+                    else if (isValueList)
+                        _fromJsonList(value as List, n)
+                    else if (value !== null)
+                        n.createChild().object = value
                 }
             }
+        }
+    }
+
+    static void _fromJson_setCoreFromList(List value, Node node) {
+        def valueListSize = value.size()
+        switch (valueListSize) {
+            case 1 -> { // number, string/formula
+                node.object = value[0]
+            }
+            case 3 -> { // number, string/formula
+                node.object = value[0]
+                node.format = value[2] as String
+            }
+            case 4 -> {
+                String val, type, format, pattern
+                (val, type, format, pattern) = value
+                if (type == FORMATTED_DATE) {
+                    try {
+                        def date = _parseDate(val, pattern, format)
+                        node.object = new FormattedDate(date, pattern)
+                        node.format = format
+                    } catch (DateTimeParseException e) {
+                        LogUtils.severe("${node.id} ${CORE}: ${e}")
+                        node.text = val
+                    }
+                } else {
+                    throw new IllegalArgumentException("${node.id} ${CORE}: in a list of ${valueListSize} elems, found type ${type} - expected ${FORMATTED_DATE}")
+                }
+            }
+        }
+    }
+
+    /** Parses a date value produced by Export.
+     * Expects value to be in the format resulting from ISO_LOCAL or ISO or DISPLAYED.
+     */
+    static Date _parseDate(String value, String fallbackPattern, String fallbackFormat = null) {
+        def valueSize = value.size()
+        if (valueSize == 10 && !value.contains(COLON))
+            return LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE).toDate()
+        if (value.contains(PLUS)) {
+            try {
+                return OffsetDateTime.parse(value).toDate()
+            } catch (DateTimeParseException ignore) {
+            }
+        }
+        if (valueSize == 19 && value.contains(COLON)) {
+            try {
+                return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toDate()
+            } catch (DateTimeParseException ignore) {
+            }
+        }
+        if (fallbackFormat) {
+            try {
+                if (fallbackFormat.contains(PLUS))
+                    return OffsetDateTime.parse(value, fallbackFormat).toDate()
+                else if (fallbackFormat.contains(COLON))
+                    return LocalDateTime.parse(value, fallbackFormat).toDate()
+                else
+                    return LocalDate.parse(value, fallbackFormat).toDate()
+            } catch (DateTimeParseException ignore) {
+            }
+        }
+        if (fallbackPattern.contains(PLUS))
+            return OffsetDateTime.parse(value, fallbackPattern).toDate()
+        else if (fallbackPattern.contains(COLON))
+            return LocalDateTime.parse(value, fallbackPattern).toDate()
+        else
+            return LocalDate.parse(value, fallbackPattern).toDate()
+    }
+
+    static simpleNameToClass = new HashMap<String, Class>()
+    static {
+        simpleNameToClass.put(HYPERLINK, Hyperlink)
+        simpleNameToClass.put(URI_, URI)
+        simpleNameToClass.put(FORMATTED_DATE, FormattedDate)
+        simpleNameToClass.put(FORMATTED_NUMBER, FormattedNumber)
+        simpleNameToClass.put(FORMATTED_FORMULA, FormattedFormula)
+        simpleNameToClass.put(FORMATTED_OBJECT, FormattedObject)
+    }
+
+    static void _fromJson_setAttributeFromList(Node node, List<Object> l) {
+        def listSize = l.size()
+        String name = l[0]
+        def value = l[1]
+        switch (listSize) {
+            case 2 -> {
+                node.attributes.add(name, value)
+            }
+            case 3 -> {
+                String simpleName = l[2]
+                assert simpleName in [HYPERLINK, URI_]
+                def uri = new URI(value as String)
+                def obj = simpleNameToClass[simpleName].newInstance(uri)
+                node.attributes.add(name, obj)
+            }
+            case 4 -> {
+                String simpleName = l[2]
+                String pattern = l[3]
+                assert simpleName in [FORMATTED_DATE, FORMATTED_NUMBER, FORMATTED_FORMULA, FORMATTED_OBJECT]
+                def obj = null
+                if (simpleName == FORMATTED_DATE) {
+                    def date = _parseDate(value as String, pattern)
+                    obj = new FormattedDate(date, pattern)
+                } else {
+                    obj = simpleNameToClass[simpleName].newInstance(value, pattern)
+                }
+                node.attributes.add(name, obj)
+            }
+            default -> throw new IllegalArgumentException("${node.id} ${ATTRIBUTES}: ${listSize} elements in list ${l} - expected 2 or 3 or 4")
         }
     }
 
@@ -234,7 +409,7 @@ class Import {
                     if (lst)
                         parent = lst.last()
                     else
-                        throw new RuntimeException("Heading ${level} was requested to be imported but no heading ${level - 1} was found to attach it to: ${line}")
+                        throw new IllegalArgumentException("Heading ${level} was requested to be imported but no heading ${level - 1} was found to attach it to: ${line}")
                 }
                 n = parent.createChild(text)
             } else {
