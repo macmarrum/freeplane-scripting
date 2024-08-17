@@ -101,7 +101,7 @@ class Export {
     ]
     public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
     public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip1: false, tail: false, quote: false]
-    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, style: true, format: true, icons: true, link: true, skip1: false, denullify: false, pretty: false, isoDate: false, forceId: false]
+    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, format: false, dateFmt: DateFmt.ISO_LOCAL, style: true, formatting: true, icons: true, link: true, skip1: false, denullify: false, pretty: false, forceId: false]
 
     enum NodePart {
         CORE, DETAILS, NOTE
