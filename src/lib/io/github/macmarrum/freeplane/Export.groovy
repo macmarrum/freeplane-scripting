@@ -34,6 +34,7 @@ import org.freeplane.plugin.script.proxy.ConvertibleText
 import javax.swing.*
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.regex.Pattern
 
@@ -600,7 +601,7 @@ class Export {
                 def date = conv.date
                 def pattern = (date as FormattedDate).pattern
                 def value = toDateString(date, settings.dateFmt as DateFmt, format)
-                // a date can be formatted twice: with node.format and (default) date pattern, so both are provided
+                // a date can be formatted twice: with node.format and (default) date pattern, so saving both
                 return !settings.format ? value : [value, node.object.class.simpleName, format, pattern]
             }
         }
@@ -625,17 +626,22 @@ class Export {
         // and in case of attributes, is the actual format
         return switch (dateFmt) {
             case DateFmt.ISO_LOCAL -> toIsoLocalDate(date)
-            case DateFmt.ISO -> date.toOffsetDateTime().toString()
+            case DateFmt.ISO -> date.toOffsetDateTime().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
             case DateFmt.DISPLAYED -> pattern ? fsbc.format(date, pattern) : date.toString()
         }
     }
 
     /**
-     * ISO LOCAL date or date/time representation. Time is stripped if 00:00:00.000
+     * ISO LOCAL date or date/time representation. Time is stripped if 00:00:00
      */
     static String toIsoLocalDate(Date date) {
-        def localDateTime = date.toLocalDateTime()
-        return localDateTime.truncatedTo(ChronoUnit.DAYS) == localDateTime ? localDateTime.toLocalDate() : localDateTime
+        def dateTime = date.toLocalDateTime()
+        DateTimeFormatter dateTimeFormatter
+        if (dateTime.truncatedTo(ChronoUnit.DAYS) == dateTime)
+            dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+        else
+            dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+        return dateTime.format(dateTimeFormatter)
     }
 
     /** Gets attributes in the simplest possible format: a map or a list of lists – if there is more
