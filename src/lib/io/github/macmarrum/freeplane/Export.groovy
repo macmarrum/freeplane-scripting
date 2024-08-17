@@ -619,11 +619,10 @@ class Export {
      */
     static String toDateString(Date date, DateFmt dateFmt, String pattern) {
         // Freeplane stores dates as FormattedDate, which extends Date and holds a text (originally entered),
-        // and a format (SimpleDateFormat), which is used for attributes; for nodes, Styles are used, because they bring their own format.
-        // node.to converts date to ConvertibleDate: this.date holds FormattedDate; this.text holds date formatted always as yyyy-MM-dd'T'HH:mmZ (probably never used)
-        // ConvertibleDate.getDate() returns FormattedDate whose toString() returns df.format(date),
-        // where – in case of nodes – df is apparently the Default Date Format from settings
-        // and in case of attributes, is the actual format
+        // and a pattern (SimpleDateFormat), which is used to format the date for attributes and for nodes if node.format is STANDARD_FORMAT, otherwise format is used.
+        // node.to converts date to ConvertibleDate: this.date holds FormattedDate; this.text holds date formatted always as yyyy-MM-dd'T'HH:mmZ (probably never used).
+        // ConvertibleDate.getDate() returns FormattedDate whose toString() returns df.format(date), where df is FormattedDate.pattern.
+        // When a date is entered, pattern is set by Freeplane to the default date/time pattern from config.
         return switch (dateFmt) {
             case DateFmt.ISO_LOCAL -> toIsoLocalDate(date)
             case DateFmt.ISO -> date.toOffsetDateTime().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
