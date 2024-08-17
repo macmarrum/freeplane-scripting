@@ -8,5 +8,5 @@ import org.freeplane.api.Node
 
 node = node as Node
 
-ConfluenceStorage.flavor = ConfluenceStorage.Flavor.CS
+ConfluenceStorage.flavor = ConfluenceStorage.Flavor.MD
 ConfluenceStorage.copyMarkup(node)
