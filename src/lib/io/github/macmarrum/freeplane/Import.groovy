@@ -19,6 +19,7 @@ package io.github.macmarrum.freeplane
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import org.freeplane.api.Node
+import org.freeplane.core.util.FreeplaneVersion
 import org.freeplane.core.util.Hyperlink
 import org.freeplane.core.util.LogUtils
 import org.freeplane.features.format.FormattedDate
@@ -53,6 +54,7 @@ class Import {
     private static final String LINK = '@link'
     private static final String NOTE = '@note'
     private static final String STYLE = '@style'
+    private static final String TAGS = '@tags'
     private static final String TEXT_COLOR = '@textColor'
     private static final String HYPERLINK = Hyperlink.class.simpleName
     private static final String URI_ = URI.class.simpleName
@@ -61,6 +63,8 @@ class Import {
     private static final String FORMATTED_FORMULA = FormattedFormula.class.simpleName
     private static final String FORMATTED_OBJECT = FormattedObject.class.simpleName
     public static Charset charset = StandardCharsets.UTF_8
+    private static final FreeplaneVersion FP_VER = FreeplaneVersion.version
+    private static final FreeplaneVersion FP_1_12_1 = FreeplaneVersion.getVersion('1.12.1')
     public static csvSettings = [sep: COMMA, np: NodePart.CORE]
 
     enum NodePart {
@@ -170,6 +174,14 @@ class Import {
                         node.icons.addAll(value as List<String>)
                     else
                         throw new IllegalArgumentException("${node.id}: got ${STYLE} of type ${value.class.simpleName} - expected List<String>")
+                }
+                case TAGS -> {
+                    if (FP_VER >= FP_1_12_1) {
+                        if (isValueList)
+                            node.tags.tags = value as List<String>
+                        else
+                            throw new IllegalArgumentException("${node.id}: got ${TAGS} of type ${value.class.simpleName} - expected List<String>")
+                    }
                 }
                 case BACKGROUND_COLOR -> {
                     if (isValueString)

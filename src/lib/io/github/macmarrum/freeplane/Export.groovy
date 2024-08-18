@@ -20,6 +20,7 @@ import groovy.json.JsonGenerator
 import groovy.json.JsonOutput
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
+import org.freeplane.core.util.FreeplaneVersion
 import org.freeplane.core.util.HtmlUtils
 import org.freeplane.core.util.Hyperlink
 import org.freeplane.core.util.TextUtils
@@ -79,10 +80,13 @@ class Export {
     private static final String LINK = '@link'
     private static final String NOTE = '@note'
     private static final String STYLE = '@style'
+    private static final String TAGS = '@tags'
     private static final String TEXT_COLOR = '@textColor'
     private static final String STANDARD_FORMAT = 'STANDARD_FORMAT'
     private static final String AUTO = 'auto'
     public static Charset charset = StandardCharsets.UTF_8
+    private static final FreeplaneVersion FP_VER = FreeplaneVersion.version
+    private static final FreeplaneVersion FP_1_12_1 = FreeplaneVersion.getVersion('1.12.1')
     private static final TextUtils textUtils = new TextUtils()
     private static final FreeplaneScriptBaseClass fsbc = new FreeplaneScriptBaseClass() {
         @Override
@@ -101,7 +105,7 @@ class Export {
     ]
     public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
     public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip1: false, tail: false, quote: false]
-    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, format: false, dateFmt: DateFmt.ISO_LOCAL, style: true, formatting: true, icons: true, link: true, skip1: false, denullify: false, pretty: false, forceId: false]
+    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, format: false, dateFmt: DateFmt.ISO_LOCAL, style: true, formatting: true, icons: true, tags: true, link: true, skip1: false, denullify: false, pretty: false, forceId: false]
 
     enum NodePart {
         CORE, DETAILS, NOTE
@@ -544,8 +548,9 @@ class Export {
         def backgroundColor = formatting && node.style.isBackgroundColorSet() ? colorToRGBAString(node.style.backgroundColor) : null
         def textColor = formatting && node.style.isTextColorSet() ? colorToRGBAString(node.style.textColor) : null
         def icons = settings.icons ? node.icons.icons : Collections.emptyList()
+        def tags = settings.tags && FP_VER >= FP_1_12_1 ? node.tags.tags : Collections.emptyList()
         def children = node.children.findAll { it.visible }
-        if (core === null && !details && !note && !attributes && !link && !style && !backgroundColor && !textColor && !icons && !children) {
+        if (core === null && !details && !note && !attributes && !link && !style && !backgroundColor && !textColor && !icons && !tags && !children) {
             return null
         } else {
             def result = [:]
@@ -564,6 +569,8 @@ class Export {
                     result[STYLE] = style
                 if (icons)
                     result[ICONS] = icons
+                if (tags)
+                    result[TAGS] = tags
                 if (backgroundColor)
                     result[BACKGROUND_COLOR] = backgroundColor
                 if (textColor)

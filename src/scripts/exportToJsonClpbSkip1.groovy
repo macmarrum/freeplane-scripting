@@ -18,6 +18,7 @@ def settings = [
 //        style      : true,
 //        formatting : true,
 //        icons      : true,
+//        tags       : true,
 //        link       : true,
         skip1      : true,
         denullify  : true,
