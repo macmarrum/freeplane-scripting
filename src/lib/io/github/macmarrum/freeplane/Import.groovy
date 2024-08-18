@@ -42,7 +42,6 @@ class Import {
     private static final String DOUBLE_QUOTE = '"'
     private static final String HASH = '#'
     private static final String NL = '\n'
-    private static final String PLUS = '+'
     private static final String SPACE = ' '
     private static final String TWO_DOUBLE_QUOTES = '""'
     private static final Pattern RX_TWO_DOUBLE_QUOTES = ~/""/
@@ -215,7 +214,7 @@ class Import {
                         def date = _parseDate(val, pattern, format)
                         node.object = new FormattedDate(date, pattern)
                         node.format = format
-                    } catch (DateTimeParseException e) {
+                    } catch (DateTimeParseException | IllegalArgumentException e) {
                         LogUtils.severe("${node.id} ${CORE}: ${e}")
                         node.text = val
                     }
@@ -231,37 +230,52 @@ class Import {
      */
     static Date _parseDate(String value, String fallbackPattern, String fallbackFormat = null) {
         def valueSize = value.size()
+        // DateFmt.ISO_LOCAL date
         if (valueSize == 10 && !value.contains(COLON))
             return LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE).toDate()
-        if (value.contains(PLUS)) {
-            try {
-                return OffsetDateTime.parse(value).toDate()
-            } catch (DateTimeParseException ignore) {
-            }
+        // DateFmt.ISO (date/time)
+        try {
+            return OffsetDateTime.parse(value).toDate()
+        } catch (DateTimeParseException ignore) {
         }
+        // DateFmt.ISO_LOCAL date/time
         if (valueSize == 19 && value.contains(COLON)) {
             try {
                 return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME).toDate()
             } catch (DateTimeParseException ignore) {
             }
         }
+        // format - could be `Date: %s`
         if (fallbackFormat) {
             try {
-                if (fallbackFormat.contains(PLUS))
-                    return OffsetDateTime.parse(value, fallbackFormat).toDate()
-                else if (fallbackFormat.contains(COLON))
-                    return LocalDateTime.parse(value, fallbackFormat).toDate()
-                else
-                    return LocalDate.parse(value, fallbackFormat).toDate()
-            } catch (DateTimeParseException ignore) {
+                // `Date: %s` is not a date/time pattern so it will fail
+                def dtf = DateTimeFormatter.ofPattern(fallbackFormat)
+                try {
+                    return OffsetDateTime.parse(value, dtf).toDate()
+                } catch (DateTimeParseException ignore) {
+                }
+                try {
+                    return LocalDateTime.parse(value, dtf).toDate()
+                } catch (DateTimeParseException ignore) {
+                }
+                try {
+                    return LocalDate.parse(value, dtf).toDate()
+                } catch (DateTimeParseException ignore) {
+                }
+            } catch (IllegalArgumentException ignore) {
             }
         }
-        if (fallbackPattern.contains(PLUS))
-            return OffsetDateTime.parse(value, fallbackPattern).toDate()
-        else if (fallbackPattern.contains(COLON))
-            return LocalDateTime.parse(value, fallbackPattern).toDate()
-        else
-            return LocalDate.parse(value, fallbackPattern).toDate()
+        // pattern
+        def dtf = DateTimeFormatter.ofPattern(fallbackPattern)
+        try {
+            return OffsetDateTime.parse(value, dtf).toDate()
+        } catch (DateTimeParseException ignore) {
+        }
+        try {
+            return LocalDateTime.parse(value, dtf).toDate()
+        } catch (DateTimeParseException ignore) {
+        }
+        return LocalDate.parse(value, dtf).toDate()
     }
 
     static simpleNameToClass = new HashMap<String, Class>()
@@ -295,8 +309,13 @@ class Import {
                 assert simpleName in [FORMATTED_DATE, FORMATTED_NUMBER, FORMATTED_FORMULA, FORMATTED_OBJECT]
                 def obj = null
                 if (simpleName == FORMATTED_DATE) {
-                    def date = _parseDate(value as String, pattern)
-                    obj = new FormattedDate(date, pattern)
+                    try {
+                        def date = _parseDate(value as String, pattern)
+                        obj = new FormattedDate(date, pattern)
+                    } catch (DateTimeParseException | IllegalArgumentException e) {
+                        LogUtils.severe("${node.id} ${ATTRIBUTES} ${name}: ${e}")
+                        obj = value as String
+                    }
                 } else {
                     obj = simpleNameToClass[simpleName].newInstance(value, pattern)
                 }
