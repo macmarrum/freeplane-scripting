@@ -207,8 +207,8 @@ class Import {
                 node.format = value[2] as String
             }
             case 4 -> {
-                String val, type, format, pattern
-                (val, type, format, pattern) = value
+                String val, type, pattern, format
+                (val, type, pattern, format) = value
                 if (type == FORMATTED_DATE) {
                     try {
                         def date = _parseDate(val, pattern, format)

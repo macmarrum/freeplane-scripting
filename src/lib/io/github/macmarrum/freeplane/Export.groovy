@@ -569,7 +569,7 @@ class Export {
                 if (textColor)
                     result[TEXT_COLOR] = textColor
             }
-            def childToCalcCore = new HashMap<Node, Object>();
+            def childToCalcCore = new HashMap<Node, Object>()
             children.each { childToCalcCore.put(it, _toJson_calcCore(it, settings)) }
             // use ID if `forceId: true` or core is not unique among children
             def useIdForChildren = settings.forceId || (children && children.size() != new HashSet<Object>(childToCalcCore.values()).size())
@@ -602,7 +602,7 @@ class Export {
                 def pattern = (date as FormattedDate).pattern
                 def value = toDateString(date, settings.dateFmt as DateFmt, format)
                 // a date can be formatted twice: with node.format and (default) date pattern, so saving both
-                return !settings.format ? value : [value, node.object.class.simpleName, format, pattern]
+                return !settings.format ? value : [value, node.object.class.simpleName, pattern, format]
             }
         }
         // a formula or text
