@@ -81,7 +81,7 @@ class Export {
     private static final String STYLE = '@style'
     private static final String TEXT_COLOR = '@textColor'
     private static final String STANDARD_FORMAT = 'STANDARD_FORMAT'
-    private static final String AUTO_FORMAT = 'AUTO_FORMAT'
+    private static final String AUTO = 'auto'
     public static Charset charset = StandardCharsets.UTF_8
     private static final TextUtils textUtils = new TextUtils()
     private static final FreeplaneScriptBaseClass fsbc = new FreeplaneScriptBaseClass() {
@@ -553,9 +553,9 @@ class Export {
                 if (core !== null)
                     result[CORE] = core
                 if (details)
-                    result[DETAILS] = !settings.format || detailsContentType == AUTO_FORMAT ? details : [details, detailsContentType]
+                    result[DETAILS] = !settings.format || detailsContentType == AUTO ? details : [details, detailsContentType]
                 if (note)
-                    result[NOTE] = !settings.format || noteContentType == AUTO_FORMAT ? note : [note, noteContentType]
+                    result[NOTE] = !settings.format || noteContentType == AUTO ? note : [note, noteContentType]
                 if (attributes)
                     result[ATTRIBUTES] = attributes
                 if (link)
@@ -601,8 +601,14 @@ class Export {
                 def date = conv.date
                 def pattern = (date as FormattedDate).pattern
                 def value = toDateString(date, settings.dateFmt as DateFmt, format)
-                // a date can be formatted twice: with node.format and (default) date pattern, so saving both
-                return !settings.format ? value : [value, node.object.class.simpleName, pattern, format]
+                // a date can be formatted twice: with node.format and (default) date pattern
+                if (!settings.format) {
+                    return value
+                } else if (format == STANDARD_FORMAT) {
+                    return [value, node.object.class.simpleName, pattern]
+                } else {
+                    return [value, node.object.class.simpleName, pattern, format]
+                }
             }
         }
         // a formula or text
