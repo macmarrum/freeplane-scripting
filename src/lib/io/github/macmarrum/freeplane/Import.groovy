@@ -127,8 +127,8 @@ class Import {
                     if (isValueString)
                         node.details = value
                     else if (isValueList) {
-                        node.details = value[0]
                         node.detailsContentType = value[1]
+                        node.details = value[0]
                     } else
                         throw new IllegalArgumentException("${node.id}: got ${DETAILS} of type ${value.class.simpleName} - expected String, List")
                 }
@@ -136,8 +136,8 @@ class Import {
                     if (isValueString)
                         node.note = value
                     else if (isValueList) {
-                        node.note = value[0]
                         node.noteContentType = value[1]
+                        node.note = value[0]
                     } else
                         throw new IllegalArgumentException("${node.id}: got ${NOTE} of type ${value.class.simpleName} - expected String, List")
                 }
@@ -202,18 +202,30 @@ class Import {
             case 1 -> { // number, string/formula
                 node.object = value[0]
             }
-            case 3 -> { // number, string/formula
-                node.object = value[0]
-                node.format = value[2] as String
+            case 3 -> { // number, string/formula, date with no format
+                String val, type, pattern_or_format
+                (val, type, pattern_or_format) = value
+                if (type == FORMATTED_DATE) {
+                    try {
+                        def date = _parseDate(val, pattern_or_format)
+                        node.object = new FormattedDate(date, pattern_or_format)
+                    } catch (DateTimeParseException | IllegalArgumentException e) {
+                        LogUtils.severe("${node.id} ${CORE}: ${e}")
+                        node.text = val
+                    }
+                } else {
+                    node.format = pattern_or_format
+                    node.object = val
+                }
             }
             case 4 -> {
                 String val, type, pattern, format
                 (val, type, pattern, format) = value
                 if (type == FORMATTED_DATE) {
                     try {
+                        node.format = format
                         def date = _parseDate(val, pattern, format)
                         node.object = new FormattedDate(date, pattern)
-                        node.format = format
                     } catch (DateTimeParseException | IllegalArgumentException e) {
                         LogUtils.severe("${node.id} ${CORE}: ${e}")
                         node.text = val
