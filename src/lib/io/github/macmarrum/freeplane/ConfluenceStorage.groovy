@@ -800,7 +800,7 @@ class ConfluenceStorage {
 
     static String mkPageInfoMd(Node n) {
         String infoType = n.details?.text ?: 'Title'
-        return "<!-- ${mk.page_info} ${infoType} -->🯄${getSpaceAfter(n)}${getEol(n)}".toString()
+        return "<!-- ${mk.page_info} ${infoType} -->&#10008;${getSpaceAfter(n)}${getEol(n)}".toString()
     }
 
     static String _mkPageInfo(Node n, String infoType, String type = 'Flat') {
@@ -865,7 +865,7 @@ class ConfluenceStorage {
     }
 
     static String mkAttachmentsMd(Node n) {
-        return "<!-- ${mk.attachments} -->${getSpaceAfter(n)}${getEol(n)}".toString()
+        return "<i>A list of files attached to the Confluence page is visible only on Confluence</i>${getSpaceAfter(n)}${getEol(n)}".toString()
     }
 
     static String mkStyleImport(Node n) {
