@@ -14,8 +14,8 @@ node.children.any { hasMoreThanOneChild(it) }</script>
         </conditional_style>
         <conditional_style ACTIVE="true" STYLE_REF="?singleInTree" LAST="false">
             <script_condition user_name="single clone in a clone tree">
-                <script>def t = node.countNodesSharingContentAndSubtree
-t &amp;&amp; node.countNodesSharingContent &gt; t</script>
+                <script>def t = (node.delegate.subtreeClones().size() - 1)
+t &amp;&amp; (node.delegate.allClones().size() - 1) &gt; t</script>
             </script_condition>
         </conditional_style>
     </conditional_styles>
@@ -379,8 +379,7 @@ ol {
 </stylenode>
 </map_styles>
 </hook>
-<attribute_layout NAME_WIDTH="127.16129 pt" VALUE_WIDTH="43.54839 pt"/>
-<attribute NAME="scriptOnMapOpen_NodeIdRefresher" VALUE="if (!node.mindMap.file) {&#xa;    // i.e. only for mind maps created from the template&#xa;    io.github.macmarrum.freeplane.NodeIdRefresher.refreshAll(node)&#xa;    node.attributes.removeAll(&apos;scriptOnMapOpen_NodeIdRefresher&apos;)&#xa;}"/>
+<attribute_layout NAME_WIDTH="127.16129 pt" VALUE_WIDTH="218.90323 pt"/>
 <hook NAME="accessories/plugins/AutomaticLayout.properties" VALUE="ALL"/>
 <node TEXT="Showcase" FOLDED="true" POSITION="top_or_left" ID="ID_1068881056">
 <attribute_layout NAME_WIDTH="100 pt" VALUE_WIDTH="210 pt"/>
