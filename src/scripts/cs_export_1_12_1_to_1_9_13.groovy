@@ -30,7 +30,7 @@ if (outputDir == mmFile.parentFile) {
 }
 def outputFile = new File(outputDir, mmFile.name)
 
-def xsltFile = new File(c.userDirectory, 'resources/export_mm_1_11_5_to_1_9_13.xslt')
+def xsltFile = new File(c.userDirectory, 'resources/export_mm_1_12_1_to_1_9_13.xslt')
 if (!xsltFile.exists()) {
     UITools.showMessage("${xsltFile} doesn't exist", JOptionPane.ERROR_MESSAGE)
     return

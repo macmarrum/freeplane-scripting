@@ -82,7 +82,26 @@ whereas the xml passed by Export to the processor has style formatting converted
         </xsl:copy>
     </xsl:template>
 
+    <!-- remove `ff` added to map background by 1.12.1 -->
+    <xsl:template match="/map/node/hook[@NAME='MapStyle']/@background">
+        <xsl:attribute name="background">
+            <xsl:choose>
+                <xsl:when test="string-length(.) = 9 and substring(., 8, 2) = 'ff'">
+                    <xsl:value-of select="substring(., 1, 7)"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="."/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:attribute>
+    </xsl:template>
+
     <!-- remove -->
     <xsl:template match="@COMMON_HGAP_QUANTITY"/>
     <xsl:template match="@TEXT_WRITING_DIRECTION"/>
+    <!-- since 1.12.1 -->
+    <xsl:template match="/map/node/hook[@NAME='MapStyle']/properties/@show_tags"/>
+    <xsl:template match="/map/node/hook[@NAME='MapStyle']/tags"/>
+    <xsl:template match="/map/node/hook[@NAME='MapStyle']/map_styles//stylenode[@LOCALIZED_TEXT='defaultstyle.tags']"/>
+    <xsl:template match="node/@TAGS"/>
 </xsl:stylesheet>
