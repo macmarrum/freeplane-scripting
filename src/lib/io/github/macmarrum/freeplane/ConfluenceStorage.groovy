@@ -866,7 +866,7 @@ class ConfluenceStorage {
     }
 
     static String mkAttachmentsMd(Node n) {
-        return "<i>A list of files attached to the Confluence page is visible only on Confluence</i>${getSpaceAfter(n)}${getEol(n)}".toString()
+        return "<i>Visible only on Confluence</i>${getSpaceAfter(n)}${getEol(n)}".toString()
     }
 
     static String mkStyleImport(Node n) {
