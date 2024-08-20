@@ -270,6 +270,7 @@ class ConfluenceStorage {
             if (i < lastIdx)
                 sb << getNewLine(n)
         }
+        sb << getEol(n)
         return sb.toString()
     }
 
@@ -311,7 +312,7 @@ class ConfluenceStorage {
      * Converts a branch to text (node and its children, recursively).
      * Adds a space after regular nodes, unless noSpaceAfter_lastQuarterMoon.
      * (!) No space after Markup Makers - use eol_chequeredFlag on each (as needed), or nl_rightArrowCurvingDown on mkParent (if used).
-     * Adds a eol (nl) after each elem (except mkParent, to avoid double eol) if eol_chequeredFlag.
+     * Adds a eol (nl) after each elem (except a markup maker, to avoid double eol) if eol_chequeredFlag.
      */
     static StringBuilder mkNode(Node n) {
         def result = new StringBuilder()
