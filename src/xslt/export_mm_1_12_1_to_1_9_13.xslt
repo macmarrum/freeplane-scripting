@@ -3,7 +3,7 @@
 Copyright (C) 2024  macmarrum (at) outlook (dot) ie
 SPDX-License-Identifier: GPL-3.0-or-later
 
-Transforms the mind-map format used by 1.11.x to 1.9.13 (used also by Freeplane 1.10.x),
+Transforms the mind-map format used by 1.12.x or 1.11.x to 1.9.13 (used also by Freeplane 1.10.x),
 removing or translating newly-added attributes and/or values to those understood by earlier Freeplane versions
 
 Not usable with Freeplane Export, because this script works on the original xml,
@@ -52,11 +52,12 @@ whereas the xml passed by Export to the processor has style formatting converted
         </xsl:attribute>
     </xsl:template>
 
-    <!-- Note: Markdown is stored in .mm by Freeplane 1.10.x and 1.11.x as CONTENT-TYPE="plain/markdown" with <text>.
-         Only in case of DETAILS, when quotable chars like ' (&apos;) are there, and when Details are first set to Markdown then to Standard/Text/LaTeX,
-         v1.10.x quotes the chars, whereas v1.11.x doesn't. So when .mm saved by v1.10.x is opened by v1.11.x,
-         the chars aren't unquoted, causing <text> tags themselves to be wrongly interpreted as literal content.
-         To correct it, in v1.10.x run a script to revert the Standard/Text/LaTeX Details from <text> to <html>:
+    <!-- Note: In .mm, Markdown is stored by Freeplane 1.10.x and 1.11.x as CONTENT-TYPE="plain/markdown" with <text>.
+         Only in case of DETAILS, when quotable chars like ' (&apos;) are there, and when Details are first set
+         to Markdown then to Standard/Text/LaTeX, v1.10.x quotes the chars, whereas v1.11.x doesn't.
+         So when .mm saved by v1.10.x is opened by v1.11.x, the chars aren't unquoted, causing <text> tags themselves
+         to be wrongly interpreted as literal content.
+         To correct it, in v1.10.x run the script to revert Standard/Text/LaTeX Details from <text> to <html>:
          c.findAll().each {
             def d = it.detailsText
             if (d && it.detailsContentType != 'markdown' && !d.startsWith('<html>')) {
