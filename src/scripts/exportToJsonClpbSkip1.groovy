@@ -28,3 +28,12 @@ def settings = [
 ]
 def text = Export.toJsonString(node, settings)
 TextUtils.copyToClipboard(text)
+
+def viewJsonInGvim = false
+if (viewJsonInGvim) {
+    def tempFile = File.createTempFile(node.id + '~', '.json')
+    tempFile.setText(text, 'UTF-8')
+    def gvimProcess = ['gvim', '--nofork', tempFile].execute()
+    gvimProcess.waitFor()
+    tempFile.delete()
+}
