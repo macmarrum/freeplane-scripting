@@ -105,7 +105,7 @@ class Export {
     ]
     public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
     public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip1: false, tail: false, quote: false]
-    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, format: false, dateFmt: DateFmt.ISO_LOCAL, style: true, formatting: true, icons: true, tags: true, link: true, skip1: false, denullify: false, pretty: false, forceId: false]
+    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, format: false, dateFmt: DateFmt.ISO_LOCAL, style: true, formatting: true, icons: true, tags: true, link: true, skip1: false, denullify: false, pretty: false, forceId: false, forceAttribList: false]
 
     enum NodePart {
         CORE, DETAILS, NOTE
@@ -656,8 +656,8 @@ class Export {
         return dateTime.format(dateTimeFormatter)
     }
 
-    /** Gets attributes in the simplest possible format: a map or a list of lists – if there is more
-     * than one attribute with the same name or any of the node's attributes has a pattern.
+    /** Gets attributes as a map or a list of lists. The latter is used if there is more than one attribute with
+     * the same name or `settings.format == true` or `settings.forceAttribList == true`.
      * An attribute can be a string, number or date and can have a pattern (can be formatted).
      * A formula can result in a string, number or date.
      * The value of a transformed attribute (evaluated formula) returned by the API is raw;
@@ -750,11 +750,11 @@ class Export {
                     entryList.remove(2)
             }
         }
-        // Use a (simple) map if format not requested and no duplicate keys
-        if (!settings.format && attributeKeyToCount.values().every { it == 1 }) {
-            return attributesList.collectEntries()
-        } else {
+        // Use a (simple) map unless attribList is enforced or format is requested or there are duplicate keys
+        if (settings.forceAttribList || settings.format || attributeKeyToCount.values().any { it > 1 }) {
             return attributesList
+        } else {
+            return attributesList.collectEntries()
         }
     }
 

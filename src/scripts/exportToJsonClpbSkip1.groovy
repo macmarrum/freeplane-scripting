@@ -23,7 +23,8 @@ def settings = [
         skip1      : true,
         denullify  : true,
         pretty     : true,
-//        forceId    : false
+//        forceId    : false,
+//        forceAttribList: false,
 ]
 def text = Export.toJsonString(node, settings)
 TextUtils.copyToClipboard(text)
