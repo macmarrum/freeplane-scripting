@@ -786,7 +786,7 @@ class ConfluenceStorage {
             def sb = new StringBuilder()
             def isToBeCollapsed = hasIcon(child, icon.collapse_fastUpButton)
             if (isToBeCollapsed) {
-                sb << '<details>' << '<summary>' << title << '</summary>' << NL
+                sb << NL << '<details>' << '<summary>' << title << '</summary>' << NL
             }
             sb << NL
             sb << '```' << lang << NL
