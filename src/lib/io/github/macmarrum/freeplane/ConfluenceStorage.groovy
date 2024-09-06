@@ -689,6 +689,7 @@ class ConfluenceStorage {
     static String mkExpandMd(Node n) {
         def nl = getNewLine(n)
         def sb = new StringBuilder()
+        sb << NL
         sb << '<details>' << nl
         sb << '<summary>' << (n.details?.text ?: 'Click here to expand...') << '</summary>' << NL
         sb << _mkParent(n) // mkParent (mkNode) adds nl, if needed
