@@ -1,7 +1,6 @@
-<map version="freeplane 1.11.5">
+<map version="freeplane 1.12.1">
 <!--To view this file, download free mind mapping software Freeplane from https://www.freeplane.org -->
-<attribute_registry SHOW_ATTRIBUTES="hide"/>
-<node TEXT="macmarrum-dark" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1939172785" VGAP_QUANTITY="20 pt" CHILD_NODES_LAYOUT="AUTO_FIRST" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES"><hook NAME="MapStyle" background="#2b2b2b">
+<node TEXT="macmarrum-dark" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1939172785" VGAP_QUANTITY="20 pt" CHILD_NODES_LAYOUT="AUTO_FIRST" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES"><hook NAME="MapStyle" background="#2b2b2bff">
     <conditional_styles>
         <conditional_style ACTIVE="true" STYLE_REF="?bigChildGap" LAST="false">
             <script_condition user_name="any child has more than one child">
@@ -19,13 +18,14 @@ t &amp;&amp; (node.delegate.allClones().size() - 1) &gt; t</script>
             </script_condition>
         </conditional_style>
     </conditional_styles>
-    <properties show_icon_for_attributes="true" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff" show_note_icons="true" fit_to_viewport="false"/>
+    <properties show_icon_for_attributes="true" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff" show_tags="UNDER_NODES" show_note_icons="true" fit_to_viewport="false"/>
+    <tags category_separator="::"/>
 
 <map_styles>
 <stylenode LOCALIZED_TEXT="styles.root_node" ID="ID_680156716" STYLE="oval" UNIFORM_SHAPE="true" VGAP_QUANTITY="24 pt">
 <font SIZE="24"/>
 <stylenode LOCALIZED_TEXT="styles.predefined" POSITION="bottom_or_right" STYLE="bubble">
-<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="20 px" FORMAT_AS_HYPERLINK="false" COLOR="#bbbbbb" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" TEXT_WRITING_DIRECTION="LEFT_TO_RIGHT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="0 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="192" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" COMMON_HGAP_QUANTITY="14 pt" CHILD_NODES_LAYOUT="AUTO" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
+<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="20 px" FORMAT_AS_HYPERLINK="false" COLOR="#bbbbbb" BACKGROUND_COLOR="#333333" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" TEXT_WRITING_DIRECTION="LEFT_TO_RIGHT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="0 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="192" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" COMMON_HGAP_QUANTITY="14 pt" CHILD_NODES_LAYOUT="AUTO" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
 <arrowlink SHAPE="CUBIC_CURVE" COLOR="#a89984" WIDTH="2" TRANSPARENCY="255" DASH="" FONT_SIZE="9" FONT_FAMILY="SansSerif" DESTINATION="ID_602083445" STARTINCLINATION="102.77419 pt;0 pt;" ENDINCLINATION="102.77419 pt;2.90323 pt;" STARTARROW="NONE" ENDARROW="DEFAULT"/>
 <font NAME="Lato" SIZE="12" BOLD="false" STRIKETHROUGH="false" ITALIC="false"/>
 <edge COLOR="#808080"/>
@@ -102,6 +102,9 @@ ol {
   margin-left-ltr: 15px;
   margin-right-rtl: 15px;
 }</hook>
+</stylenode>
+<stylenode LOCALIZED_TEXT="defaultstyle.tags">
+<font SIZE="10"/>
 </stylenode>
 <stylenode LOCALIZED_TEXT="defaultstyle.attributes" ID="ID_1169762759">
 <font SIZE="9"/>
@@ -322,6 +325,7 @@ ol {
 <font NAME="JetBrains Mono" SIZE="11"/>
 </stylenode>
 <stylenode TEXT="+max20cm" MAX_WIDTH="20 cm"/>
+<stylenode TEXT="+max50cm" MAX_WIDTH="50 cm"/>
 <stylenode TEXT="MaterializedSymlink">
 <icon BUILTIN="emoji-2744"/>
 </stylenode>
@@ -379,14 +383,14 @@ ol {
 </stylenode>
 </map_styles>
 </hook>
-<attribute_layout NAME_WIDTH="127.16129 pt" VALUE_WIDTH="218.90323 pt"/>
 <hook NAME="accessories/plugins/AutomaticLayout.properties" VALUE="ALL"/>
+<attribute_layout VALUE_WIDTH="100 pt"/>
 <node TEXT="Showcase" FOLDED="true" POSITION="top_or_left" ID="ID_1068881056">
-<attribute_layout NAME_WIDTH="100 pt" VALUE_WIDTH="210 pt"/>
+<attribute_layout VALUE_WIDTH="100 pt"/>
 <node TEXT="1" OBJECT="java.lang.Long|1" ID="ID_1176543057">
-<node TEXT="2" OBJECT="java.lang.Long|2" STYLE_REF="Projects" ID="ID_1355144522">
-<node TEXT="3" OBJECT="java.lang.Long|3" STYLE_REF="Project" ID="ID_1122066066">
-<node TEXT="4" OBJECT="java.lang.Long|4" STYLE_REF="Next Action" ID="ID_179614780">
+<node TEXT="2" OBJECT="java.lang.Long|2" ID="ID_1355144522">
+<node TEXT="3" OBJECT="java.lang.Long|3" ID="ID_1122066066">
+<node TEXT="4" OBJECT="java.lang.Long|4" ID="ID_179614780">
 <node TEXT="5" OBJECT="java.lang.Long|5" ID="ID_1453584683">
 <node TEXT="6" OBJECT="java.lang.Long|6" ID="ID_644941512">
 <node TEXT="7" OBJECT="java.lang.Long|7" ID="ID_1885017827">
@@ -410,12 +414,14 @@ ol {
 <node TEXT="a note; can be free; can have connectors" STYLE_REF="=FreeNote" ID="ID_1890635325"/>
 </node>
 <node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table" ID="ID_878695655">
-<attribute_layout NAME_WIDTH="100 pt" VALUE_WIDTH="210 pt"/>
-<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table.row.accent" ID="ID_707372107">
-<attribute_layout NAME_WIDTH="100 pt" VALUE_WIDTH="210 pt"/>
-<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table.cell.accent" ID="ID_1691723926">
-<attribute_layout NAME_WIDTH="100 pt" VALUE_WIDTH="210 pt"/>
+<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table.row.accent" ID="ID_707372107" MAX_WIDTH="204 px" MIN_WIDTH="204 px">
+<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table.cell.accent" ID="ID_1691723926" MAX_WIDTH="196 px" MIN_WIDTH="196 px"/>
 </node>
+<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table.row" ID="ID_727865232" MAX_WIDTH="204 px" MIN_WIDTH="204 px">
+<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table.cell" ID="ID_1371385025" MAX_WIDTH="196 px" MIN_WIDTH="196 px"/>
+</node>
+<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table.row" ID="ID_1836880839" MAX_WIDTH="204 px" MIN_WIDTH="204 px">
+<node TEXT="=node.style.allActiveStyles[0]" STYLE_REF="=Table.cell" ID="ID_1550064258" MAX_WIDTH="196 px" MIN_WIDTH="196 px"/>
 </node>
 </node>
 <node TEXT="Style" GLOBALLY_VISIBLE="true" ID="ID_797952343">
@@ -451,20 +457,32 @@ ol {
 <node TEXT="=style.name" STYLE_REF="cStorageMarkupRoot" ID="ID_1859853408"/>
 <node TEXT="=style.name" STYLE_REF="cStorageMarkupMaker" ID="ID_842423210"/>
 <node TEXT="Icons" ID="ID_1675435887">
-<node TEXT="eol (mkNode)" ID="ID_1502962718">
+<node TEXT="new line at the end (markupMaker)" ID="ID_1502962718">
 <icon BUILTIN="emoji-1F3C1"/>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node TEXT="=parent.delegate.icons*.translatedDescription.join(&apos; | &apos;)" STYLE_REF="=Table.cell" ID="ID_645148925"/>
 </node>
-<node TEXT="new line within" ID="ID_89612255">
+<node TEXT="new line within, after each element (makrupMaker)" ID="ID_89612255">
 <icon BUILTIN="emoji-2935"/>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_718602692" CONTENT_ID="ID_645148925"/>
 </node>
 <node TEXT="&lt;h1&gt; (mkNode)" ID="ID_159697610">
 <icon BUILTIN="full-1"/>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_1382123106" CONTENT_ID="ID_645148925"/>
 </node>
-<node TEXT="&lt;p&gt; + pReplacements (mkNode)" ID="ID_762113408">
+<node TEXT="&lt;p&gt; (mkNode)" ID="ID_762113408">
 <icon BUILTIN="emoji-1F17F"/>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_1713063795" CONTENT_ID="ID_645148925"/>
 </node>
 <node TEXT="pReplacements (mkNode, mkTableCell, _mkHeading, mkZipList)" ID="ID_1810137487">
@@ -480,23 +498,38 @@ ol {
     </p>
   </body>
 </html></richcontent>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_1934564504" CONTENT_ID="ID_645148925"/>
 </node>
 <node TEXT="s/ /&amp;nbsp;/g (mkNode, mkTableCell)" ID="ID_1497001735">
 <icon BUILTIN="emoji-264A"/>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_1464219629" CONTENT_ID="ID_645148925"/>
 </node>
 <node TEXT="escapeXml (mkNode, mkTableCell)" ID="ID_1750579653">
 <icon BUILTIN="emoji-1F9F9"/>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_1911847089" CONTENT_ID="ID_645148925"/>
 </node>
-<node TEXT="no trailing sep (mkNode)" ID="ID_123883854">
+<node TEXT="no trailing space (mkNode, mkCsv, mkFormat, mkTemplate)" ID="ID_123883854">
 <icon BUILTIN="emoji-1F317"/>
 <icon BUILTIN="emoji-264B"/>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_125883854" CONTENT_ID="ID_645148925"/>
 </node>
-<node TEXT="no entry (mkNode, mkTableCell, mkTable)" ID="ID_1314478090">
+<node TEXT="no entry (mkNode, mkTableCell, mkTable, mkFormat, mkTemplate)" ID="ID_1314478090">
 <icon BUILTIN="emoji-26D4"/>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_1771847933" CONTENT_ID="ID_645148925"/>
 </node>
 <node TEXT="stop at this (mkTable, also: mkZipList, mkCsv)" ID="ID_1804959483">
@@ -515,18 +548,31 @@ ol {
     </p>
   </body>
 </html></richcontent>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_867479546" CONTENT_ID="ID_645148925"/>
 </node>
 <node TEXT="&lt;ol&gt; (mkList)" ID="ID_1553618132">
+<icon BUILTIN="emoji-1F522"/>
 <icon BUILTIN="emoji-0023-20E3"/>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_1034103639" CONTENT_ID="ID_645148925"/>
 </node>
 <node TEXT="collapse (mkCode)" ID="ID_273599376">
 <icon BUILTIN="emoji-23EB"/>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_527472432" CONTENT_ID="ID_645148925"/>
 </node>
 <node TEXT="line numbers (mkCode)" ID="ID_329929366">
 <icon BUILTIN="emoji-1F522"/>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_1720876546" CONTENT_ID="ID_645148925"/>
 </node>
 <node TEXT="border (mkImage, mkSection)" ID="ID_552910097">
@@ -542,17 +588,20 @@ ol {
     </p>
   </body>
 </html></richcontent>
+<hook NAME="NodeConditionalStyles">
+    <conditional_style ACTIVE="true" STYLE_REF="+max20cm" LAST="false"/>
+</hook>
 <node ID="ID_22989845" CONTENT_ID="ID_645148925"/>
 </node>
 </node>
 </node>
 </node>
 <node TEXT="macmarrum NodeChangeListener" GLOBALLY_VISIBLE="true" ALIAS="macmarrum_NodeChangeListener" ID="ID_1966479509" VGAP_QUANTITY="3 pt">
-<attribute_layout NAME_WIDTH="33.75 pt" VALUE_WIDTH="166.5 pt"/>
+<attribute_layout VALUE_WIDTH="100 pt"/>
 <attribute NAME="runMe" VALUE="menuitem:_MinimizeNodesIfTextIsLongerNCL_on_single_node" OBJECT="java.net.URI|menuitem:_MinimizeNodesIfTextIsLongerNCL_on_single_node"/>
 </node>
 <node TEXT="minimize all nodes if text is longer" ID="ID_950285179">
-<attribute_layout NAME_WIDTH="33 pt" VALUE_WIDTH="167.99999 pt"/>
+<attribute_layout VALUE_WIDTH="100 pt"/>
 <attribute NAME="runMe" VALUE="menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node" OBJECT="java.net.URI|menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node"/>
 </node>
 </node>
