@@ -355,7 +355,12 @@ class ConfluenceStorage {
         def hLevel = hIcon[5..-1]
         def childrenBody = n.children.size() > 0 ? n.children.collect { mkNode(it) }.join(BLANK) : BLANK
         def result = new StringBuilder()
-        result << '<h' << hLevel << '>' << nl << getContent(n) << nl << '</h' << hLevel << '>' << eol << childrenBody
+        switch (flavor) {
+            case Flavor.CS ->
+                result << '<h' << hLevel << '>' << nl << getContent(n) << nl << '</h' << hLevel << '>' << eol << childrenBody
+            case Flavor.MD ->
+                result << NL << '#' * (hLevel as Integer) << SPACE << getContent(n) << NL << childrenBody
+        }
         return result
     }
 
