@@ -359,7 +359,7 @@ class ConfluenceStorage {
             case Flavor.CS ->
                 result << '<h' << hLevel << '>' << nl << getContent(n) << nl << '</h' << hLevel << '>' << eol << childrenBody
             case Flavor.MD ->
-                result << NL << '#' * (hLevel as Integer) << SPACE << getContent(n) << NL << childrenBody
+                result << NL << NL << '#' * (hLevel as Integer) << SPACE << getContent(n) << NL << childrenBody
         }
         return result
     }
