@@ -596,6 +596,7 @@ class ConfluenceStorage {
             def result = new StringBuilder()
             def item_prefix = hasIcon(n, olIcons) ? '1. ' : '* '
             String body
+            result << NL
             n.children.each {
                 body = mkNode(it)
                 if (body.trim().size() > 0)
