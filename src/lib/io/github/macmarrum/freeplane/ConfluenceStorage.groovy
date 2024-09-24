@@ -69,6 +69,7 @@ class ConfluenceStorage {
             replacements_doubleCurlyLoop: 'emoji-27BF',
             stopAtThis_stopSign         : 'emoji-1F6D1',
             noSpaceAfter_lastQuarterMoon: 'emoji-1F317',
+            forceMarkdown_circledM      : 'emoji-24C2',
     ]
 
     private static tbl = [
@@ -174,7 +175,10 @@ class ConfluenceStorage {
             case mk.format -> mkFormat(n)
             case mk.template -> mkTemplate(n)
             case mk.table -> mkTable(n)
-            case mk.list -> mkList(n)
+            case mk.list -> switch (flavor) {
+                case Flavor.CS -> mkList(n)
+                case Flavor.MD -> mkListMd(n)
+            }
             case mk.zip_list -> mkZipList(n)
             case mk.quote -> mkQuote(n)
             case mk.link -> mkLink(n)
@@ -507,7 +511,7 @@ class ConfluenceStorage {
 
     static void mkTableCellOfEachFirstChildInChainAndAppendTo(StringBuilder tableWiki, Node n, int rowNum, int colNum, HiLite1st hiLite1st, String nl, boolean isToAnnotate) {
         tableWiki << makeTableCell(this::getContent, n, rowNum, colNum, hiLite1st, nl, isToAnnotate)
-        // canExcludeMarkupMaker=false because each cell is basically a top-level node, i.e. can be a cStorageMarkupMaker
+        // shouldOmitMarkupMaker=false because each cell is basically a top-level node, i.e. can be a cStorageMarkupMaker
         Node firstChildIfNotIgnoreNode = getFirstChildIfNotIgnoreNode(n, false)
         if (firstChildIfNotIgnoreNode) {
             colNum++
@@ -552,10 +556,10 @@ class ConfluenceStorage {
     }
 
     /**
-     * canExcludeMarkupMaker for getFirstChildChain, used by mkCsv – to stop at markupMaker nodes
+     * shouldOmitMarkupMaker for getFirstChildChain, used by mkCsv – to stop at markupMaker nodes
      */
-    static Node getFirstChildIfNotIgnoreNode(Node n, boolean canExcludeMarkupMaker = true) {
-        def isMarkupMakerAndCanExcludeIt = isMarkupMaker(n) && canExcludeMarkupMaker
+    static Node getFirstChildIfNotIgnoreNode(Node n, boolean shouldOmitMarkupMaker = true) {
+        def isMarkupMakerAndCanExcludeIt = isMarkupMaker(n) && shouldOmitMarkupMaker
         if (isMarkupMakerAndCanExcludeIt || n.children.size() == 0 || hasIcon(n, icon.stopAtThis_stopSign) || hasIcon(n.children[0], icon.noEntry))
             return null
         else
@@ -585,6 +589,23 @@ class ConfluenceStorage {
         }
         result << '</' << tag[1..-1] << getSpaceAfter(n) << getEol(n)
         return result
+    }
+
+    static StringBuilder mkListMd(Node n) {
+        if (hasIcon(n, icon.forceMarkdown_circledM)) {
+            def result = new StringBuilder()
+            def item_prefix = hasIcon(n, olIcons) ? '1. ' : '* '
+            String body
+            n.children.each {
+                body = getFirstChildChain(it)*.text.join(SPACE)
+                if (body.trim().size() > 0)
+                    result << item_prefix << body << NL
+            }
+            result << getSpaceAfter(n) << getEol(n)
+            return result
+        } else {
+            return mkList(n)
+        }
     }
 
     /**
@@ -628,12 +649,12 @@ class ConfluenceStorage {
     }
 
     /**
-     * canExcludeMarkupMaker for getFirstChildIfNotIgnoreNode
+     * shouldOmitMarkupMaker for getFirstChildIfNotIgnoreNode
      * then for getFirstChildChain, used by mkCsv – to stop at markupMaker nodes
      */
-    static StringBuilder getEachFirstChildsContent(n, String sep = SPACE, boolean canExcludeMarkupMaker = true) {
-        /* canExcludeMarkupMaker for top-level nodes of mkSomething */
-        def child = getFirstChildIfNotIgnoreNode(n, canExcludeMarkupMaker)
+    static StringBuilder getEachFirstChildsContent(n, String sep = SPACE, boolean shouldOmitMarkupMaker = true) {
+        /* shouldOmitMarkupMaker for top-level nodes of mkSomething */
+        def child = getFirstChildIfNotIgnoreNode(n, shouldOmitMarkupMaker)
         final sb = new StringBuilder()
         if (child) {
             sb << getContent(child)
@@ -1090,8 +1111,7 @@ class ConfluenceStorage {
         }
     }
 
-    /*
-     * Uses _command_after_copying_cstorage_markup to define the editor -- must be in PATH
+    /** Uses _command_after_copying_cstorage_markup to define the editor -- must be in PATH
      */
     static void openInEditorIfDefined(Node node, String markup) {
         def config = new FreeplaneScriptBaseClass.ConfigProperties()
