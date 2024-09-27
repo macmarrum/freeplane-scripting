@@ -21,6 +21,7 @@ package io.github.macmarrum.freeplane
 import groovy.xml.XmlUtil
 import org.freeplane.api.Node
 import org.freeplane.core.util.HtmlUtils
+import org.freeplane.core.util.LogUtils
 import org.freeplane.core.util.TextUtils
 import org.freeplane.plugin.script.FormulaUtils
 import org.freeplane.plugin.script.FreeplaneScriptBaseClass
@@ -444,8 +445,20 @@ class ConfluenceStorage {
                 def contentList = firstChildChain.collect { getContent(it) }
                 def pattern = getContent(patternNode) + getSpaceAfter(patternNode)
                 def result = switch (templateType) {
-                    case TemplateType.MESSAGE -> MessageFormat.format(pattern, *contentList)
-                    case TemplateType.STRING -> String.format(pattern, *contentList)
+                    case TemplateType.MESSAGE -> {
+                        try {
+                            MessageFormat.format(pattern, *contentList)
+                        } catch (IllegalArgumentException e) {
+                            throw new IllegalArgumentException("(Node ${n.id}) ${e.message}")
+                        }
+                    }
+                    case TemplateType.STRING -> {
+                        try {
+                            String.format(pattern, *contentList)
+                        } catch (MissingFormatArgumentException e) {
+                            throw new MissingFormatArgumentException("(Node ${n.id}) ${e.message}")
+                        }
+                    }
                     default -> throw new RuntimeException("unknown TemplateType: ${templateType.name()}")
                 }
                 return result + getEol(n)
