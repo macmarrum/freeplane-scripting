@@ -69,7 +69,7 @@ class ConfluenceStorage {
             replacements_doubleCurlyLoop: 'emoji-27BF',
             stopAtThis_stopSign         : 'emoji-1F6D1',
             noSpaceAfter_lastQuarterMoon: 'emoji-1F317',
-            forceMarkdown_circledM      : 'emoji-24C2',
+            markdown_circledM           : 'emoji-24C2',
     ]
 
     private static tbl = [
@@ -266,6 +266,8 @@ class ConfluenceStorage {
     }
 
     static String _mkParent(Node n) {
+        if (flavor != Flavor.MD && hasIcon(n, icon.markdown_circledM))
+            return ''
         def sb = new StringBuilder()
         def children = n.children
         def lastIdx = children.size() - 1
@@ -592,7 +594,7 @@ class ConfluenceStorage {
     }
 
     static StringBuilder mkListMd(Node n) {
-        if (hasIcon(n, icon.forceMarkdown_circledM)) {
+        if (hasIcon(n, icon.markdown_circledM)) {
             def result = new StringBuilder()
             def item_prefix = hasIcon(n, olIcons) ? '1. ' : '* '
             String body
