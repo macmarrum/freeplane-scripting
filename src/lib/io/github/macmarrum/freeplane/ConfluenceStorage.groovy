@@ -71,6 +71,7 @@ class ConfluenceStorage {
             stopAtThis_stopSign         : 'emoji-1F6D1',
             noSpaceAfter_lastQuarterMoon: 'emoji-1F317',
             markdown_circledM           : 'emoji-24C2',
+            confluence_ClButton         : 'emoji-1F191',
     ]
 
     private static tbl = [
@@ -267,7 +268,7 @@ class ConfluenceStorage {
     }
 
     static String _mkParent(Node n) {
-        if (flavor != Flavor.MD && hasIcon(n, icon.markdown_circledM))
+        if ((flavor != Flavor.MD && hasIcon(n, icon.markdown_circledM)) || (flavor != Flavor.CS && hasIcon(n, icon.confluence_ClButton)))
             return ''
         def sb = new StringBuilder()
         def children = n.children
