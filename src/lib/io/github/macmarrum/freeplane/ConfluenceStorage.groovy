@@ -408,7 +408,7 @@ class ConfluenceStorage {
                     if (!hasIcon(it, icon.noCsvSep_cancer)) // noCsvSep_cancer is missing
                         sb << csvSep << nl
                 } else  // last item – space if noSpaceAfter_lastQuarterMoon is missing
-                    sb << getSpaceAfter(it) << getEol(it)
+                    sb << getSpaceAfter(n) << getEol(it)
             }
             sb << getEol(n)
             // NB. getContent->makeMarkup->mk***->mkNode adds a trailing space (unless noSepAfter)
@@ -1100,7 +1100,7 @@ class ConfluenceStorage {
         return createMarkupMaker(node, 'parent')
     }
 
-    static Node createCsv(Node node) {
+    static Node createCs1v(Node node) {
         return createMarkupMaker(node, 'csv')
     }
 
