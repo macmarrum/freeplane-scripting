@@ -10,7 +10,7 @@ import org.freeplane.api.Controller
 def STYLE_NAME = '+max20cm'
 
 def c = c as Controller
-c.selected.each { n ->
+c.selecteds.each { n ->
     def ncs = n.conditionalStyles
     def isFound = false
     def indexesToBeRemoved = new ArrayList<Integer>()

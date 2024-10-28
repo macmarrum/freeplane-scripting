@@ -9,7 +9,7 @@ import org.freeplane.api.Controller
 def STYLE_NAME = '+max20cm'
 
 c = c as Controller
-c.selected.each { n ->
+c.selecteds.each { n ->
     def ncs = n.conditionalStyles
     ncs.collect().each {
         if (it.active && it.always && it.styleName == STYLE_NAME && !it.last)
