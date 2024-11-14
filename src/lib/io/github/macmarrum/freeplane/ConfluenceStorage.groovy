@@ -1100,7 +1100,7 @@ class ConfluenceStorage {
         return createMarkupMaker(node, 'parent')
     }
 
-    static Node createCs1v(Node node) {
+    static Node createCsv(Node node) {
         return createMarkupMaker(node, 'csv')
     }
 
