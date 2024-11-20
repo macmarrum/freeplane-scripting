@@ -169,6 +169,7 @@ class ConfluenceStorage {
             column      : 'column',
             template    : 'template',
             format      : 'format',
+            heading     : 'heading',
     ]
 
     static String makeMarkup(Node n) {
@@ -241,6 +242,7 @@ class ConfluenceStorage {
                 case Flavor.CS -> mkColumn(n)
                 case Flavor.MD -> mkColumnMd(n)
             }
+            case mk.heading -> mkHeading(n)
             default -> "<!-- mk function by that name not found: ${n.text} -->"
         }
     }
@@ -369,6 +371,24 @@ class ConfluenceStorage {
                 result << '<h' << hLevel << '>' << nl << getContent(n) << nl << '</h' << hLevel << '>' << eol << childrenBody
             case Flavor.MD ->
                 result << NL << NL << '#' * (hLevel as Integer) << SPACE << getContent(n) << NL << childrenBody
+        }
+        return result
+    }
+
+
+    /** Uses its children's content as the heading text, unlike _mkHeading
+     */
+    static StringBuilder mkHeading(Node n) {
+        def hIcon = n.icons.icons.find { it.startsWith('full-') }
+        def hLevel = hIcon ? hIcon[5..-1] : '1'
+        def result = new StringBuilder()
+        switch (flavor) {
+            case Flavor.CS -> {
+                def nl = getNewLine(n)
+                result << '<h' << hLevel << '>' << nl << mkParent(n) << nl << '</h' << hLevel << '>'
+            }
+            case Flavor.MD ->
+                result << NL << NL << '#' * (hLevel as Integer) << SPACE << mkParent(n) << NL
         }
         return result
     }
