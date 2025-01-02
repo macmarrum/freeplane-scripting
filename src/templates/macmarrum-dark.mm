@@ -18,7 +18,7 @@ t &amp;&amp; (node.delegate.allClones().size() - 1) &gt; t</script>
             </script_condition>
         </conditional_style>
     </conditional_styles>
-    <properties show_icon_for_attributes="true" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff" show_tags="UNDER_NODES" show_note_icons="true" fit_to_viewport="false"/>
+    <properties show_icon_for_attributes="true" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff" show_tags="UNDER_NODES" show_note_icons="true" fit_to_viewport="false" />
     <tags category_separator="::"/>
 
 <map_styles>
@@ -343,6 +343,30 @@ ol {
 </stylenode>
 <stylenode TEXT="=Seamless" ID="ID_218573881" BACKGROUND_COLOR="#2b2b2b" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0">
 <arrowlink DESTINATION="ID_218573881"/>
+</stylenode>
+<stylenode TEXT="fishboneR0" CHILD_NODES_LAYOUT="LEFTTORIGHT_BOTHSIDES_RIGHT" COMMON_HGAP_QUANTITY="25 pt" STYLE="narrow_hexagon" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" UNIFORM_SHAPE="true" TEXT_ALIGN="CENTER"/>
+<stylenode TEXT="fishboneR1B" CHILD_NODES_LAYOUT="TOPTOBOTTOM_RIGHT_BOTTOM" COMMON_HGAP_QUANTITY="7 pt">
+<edge STYLE="horizontal"/>
+<font BOLD="true"/>
+</stylenode>
+<stylenode TEXT="fishboneR1T" CHILD_NODES_LAYOUT="TOPTOBOTTOM_RIGHT_TOP" COMMON_HGAP_QUANTITY="7 pt">
+<edge STYLE="horizontal"/>
+<font BOLD="true"/>
+</stylenode>
+<stylenode TEXT="fishboneR2" TEXT_ALIGN="LEFT" COMMON_HGAP_QUANTITY="7 pt">
+<edge STYLE="horizontal"/>
+</stylenode>
+<stylenode TEXT="fishboneL0" CHILD_NODES_LAYOUT="LEFTTORIGHT_BOTHSIDES_LEFT" COMMON_HGAP_QUANTITY="25 pt" STYLE="narrow_hexagon" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" UNIFORM_SHAPE="true" TEXT_ALIGN="CENTER"/>
+<stylenode TEXT="fishboneL1B" CHILD_NODES_LAYOUT="TOPTOBOTTOM_LEFT_BOTTOM" TEXT_ALIGN="RIGHT" COMMON_HGAP_QUANTITY="7 pt">
+<edge STYLE="horizontal"/>
+<font BOLD="true"/>
+</stylenode>
+<stylenode TEXT="fishboneL1T" CHILD_NODES_LAYOUT="TOPTOBOTTOM_LEFT_TOP" TEXT_ALIGN="RIGHT" COMMON_HGAP_QUANTITY="7 pt">
+<edge STYLE="horizontal"/>
+<font BOLD="true"/>
+</stylenode>
+<stylenode TEXT="fishboneL2" TEXT_ALIGN="RIGHT" COMMON_HGAP_QUANTITY="7 pt">
+<edge STYLE="horizontal"/>
 </stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="bottom_or_right" STYLE="bubble">
