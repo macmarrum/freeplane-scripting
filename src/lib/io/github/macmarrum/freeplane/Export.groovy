@@ -453,7 +453,7 @@ class Export {
         def listOfRows = createListOfRows(n, 1)
         def nText = n.text
         def isCommented = nText.startsWith(HASH)
-        def settingNameUncommented = isCommented ? nText.drop(1) : nText
+        def settingNameUncommented = isCommented ? nText.replaceFirst(/^#+\s*/, '') : nText
         if (settingNameUncommented in RUMAR_TOML_INTEGER_SETTINGS || settingNameUncommented in RUMAR_TOML_BOOLEAN_SETTINGS) {
             "${nText} = ${listOfRows[0]*.text.join(BLANK)}"
         } else if (settingNameUncommented in RUMAR_TOML_STRING_SETTINGS) {
@@ -462,7 +462,7 @@ class Export {
             def _h_ = isCommented ? HASH : BLANK
             "${nText} = [$NL${listOfRows.collect { row -> _h_ + FOUR_SPACES + _quote(row*.text.join(BLANK)) + COMMA }.join(NL)}$NL$_h_]"
         } else {
-            throw IllegalArgumentException("${nText} not in RUMAR_TOML_*_SETTINGS in Export.groovy")
+            throw new IllegalArgumentException("${nText} not in RUMAR_TOML_*_SETTINGS in Export.groovy")
         }
     }
 
