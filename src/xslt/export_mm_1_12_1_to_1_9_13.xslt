@@ -105,4 +105,7 @@ whereas the xml passed by Export to the processor has style formatting converted
     <xsl:template match="/map/node/hook[@NAME='MapStyle']/tags"/>
     <xsl:template match="/map/node/hook[@NAME='MapStyle']/map_styles//stylenode[@LOCALIZED_TEXT='defaultstyle.tags']"/>
     <xsl:template match="node/@TAGS"/>
+    <!-- since 1.12.9 -->
+    <xsl:template match="/map/node/hook[@NAME='MapStyle']/properties/@show_icons"/>
+    <xsl:template match="/map/node/hook[@NAME='MapStyle']/properties/@showTagCategories"/>
 </xsl:stylesheet>
