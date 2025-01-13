@@ -338,9 +338,12 @@ class Export {
     }
 
     static List<List<Node>> createListOfRows(Node node, Integer numOfNodesToIgnore = 0) {
-        node.find { it.leaf && it.visible }.collect {
+        def nodeIndex = node.pathToRoot.count { it.isVisible() } - 1
+        node.find { it.isLeaf() && it.isVisible() }.collect {
             def eachNodeFromRootToIt = it.pathToRoot
-            def i = eachNodeFromRootToIt.findIndexOf { it == node } + numOfNodesToIgnore
+            def i = nodeIndex + numOfNodesToIgnore
+            if (eachNodeFromRootToIt.size() - 1 < i)
+                throw new IllegalStateException("createListOfRows: node '${node.text}' ${node.id} has not enough children to skip ${numOfNodesToIgnore}")
             eachNodeFromRootToIt[i..-1]
         }
     }
@@ -435,7 +438,7 @@ class Export {
         node.children.each { n ->
             nChildren = n.children
             if (nChildren) {
-                def nTextUncommented = n.text.replaceFirst(/^#/, '')
+                def nTextUncommented = n.text.replaceFirst(/^#+\s*/, '')
                 if (nTextUncommented in allSettingNames) {
                     text = _toRumarTomlEntry(n)
                 } else {
