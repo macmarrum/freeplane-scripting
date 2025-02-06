@@ -1,8 +1,14 @@
+/**
+ * Copyright (C) 2023, 2025  macmarrum (at) outlook (dot) ie
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Copy"})
 // https://github.com/freeplane/freeplane/issues/1376
 
 
 import org.apache.commons.lang.SystemUtils
+import org.freeplane.api.Controller
+import org.freeplane.api.Node
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import java.awt.*
@@ -76,8 +82,11 @@ static File getCanonicalFile(URI uri, File mapFile) {
     }
 }
 
-def mapFile = ScriptUtils.node().mindMap.file
-def files = ScriptUtils.c().selecteds.collect(new HashSet<File>()) { getCanonicalFile(it.link.uri, mapFile) }.findAll()
+node = node as Node
+c = c as Controller
+
+def mapFile = node.mindMap.file
+def files = c.selecteds.collect(new HashSet<File>()) { getCanonicalFile(it.link.uri, mapFile) }.findAll()
 Toolkit.defaultToolkit.systemClipboard.setContents(new FileTransferable(files), new ClipboardOwner() {
     @Override
     void lostOwnership(Clipboard clipboard, Transferable transferable) {}
