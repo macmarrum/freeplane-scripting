@@ -966,17 +966,17 @@ class ConfluenceStorage {
     }
 
     /**
-     * To set a height, put a number in details.
+     * To set a width, put a number in child details.
      * To add a border, use icon `unchecked`.
      * To link an image attached in a different page, put `key:title` attribute with <space key>:<page title>
      */
     static String mkImage(Node n) {
-        String detailsText
         for (child in n.children.find { Node it -> it.text }) {
             def result = new StringBuilder()
             result << '<ac:image '
-            if (detailsText = child.details?.text)
-                result << 'ac:height="' << detailsText << '" '
+            String detailsText = child.details?.text
+            if (detailsText)
+                result << 'ac:width="' << detailsText << '" '
             if (hasIcon(child, icon.border_unchecked))
                 result << 'ac:border="true" '
             result << '>'
