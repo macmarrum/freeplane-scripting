@@ -968,7 +968,7 @@ class ConfluenceStorage {
     /**
      * To set a height, put a number in details.
      * To add a border, use icon `unchecked`.
-     * To link an image attached in a different page, put `page` attribute with <space key>:<page title>
+     * To link an image attached in a different page, put `key:title` attribute with <space key>:<page title>
      */
     static String mkImage(Node n) {
         String detailsText
