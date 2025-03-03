@@ -25,7 +25,7 @@ t &amp;&amp; (node.delegate.allClones().size() - 1) &gt; t</script>
 <stylenode LOCALIZED_TEXT="styles.root_node" ID="ID_680156716" STYLE="oval" UNIFORM_SHAPE="true" VGAP_QUANTITY="24 pt">
 <font SIZE="24"/>
 <stylenode LOCALIZED_TEXT="styles.predefined" POSITION="bottom_or_right" STYLE="bubble">
-<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="20 px" FORMAT_AS_HYPERLINK="false" COLOR="#bbbbbb" BACKGROUND_COLOR="#333333" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" TEXT_WRITING_DIRECTION="LEFT_TO_RIGHT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="0 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="192" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" COMMON_HGAP_QUANTITY="14 pt" CHILD_NODES_LAYOUT="AUTO" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
+<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="24 px" FORMAT_AS_HYPERLINK="false" COLOR="#bbbbbb" BACKGROUND_COLOR="#333333" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" TEXT_WRITING_DIRECTION="LEFT_TO_RIGHT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="0 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="192" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" COMMON_HGAP_QUANTITY="14 pt" CHILD_NODES_LAYOUT="AUTO" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
 <arrowlink SHAPE="CUBIC_CURVE" COLOR="#a89984" WIDTH="2" TRANSPARENCY="255" DASH="" FONT_SIZE="9" FONT_FAMILY="SansSerif" DESTINATION="ID_602083445" STARTINCLINATION="102.77419 pt;0 pt;" ENDINCLINATION="102.77419 pt;2.90323 pt;" STARTARROW="NONE" ENDARROW="DEFAULT"/>
 <font NAME="Lato" SIZE="12" BOLD="false" STRIKETHROUGH="false" ITALIC="false"/>
 <edge COLOR="#808080"/>
@@ -329,7 +329,7 @@ ol {
 <stylenode TEXT="MaterializedSymlink">
 <icon BUILTIN="emoji-2744"/>
 </stylenode>
-<stylenode TEXT="=Code" MAX_WIDTH="25 cm">
+<stylenode TEXT="=Code" MAX_WIDTH="25 cm" FORMAT="NO_FORMAT">
 <font NAME="JetBrains Mono" SIZE="11"/>
 </stylenode>
 <stylenode TEXT="=DateISO" ID="ID_951700093" FORMAT="yyyy-MM-dd"/>
@@ -358,15 +358,24 @@ ol {
 </stylenode>
 <stylenode TEXT="fishboneL0" CHILD_NODES_LAYOUT="LEFTTORIGHT_BOTHSIDES_LEFT" COMMON_HGAP_QUANTITY="25 pt" STYLE="narrow_hexagon" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" UNIFORM_SHAPE="true" TEXT_ALIGN="CENTER"/>
 <stylenode TEXT="fishboneL1B" CHILD_NODES_LAYOUT="TOPTOBOTTOM_LEFT_BOTTOM" TEXT_ALIGN="RIGHT" COMMON_HGAP_QUANTITY="7 pt">
-<edge STYLE="horizontal"/>
 <font BOLD="true"/>
+<edge STYLE="horizontal"/>
 </stylenode>
 <stylenode TEXT="fishboneL1T" CHILD_NODES_LAYOUT="TOPTOBOTTOM_LEFT_TOP" TEXT_ALIGN="RIGHT" COMMON_HGAP_QUANTITY="7 pt">
-<edge STYLE="horizontal"/>
 <font BOLD="true"/>
+<edge STYLE="horizontal"/>
 </stylenode>
 <stylenode TEXT="fishboneL2" TEXT_ALIGN="RIGHT" COMMON_HGAP_QUANTITY="7 pt">
 <edge STYLE="horizontal"/>
+</stylenode>
+<stylenode TEXT="=Red" COLOR="#e57255">
+<icon BUILTIN="emoji-1F534"/>
+</stylenode>
+<stylenode TEXT="=Amber" COLOR="#e5c453">
+<icon BUILTIN="emoji-1F7E1"/>
+</stylenode>
+<stylenode TEXT="=Green" COLOR="#52d273">
+<icon BUILTIN="emoji-1F7E2"/>
 </stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="bottom_or_right" STYLE="bubble">
