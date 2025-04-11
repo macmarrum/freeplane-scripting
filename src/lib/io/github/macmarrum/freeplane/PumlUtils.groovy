@@ -38,10 +38,10 @@ class PumlUtils {
         return (code =~ /^\n*@startuml\n/ && code =~ /\n@enduml\n*$/) ? code : "@startuml\n$code@enduml" as String
     }
 
-    /** allow PlantUML root node to be either the diagram itself or the node below the diagram
+    /** allow PlantUML root node to be either the diagram's first child or the node below the diagram
      */
     static Node calcPlantRoot(Node node) {
-        return node.children ? node : node.parent.children[node.parent.getChildPosition(node) + 1]
+        return node.children ? node.children[0] : node.parent.children[node.parent.getChildPosition(node) + 1]
     }
 
     static String extractText(Node n) {
