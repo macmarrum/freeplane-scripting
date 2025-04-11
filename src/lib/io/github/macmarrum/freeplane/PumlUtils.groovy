@@ -16,48 +16,93 @@
  */
 package io.github.macmarrum.freeplane
 
-import org.freeplane.api.ConversionException
+
 import org.freeplane.api.Node
 
+import java.util.function.Function
+
 class PumlUtils {
-    public static HashMap<String, Object> ganttchartSettings = [
+    public static HashMap<String, Object> defaultSettings = [
             skipIconName: 'emoji-274C', // cross mark
+            joinIconName: 'emoji-1F300', // cyclone
             taskIconName: 'emoji-1F532', // black square button
     ]
 
-    static def mkGanttChart(Node node, HashMap<String, Object> settings = null) {
-        settings = !settings ? ganttchartSettings.clone() : ganttchartSettings + settings
+    static String mkUml(Node node, HashMap<String, Object> settings = null) {
+        settings = !settings ? defaultSettings.clone() : defaultSettings + settings
+        def plantRoot = calcPlantRoot(node)
+        def lol = new LinkedList<LinkedList<String>>()
+        lol << new LinkedList<String>()
+        appendEachRow(plantRoot, lol, settings, this::extractText)
+        def code = lol.collect { it.join(' ') }.join('\n')
+        return (code =~ /^\n*@startuml\n/ && code =~ /\n@enduml\n*$/) ? code : "@startuml\n$code@enduml" as String
+    }
 
-        // allow PlantUML root node to be either the digram itself or the node below the diagram
-        def plantRoot = node.children ? node : node.parent.children[node.parent.getChildPosition(node) + 1]
+    /** allow PlantUML root node to be either the diagram itself or the node below the diagram
+     */
+    static Node calcPlantRoot(Node node) {
+        return node.children ? node : node.parent.children[node.parent.getChildPosition(node) + 1]
+    }
 
-        def sb = new StringBuilder()
-        plantRoot.children.findAll { !isSkip(it, settings) }.each { firstLevelChild ->
-            def firstLevelChildChildren = firstLevelChild.children
-            if (firstLevelChildChildren.size() == 1) {
-                // not a group header, threfore treat it as a row
-                appendRowContent(sb, firstLevelChild, settings)
-            } else {
-                // a group header, therefore treat each of its children as separate rows
-                sb << getTextOrIsoDate(firstLevelChild, settings) << '\n'
-                firstLevelChildChildren.findAll { !isSkip(it, settings) }.each { child -> appendRowContent(sb, child, settings) }
+    static String extractText(Node n) {
+        return n.transformedText
+    }
+
+    static void appendEachRow(Node node, LinkedList<LinkedList<String>> lol, HashMap<String, Object> settings, Function<Node, String> extractContent) {
+        if (isJoin(node, settings)) { // join all descendants into a single line
+            node.find { !isSkip(it, settings) }.collect { extractContent(it) }.findAll().each { lol[-1] << it }
+            lol << new LinkedList<String>()
+        } else {
+            def nodeChildren = node.children.findAll { !isSkip(it, settings) }
+            if (nodeChildren.size() == 1) {
+                lol[-1] << extractContent(node)
+                appendEachRow(nodeChildren[0], lol, settings, extractContent)
+            } else { // no children or many children
+                lol[-1] << extractContent(node)
+                lol << new LinkedList<String>()
+                nodeChildren.each { appendEachRow(it, lol, settings, extractContent) }
             }
         }
-        def code = sb.toString()
+    }
+
+    static boolean isJoin(Node n, HashMap<String, Object> settings) {
+        return n.icons.contains(settings.joinIconName as String)
+    }
+
+    static boolean isSkip(Node n, HashMap<String, Object> settings) {
+        def result = n.icons.contains(settings.skipIconName as String)
+        println ":: isSkip ${n.text} ${settings.skipIconName as String} => ${result}"
+        return result
+    }
+
+    static String mkGantt(Node node, HashMap<String, Object> settings = null) {
+        settings = !settings ? defaultSettings.clone() : defaultSettings + settings
+        def plantRoot = calcPlantRoot(node)
+        def lol = new LinkedList<LinkedList<String>>()
+        lol << new LinkedList<String>()
+        def _extractTextOrIsoDate = { Node n -> extractTextOrIsoDate(n, settings) }
+        appendEachRow(plantRoot, lol, settings, _extractTextOrIsoDate)
+        // replace `???` with `???'s` if followed by `end` or `start`
+        lol.each { listOfRowCells ->
+            ['end', 'start'].each { end_or_start ->
+                def i = listOfRowCells.indexOf(end_or_start)
+                if (i > -1) { // i.e. end_or_start in listOfRowCells
+                    listOfRowCells[i - 1] = "${listOfRowCells[i - 1]}'s" as String
+                }
+            }
+        }
+        def code = lol.collect { it.join(' ') }.join('\n')
         return (code =~ /^\n*@startgantt\n/ && code =~ /\n@endgantt\n*$/) ? code : "@startgantt\n$code@endgantt" as String
     }
 
-    static def isSkip(Node n, HashMap<String, Object> settings) {
-        n.icons.contains(settings.skipIconName as String)
-    }
-
-    // get node's text
-    // - transformed text
-    // -- additionally surrounded in [] if it's a task
-    // - ISO date format if it's a date
-    static def getTextOrIsoDate(Node n, HashMap<String, Object> settings) {
+    /** get node's text
+     * - transformed text
+     * -- additionally surrounded in [] if it's a task
+     * - ISO date format if it's a date
+     */
+    static String extractTextOrIsoDate(Node n, HashMap<String, Object> settings) {
         if (isTask(n, settings)) {
-            return "[${n.transformedText}]"
+            return "[${n.transformedText}]" as String
         }
         try {
             return n.to.date.format('yyyy-MM-dd')
@@ -66,19 +111,7 @@ class PumlUtils {
         }
     }
 
-    static def isTask(Node n, HashMap<String, Object> settings) {
-        n.icons.contains(settings.taskIconName as String)
-    }
-
-    static def appendRowContent(StringBuilder sb, Node child, HashMap<String, Object> settings) {
-        def listOfGrandchildrenText = child.find { !isSkip(it, settings) }.collect { getTextOrIsoDate(it, settings) }
-        // replace `???` with `???'s` if followed by `end` or `start`
-        ['end', 'start'].each { end_or_start ->
-            def i = listOfGrandchildrenText.indexOf(end_or_start)
-            if (i > -1) { // i.e. end_or_start in listOfGrandchildrenText
-                listOfGrandchildrenText[i - 1] = "${listOfGrandchildrenText[i - 1]}'s"
-            }
-        }
-        sb << listOfGrandchildrenText.join(' ') << '\n'
+    static boolean isTask(Node n, HashMap<String, Object> settings) {
+        return n.icons.contains(settings.taskIconName as String)
     }
 }
