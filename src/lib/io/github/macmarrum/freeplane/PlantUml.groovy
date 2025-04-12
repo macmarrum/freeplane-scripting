@@ -24,11 +24,11 @@ import java.util.function.Function
 class PlantUml {
     public static HashMap<String, Object> defaultSettings = new HashMap<>()
     static {
-        defaultSettings.skip1 = true // consider the first node a "PlantUml-code parent" and skip it
+        defaultSettings.skip1 = true // whether to consider the first node a "PlantUml-code parent" and skip it
         defaultSettings.noEntryIconName = 'emoji-26D4' // no entry - ignore the entire branch
         defaultSettings.ignoredIconName = 'emoji-274C' // cross mark - ignore the node
         defaultSettings.sinkIconName = 'emoji-1F300' // cyclone - form one line from the node and all its descendants
-        defaultSettings.taskIconName = 'emoji-1F532' // black square button - make it a task by enclosing it in square brackets
+        defaultSettings.taskIconName = 'emoji-1F532' // black square button - make it a Gantt-chart task by enclosing it in square brackets
     }
 
     static String makeUml(Node node, HashMap<String, Object> settings = null) {
@@ -77,7 +77,7 @@ class PlantUml {
                 nodes.remove(0)
                 settings.skip1 = false
             }
-            nodes.findAll { !isIgnored(it, settings) }.collect { extractContent(it) }.findAll().each { lol[-1] << it }
+            nodes.findAll { !isIgnored(it, settings) }.collect { extractContent(it) }.findAll(/*skip empty*/).each { lol[-1] << it }
             lol << new LinkedList<String>()
         } else {
             def nodeChildren = node.children.findAll { !isNoEntry(it, settings) }
@@ -91,11 +91,9 @@ class PlantUml {
             } else { // no children or many children
                 if (skip1) {
                     settings.skip1 = false
-                } else {
-                    if (!isIgnored(node, settings)) {
-                        lol[-1] << extractContent(node)
-                        lol << new LinkedList<String>()
-                    }
+                } else if (!isIgnored(node, settings)) {
+                    lol[-1] << extractContent(node)
+                    lol << new LinkedList<String>()
                 }
                 nodeChildren.each { appendEachRow(it, lol, settings, extractContent) }
             }
@@ -112,6 +110,10 @@ class PlantUml {
 
     static boolean isIgnored(Node n, HashMap<String, Object> settings) {
         return n.icons.contains(settings.ignoredIconName as String)
+    }
+
+    static boolean isTask(Node n, HashMap<String, Object> settings) {
+        return n.icons.contains(settings.taskIconName as String)
     }
 
     static String makeGantt(Node node, HashMap<String, Object> settings = null) {
@@ -148,9 +150,5 @@ class PlantUml {
         } catch (ignored) {
             return n.transformedText
         }
-    }
-
-    static boolean isTask(Node n, HashMap<String, Object> settings) {
-        return n.icons.contains(settings.taskIconName as String)
     }
 }
