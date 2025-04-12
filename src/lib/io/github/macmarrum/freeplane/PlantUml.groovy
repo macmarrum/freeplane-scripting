@@ -21,7 +21,7 @@ import org.freeplane.api.Node
 
 import java.util.function.Function
 
-class PumlUtils {
+class PlantUml {
     public static HashMap<String, Object> defaultSettings = new HashMap<>()
     static {
         defaultSettings.skip1 = true // consider the first node a "PlantUml-code parent" and skip it
@@ -31,7 +31,7 @@ class PumlUtils {
         defaultSettings.taskIconName = 'emoji-1F532' // black square button - make it a task by enclosing it in square brackets
     }
 
-    static String mkUml(Node node, HashMap<String, Object> settings = null) {
+    static String makeUml(Node node, HashMap<String, Object> settings = null) {
         settings = (!settings ? defaultSettings.clone() : defaultSettings + settings) as HashMap<String, Object>
         def plantUmlCodeParent = findPlantUmlCodeParent(node, settings)
         def lol = new LinkedList<LinkedList<String>>()
@@ -114,7 +114,7 @@ class PumlUtils {
         return n.icons.contains(settings.ignoredIconName as String)
     }
 
-    static String mkGantt(Node node, HashMap<String, Object> settings = null) {
+    static String makeGantt(Node node, HashMap<String, Object> settings = null) {
         settings = (!settings ? defaultSettings.clone() : defaultSettings + settings) as HashMap<String, Object>
         def plantUmlCodeParent = findPlantUmlCodeParent(node, settings)
         def lol = new LinkedList<LinkedList<String>>()
