@@ -22,26 +22,45 @@ import org.freeplane.api.Node
 import java.util.function.Function
 
 class PumlUtils {
-    public static HashMap<String, Object> defaultSettings = [
-            skipIconName: 'emoji-274C', // cross mark
-            joinIconName: 'emoji-1F300', // cyclone
-            taskIconName: 'emoji-1F532', // black square button
-    ]
+    public static HashMap<String, Object> defaultSettings = new HashMap<>()
+    static {
+        defaultSettings.skip1 = true // consider the first node a "PlantUml-code parent" and skip it
+        defaultSettings.noEntryIconName = 'emoji-26D4' // no entry - ignore the entire branch
+        defaultSettings.ignoredIconName = 'emoji-274C' // cross mark - ignore the node
+        defaultSettings.sinkIconName = 'emoji-1F300' // cyclone - form one line from the node and all its descendants
+        defaultSettings.taskIconName = 'emoji-1F532' // black square button - make it a task by enclosing it in square brackets
+    }
 
     static String mkUml(Node node, HashMap<String, Object> settings = null) {
-        settings = !settings ? defaultSettings.clone() : defaultSettings + settings
-        def plantRoot = calcPlantRoot(node)
+        settings = (!settings ? defaultSettings.clone() : defaultSettings + settings) as HashMap<String, Object>
+        def plantUmlCodeParent = findPlantUmlCodeParent(node, settings)
         def lol = new LinkedList<LinkedList<String>>()
         lol << new LinkedList<String>()
-        appendEachRow(plantRoot, lol, settings, this::extractText)
+        appendEachRow(plantUmlCodeParent, lol, settings, this::extractText)
         def code = lol.collect { it.join(' ') }.join('\n')
         return (code =~ /^\n*@startuml\n/ && code =~ /\n@enduml\n*$/) ? code : "@startuml\n$code@enduml" as String
     }
 
-    /** allow PlantUML root node to be either the diagram's first child or the node below the diagram
+    /** Allow PlantUML-code parent to be either the diagram itself or the next sibling, i.e. the node below the diagram
      */
-    static Node calcPlantRoot(Node node) {
-        return node.children ? node.children[0] : node.parent.children[node.parent.getChildPosition(node) + 1]
+    static Node findPlantUmlCodeParent(Node node, HashMap<String, Object> settings) {
+        Node plantUmlCodeParent = null
+        def nodeChildren = node.children
+        if (nodeChildren && nodeChildren.any { !isNoEntry(it, settings) }) {
+            plantUmlCodeParent = node
+        } else {
+            def nodePosition = node.parent.getChildPosition(node)
+            def siblings = node.parent.children
+            int pos = 0
+            for (Node n in siblings) {
+                if (pos > nodePosition && !isNoEntry(n, settings)) {
+                    plantUmlCodeParent = n
+                    break
+                }
+                pos++
+            }
+        }
+        return plantUmlCodeParent
     }
 
     static String extractText(Node n) {
@@ -49,39 +68,59 @@ class PumlUtils {
     }
 
     static void appendEachRow(Node node, LinkedList<LinkedList<String>> lol, HashMap<String, Object> settings, Function<Node, String> extractContent) {
-        if (isJoin(node, settings)) { // join all descendants into a single line
-            node.find { !isSkip(it, settings) }.collect { extractContent(it) }.findAll().each { lol[-1] << it }
+        if (isNoEntry(node, settings))
+            return
+        boolean skip1 = settings.skip1
+        if (isSink(node, settings)) { // join all descendants into a single line
+            def nodes = node.findAll()
+            if (skip1) {
+                nodes.remove(0)
+                settings.skip1 = false
+            }
+            nodes.findAll { !isIgnored(it, settings) }.collect { extractContent(it) }.findAll().each { lol[-1] << it }
             lol << new LinkedList<String>()
         } else {
-            def nodeChildren = node.children.findAll { !isSkip(it, settings) }
+            def nodeChildren = node.children.findAll { !isNoEntry(it, settings) }
             if (nodeChildren.size() == 1) {
-                lol[-1] << extractContent(node)
+                if (skip1) {
+                    settings.skip1 = false
+                } else if (!isIgnored(node, settings)) {
+                    lol[-1] << extractContent(node)
+                }
                 appendEachRow(nodeChildren[0], lol, settings, extractContent)
             } else { // no children or many children
-                lol[-1] << extractContent(node)
-                lol << new LinkedList<String>()
+                if (skip1) {
+                    settings.skip1 = false
+                } else {
+                    if (!isIgnored(node, settings)) {
+                        lol[-1] << extractContent(node)
+                        lol << new LinkedList<String>()
+                    }
+                }
                 nodeChildren.each { appendEachRow(it, lol, settings, extractContent) }
             }
         }
     }
 
-    static boolean isJoin(Node n, HashMap<String, Object> settings) {
-        return n.icons.contains(settings.joinIconName as String)
+    static boolean isNoEntry(Node n, HashMap<String, Object> settings) {
+        return n.icons.contains(settings.noEntryIconName as String)
     }
 
-    static boolean isSkip(Node n, HashMap<String, Object> settings) {
-        def result = n.icons.contains(settings.skipIconName as String)
-        println ":: isSkip ${n.text} ${settings.skipIconName as String} => ${result}"
-        return result
+    static boolean isSink(Node n, HashMap<String, Object> settings) {
+        return n.icons.contains(settings.sinkIconName as String)
+    }
+
+    static boolean isIgnored(Node n, HashMap<String, Object> settings) {
+        return n.icons.contains(settings.ignoredIconName as String)
     }
 
     static String mkGantt(Node node, HashMap<String, Object> settings = null) {
-        settings = !settings ? defaultSettings.clone() : defaultSettings + settings
-        def plantRoot = calcPlantRoot(node)
+        settings = (!settings ? defaultSettings.clone() : defaultSettings + settings) as HashMap<String, Object>
+        def plantUmlCodeParent = findPlantUmlCodeParent(node, settings)
         def lol = new LinkedList<LinkedList<String>>()
         lol << new LinkedList<String>()
         def _extractTextOrIsoDate = { Node n -> extractTextOrIsoDate(n, settings) }
-        appendEachRow(plantRoot, lol, settings, _extractTextOrIsoDate)
+        appendEachRow(plantUmlCodeParent, lol, settings, _extractTextOrIsoDate)
         // replace `???` with `???'s` if followed by `end` or `start`
         lol.each { listOfRowCells ->
             ['end', 'start'].each { end_or_start ->
@@ -106,7 +145,7 @@ class PumlUtils {
         }
         try {
             return n.to.date.format('yyyy-MM-dd')
-        } catch (ConversionException) {
+        } catch (ignored) {
             return n.transformedText
         }
     }
