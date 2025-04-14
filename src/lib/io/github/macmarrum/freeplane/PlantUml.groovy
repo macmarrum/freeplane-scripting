@@ -77,21 +77,22 @@ class PlantUml {
                 nodes.remove(0)
                 settings.skip1 = false
             }
+            // TODO: handle isNoEntry inside isSink tree
             nodes.findAll { !isIgnored(it, settings) }.collect { extractContent(it) }.findAll(/*skip empty*/).each { lol[-1] << it }
             lol << new LinkedList<String>()
         } else {
-            def nodeChildren = node.children.findAll { !isNoEntry(it, settings) }
+            def nodeChildren = node.children.findAll { !isNoEntry(it, settings) && !isIgnored(it, settings) }
             if (nodeChildren.size() == 1) {
                 if (skip1) {
                     settings.skip1 = false
-                } else if (!isIgnored(node, settings)) {
+                } else {
                     lol[-1] << extractContent(node)
                 }
                 appendEachRow(nodeChildren[0], lol, settings, extractContent)
             } else { // no children or many children
                 if (skip1) {
                     settings.skip1 = false
-                } else if (!isIgnored(node, settings)) {
+                } else {
                     lol[-1] << extractContent(node)
                     lol << new LinkedList<String>()
                 }
