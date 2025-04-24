@@ -72,29 +72,32 @@ class PlantUml {
             return
         boolean skip1 = settings.skip1
         if (isSink(node, settings)) { // join all descendants into a single line
-            def nodes = node.findAll()
             if (skip1) {
-                nodes.remove(0)
                 settings.skip1 = false
+                node.children.each { appendMeAndDescendants(it, lol, settings, extractContent) }
+            } else {
+                appendMeAndDescendants(node, lol, settings, extractContent)
             }
-            // TODO: handle isNoEntry inside isSink tree
-            nodes.findAll { !isIgnored(it, settings) }.collect { extractContent(it) }.findAll(/*skip empty*/).each { lol[-1] << it }
             lol << new LinkedList<String>()
         } else {
-            def nodeChildren = node.children.findAll { !isNoEntry(it, settings) && !isIgnored(it, settings) }
+            def nodeChildren = node.children.findAll { !isNoEntry(it, settings) }
             if (nodeChildren.size() == 1) {
                 if (skip1) {
                     settings.skip1 = false
                 } else {
-                    lol[-1] << extractContent(node)
+                    if (!isIgnored(node, settings))
+                        lol[-1] << extractContent(node)
                 }
                 appendEachRow(nodeChildren[0], lol, settings, extractContent)
             } else { // no children or many children
                 if (skip1) {
                     settings.skip1 = false
                 } else {
-                    lol[-1] << extractContent(node)
-                    lol << new LinkedList<String>()
+                    def notIgnored = !isIgnored(node, settings)
+                    if (notIgnored)
+                        lol[-1] << extractContent(node)
+                    if (notIgnored || nodeChildren.size() == 0)
+                        lol << new LinkedList<String>()
                 }
                 nodeChildren.each { appendEachRow(it, lol, settings, extractContent) }
             }
@@ -117,6 +120,16 @@ class PlantUml {
         return n.icons.contains(settings.taskIconName as String)
     }
 
+    /** sink
+     */
+    static void appendMeAndDescendants(Node node, LinkedList<LinkedList<String>> lol, HashMap<String, Object> settings, Function<Node, String> extractContent) {
+        if (isNoEntry(node, settings))
+            return
+        if (!isIgnored(node, settings))
+            lol[-1] << extractContent(node)
+        node.children.each { appendMeAndDescendants(it, lol, settings, extractContent) }
+    }
+
     static String makeGantt(Node node, HashMap<String, Object> settings = null) {
         settings = (!settings ? defaultSettings.clone() : defaultSettings + settings) as HashMap<String, Object>
         def plantUmlCodeParent = findPlantUmlCodeParent(node, settings)
@@ -137,11 +150,11 @@ class PlantUml {
         return (code =~ /^\n*@startgantt\n/ && code =~ /\n@endgantt\n*$/) ? code : "@startgantt\n$code@endgantt" as String
     }
 
-    /** get node's text
-     * - transformed text
-     * -- additionally surrounded in [] if it's a task
-     * - ISO date format if it's a date
-     */
+/** get node's text
+ * - transformed text
+ * -- additionally surrounded in [] if it's a task
+ * - ISO date format if it's a date
+ */
     static String extractTextOrIsoDate(Node n, HashMap<String, Object> settings) {
         if (isTask(n, settings)) {
             return "[${n.transformedText}]" as String
@@ -152,4 +165,5 @@ class PlantUml {
             return n.transformedText
         }
     }
+
 }
