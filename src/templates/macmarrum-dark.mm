@@ -18,7 +18,7 @@ t &amp;&amp; (node.delegate.allClones().size() - 1) &gt; t</script>
             </script_condition>
         </conditional_style>
     </conditional_styles>
-    <properties show_icon_for_attributes="true" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff" show_tags="UNDER_NODES" show_note_icons="true" fit_to_viewport="false" />
+    <properties show_icon_for_attributes="true" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff" show_tags="UNDER_NODES" show_note_icons="true" fit_to_viewport="false" show_icons="BESIDE_NODES"/>
     <tags category_separator="::"/>
 
 <map_styles>
@@ -377,6 +377,7 @@ ol {
 <stylenode TEXT="=Green" COLOR="#52d273">
 <icon BUILTIN="emoji-1F7E2"/>
 </stylenode>
+<stylenode TEXT="md" FORMAT="markdownPatternFormat"/>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="bottom_or_right" STYLE="bubble">
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level.root" ID="ID_1659178249" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="10 pt" VGAP_QUANTITY="20 pt">
