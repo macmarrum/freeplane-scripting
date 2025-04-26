@@ -13,18 +13,18 @@ import java.awt.*
 import java.awt.datatransfer.DataFlavor
 import java.awt.image.BufferedImage
 
-node = node as Node
 c = c as Controller
+node = node as Node
 def mindMapFile = node.mindMap.file
 
-def settings = [
+HashMap<String, String> settings = [
         customSaveDir      : mindMapFile.parent,
         imageFileNamePrefix: node.mindMap.name,
-//        customSaveDir      : "${mindMapFile.parent}/images",
+//        customSaveDir      : "${mindMapFile.parent}/my_images",
 //        imageFileNamePrefix: '',
 ]
 
-def customSaveDir = settings.customSaveDir ?: mindMapFile.parent
+def customSaveDir = settings.get('customSaveDir', mindMapFile.parent)
 if (!new File(customSaveDir).canWrite()) {
     c.statusInfo = "(!) cannot write to ${customSaveDir}"
     return
@@ -33,23 +33,21 @@ if (!new File(customSaveDir).canWrite()) {
 def transferable = Toolkit.defaultToolkit.systemClipboard.getContents(null)
 if (transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
     def bufferedImage = transferable.getTransferData(DataFlavor.imageFlavor) as BufferedImage
-    def imageFileNamePrefix = settings.imageFileNamePrefix ? "${settings.imageFileNamePrefix}_" : ''
+    def imageFileNamePrefix = settings['imageFileNamePrefix'] ? "${settings.imageFileNamePrefix}_" : ''
     def imageFileName = "${imageFileNamePrefix}${node.id}_${new Date().format('yyyyMMdd_HHmmssS')}.png"
-    def file = new File(customSaveDir, imageFileName)
+    def imageFile = new File(customSaveDir, imageFileName)
     def useCache = ImageIO.useCache
     ImageIO.useCache = false
-    ImageIO.write(bufferedImage, 'png', file)
+    ImageIO.write(bufferedImage, 'png', imageFile)
     ImageIO.useCache = useCache
     def child = node.createChild()
     child.text = imageFileName
     if (config.getProperty('links') == 'relative') {
-        def filePathRelativeToMindMapParent = mindMapFile.parentFile.relativePath(file)
-        def uri = makeUriRetainingRelative(filePathRelativeToMindMapParent)
-        child.externalObject.uri = uri
-//        child.details = "URI: $uri"
+        def filePathRelativeToMindMapParent = mindMapFile.parentFile.relativePath(imageFile)
+        def imageUri = makeUriRetainingRelative(filePathRelativeToMindMapParent)
+        child.externalObject.uri = imageUri
     } else {
-        child.externalObject.file = file
-//        child.details = "File: $file"
+        child.externalObject.file = imageFile
     }
 } else {
     c.statusInfo = '(!) no image found in clipboard'
