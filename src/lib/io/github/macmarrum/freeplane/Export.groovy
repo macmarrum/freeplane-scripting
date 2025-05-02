@@ -18,6 +18,7 @@ package io.github.macmarrum.freeplane
 
 import groovy.json.JsonGenerator
 import groovy.json.JsonOutput
+import org.freeplane.api.Controller
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
 import org.freeplane.core.util.FreeplaneVersion
@@ -31,6 +32,7 @@ import org.freeplane.features.format.FormattedObject
 import org.freeplane.plugin.script.FreeplaneScriptBaseClass
 import org.freeplane.plugin.script.proxy.ConvertibleNumber
 import org.freeplane.plugin.script.proxy.ConvertibleText
+import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import javax.swing.*
 import java.nio.charset.Charset
@@ -47,6 +49,7 @@ class Export {
     private static final String TAB = '\t'
     private static final String NL = '\n'
     private static final String CR = '\r'
+    private static final String PILCROW = '\u00B6'
     private static final String BLANK = ''
     private static final String SPACE = ' '
     private static final String TWO_SPACES = '  '
@@ -85,6 +88,7 @@ class Export {
     private static final String STANDARD_FORMAT = 'STANDARD_FORMAT'
     private static final String AUTO = 'auto'
     public static Charset charset = StandardCharsets.UTF_8
+    private static final Controller c = ScriptUtils.c()
     private static final FreeplaneVersion FP_VER = FreeplaneVersion.version
     private static final FreeplaneVersion FP_1_12_1 = FreeplaneVersion.getVersion('1.12.1')
     private static final TextUtils textUtils = new TextUtils()
@@ -104,7 +108,7 @@ class Export {
             'AutomaticLayout.level,6'   : '#######',
     ]
     public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
-    public static csvSettings = [sep: COMMA, eol: NL, nl: CR, np: NodePart.CORE, skip1: false, tail: false, quote: false]
+    public static csvSettings = [sep: COMMA, eol: NL, nl: null, np: NodePart.CORE, skip1: false, tail: false, quote: 'MINIMAL']
     public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, format: false, dateFmt: DateFmt.ISO_LOCAL, style: true, formatting: true, icons: true, tags: true, link: true, skip1: false, denullify: false, pretty: false, forceId: false, forceAttribList: false]
 
     enum NodePart {
@@ -350,20 +354,26 @@ class Export {
 
     static void toCsvFile(File file, Node node, HashMap<String, Object> settings = null) {
         def outputStream = new BufferedOutputStream(new FileOutputStream(file))
-        toCsvOutputStream(outputStream, node, settings)
-        outputStream.close()
+        def outputStreamWriter = new OutputStreamWriter(outputStream, charset)
+        _toCsvAppendable(outputStreamWriter, node, settings)
+        outputStreamWriter.close()
     }
 
     static String toCsvString(Node node, HashMap<String, Object> settings = null) {
-        def outputStream = new ByteArrayOutputStream()
-        toCsvOutputStream(outputStream, node, settings)
-        outputStream.toString(charset)
+        def sb = new StringBuilder()
+        _toCsvAppendable(sb, node, settings)
+        return sb.toString()
     }
 
+//    static void toCsvOutputStream(OutputStream outputStream, Node node, HashMap<String, Object> settings) {
+//        def outputStreamWriter = new OutputStreamWriter(outputStream, charset)
+//        _toCsvAppendable(outputStreamWriter, node, settings)
+//    }
+
     /**
-     * Output to CSV, using any deilmeter as a separator (comma by default)
+     * Output to CSV, using any delimiter as a separator (comma by default)
      *
-     * @param outputStream the stream to write to
+     * @param appendable the object to append to
      * @param node the starting node for the export (see also settings.skip1)
      * @param settings a hashMap -- see csvSettings for default values =>
      *  sep -- separator to use;
@@ -372,25 +382,40 @@ class Export {
      *  np -- NodePart to take the value from;
      *  skip1 -- whether to skip the first node;
      *  tail -- whether to put Separator after the last value;
-     *  quote -- whether to force quotes around each value | default: auto-quote when sep or NL or CR in value;
+     *  quote -- org.apache.commons.csv.QuoteMode name or (boolean to force quotes around each value | default: auto-quote when sep or NL or CR in value);
      */
-    static void toCsvOutputStream(OutputStream outputStream, Node node, HashMap<String, Object> settings) {
+    static void _toCsvAppendable(Appendable appendable, Node node, HashMap<String, Object> settings) {
         settings = !settings ? csvSettings.clone() : csvSettings + settings
         def sep = settings.sep as String
         def eol = settings.eol as String
         def newlineReplacement = settings.getOrDefault('newlineReplacement', settings.nl) as String
         def nodePart = settings.getOrDefault('nodePart', settings.np) as NodePart
-        def shouldQuote = settings.quote as boolean
+        def quote = settings.quote as String
+        def shouldQuote = (quote == 'true')
+        quote = switch (quote) {
+            case 'true' -> 'NON_NUMERIC'
+            case 'false' -> 'NONE'
+            case 'null' -> 'MINIMAL'
+            default -> quote
+        }
         def skip1 = settings.skip1 as boolean
         def numOfNodesToIgnore = skip1 ? 1 : settings.getOrDefault('numOfNodesToIgnore', settings.getOrDefault('skip', 0)) as int
         def sepAtRowEnds = settings.getOrDefault('sepAtRowEnds', settings.tail) as boolean
-        def sepAsBytes = sep.getBytes(charset)
         def rows = createListOfRows(node, numOfNodesToIgnore)
         def rowSizes = rows.collect { it.size() }
         def maxRowSize = rowSizes.max()
+        def csvFormat = null
+        try {
+            def quoteMode = Class.forName('org.apache.commons.csv.QuoteMode').valueOf(quote)
+            csvFormat = Class.forName('org.apache.commons.csv.CSVFormat').EXCEL.builder().setQuoteMode(quoteMode).setDelimiter(sep).build()
+        } catch (ClassNotFoundException e) {
+            def msg = "(!) 'Apache Commons CSV' (optional) not found in classpath - download it to `<user-dir>/lib`: https://repo1.maven.org/maven2/org/apache/commons/commons-csv/1.10.0/commons-csv-1.10.0.jar"
+            c.statusInfo = msg
+            println(msg)
+        }
         rows.eachWithIndex { row, i ->
             if (sepAtRowEnds)
-                outputStream.write(sepAsBytes)
+                appendable << sep
             def rowSize = rowSizes[i]
             row.eachWithIndex { n, j ->
                 def text = switch (nodePart) {
@@ -401,18 +426,24 @@ class Export {
                 }
                 if (newlineReplacement !== null)
                     text = text.replace(NL, newlineReplacement)
-                if ((shouldQuote || text.contains(sep) || text.contains(NL) || text.contains(CR)) && sep != '"')
-                    text = /"${text.replaceAll('"', '""')}"/
-                outputStream.write(text.getBytes(charset))
-                def isLastRow = j == rowSize - 1
+                if (csvFormat) {
+                    csvFormat.print(text, appendable, true)
+                } else {
+                    if ((shouldQuote || (sep != BLANK && text.contains(sep)) || text.contains(NL) || text.contains(CR)) && sep != '"')
+                        text = /"${text.replaceAll('"', '""')}"/
+                    appendable << text
+                }
+                def isLastRow = (j == rowSize - 1)
                 if (!isLastRow)
-                    outputStream.write(sepAsBytes)
+                    appendable << sep
             }
             def delta = maxRowSize - rowSize
-            (0..<delta).each { outputStream.write(sepAsBytes) }
+            (0..<delta).each {
+                appendable << sep
+            }
             if (sepAtRowEnds)
-                outputStream.write(sepAsBytes)
-            outputStream.write(eol.getBytes(charset))
+                appendable << sep
+            appendable << eol
         }
     }
 
