@@ -473,6 +473,8 @@ class Import {
                 c.statusInfo = msg
                 println(msg)
             }
+        } else {
+            c.statusInfo = '(!) no HTML in clipboard'
         }
     }
 
