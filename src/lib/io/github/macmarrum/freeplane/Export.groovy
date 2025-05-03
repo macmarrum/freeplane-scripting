@@ -168,24 +168,30 @@ class Export {
     }
 
     static void toMarkdownFile(File file, Node node, HashMap<String, Object> settings = null) {
-        def outputStream = new BufferedOutputStream(new FileOutputStream(file))
-        toMarkdownOutputStream(outputStream, node, settings)
-        outputStream.close()
+        def writer = new OutputStreamWriter(file.newOutputStream(), charset)
+        _toMarkdownAppendable(writer, node, settings)
+        writer.close()
     }
 
     /**
      * https://github.com/freeplane/freeplane/issues/333
      */
     static String toMarkdownString(Node node, HashMap<String, Object> settings = null) {
-        def outputStream = new ByteArrayOutputStream()
-        toMarkdownOutputStream(outputStream, node, settings)
-        outputStream.toString(charset)
+        def sb = new StringBuilder()
+        _toMarkdownAppendable(sb, node, settings)
+        return sb.toString()
     }
+
+//    static String toMarkdownOutputStream(OutputStream outputStream, Node node, HashMap<String, Object> settings = null) {
+//        def writer = new OutputStreamWriter(outputStream, charset)
+//        _toMarkdownAppendable(writer, node, settings)
+//        writer.close()
+//    }
 
     /**
      * Output to Markdown
      *
-     * @param outputStream the stream to write to
+     * @param appendable the object to append to
      * @param node the starting node for the export (see also settings.skip1)
      * @param settings a hashMap -- see mdSettings for default values =>
      *  h1 -- where the heading level is counted from when Level Styles are encountered;
@@ -196,17 +202,11 @@ class Export {
      *  ulStyle -- the style of nodes to be output as ul bullets;
      *  olStyle -- the style of nodes to be output as ol bullets;
      */
-    static String toMarkdownOutputStream(OutputStream outputStream, Node node, HashMap<String, Object> settings = null) {
+    static String _toMarkdownAppendable(Appendable appendable, Node node, HashMap<String, Object> settings = null) {
         settings = !settings ? mdSettings.clone() : mdSettings + settings
-        def bNL = NL.getBytes(charset)
-        def bSPACE = SPACE.getBytes(charset)
         def mdH1 = settings.h1 as MdH1
         def ulOlStyles = [settings.ulStyle as String, settings.olStyle as String]
         def levelStyleToHeading = settings.getOrDefault('levelStyleToHeading', settings.lsToH) as Map<String, String>
-        def bLevelStyleToHeading
-        if (mdH1 == MdH1.ROOT) {
-            bLevelStyleToHeading = levelStyleToHeading.collectEntries { k, v -> [k, v.getBytes(charset)] }
-        }
         def nodeToStyles = new LinkedHashMap<Node, List<String>>()
         node.find { it.visible }.eachWithIndex { it, i ->
             if (!(i == 0 && settings.skip1))
@@ -227,15 +227,14 @@ class Export {
             }
         }
         nodeToStyles.eachWithIndex { n, allActiveStyles, i ->
-            if (i > 0) outputStream.write(bNL)
+            if (i > 0) appendable << NL
             boolean isHeading = false
             switch (mdH1) {
                 case MdH1.ROOT -> {
                     for (def styleName in allActiveStyles) {
-                        if (bLevelStyleToHeading.containsKey(styleName)) {
+                        if (levelStyleToHeading.containsKey(styleName)) {
                             isHeading = true
-                            outputStream.write(bLevelStyleToHeading[styleName])
-                            outputStream.write(bSPACE)
+                            appendable << levelStyleToHeading[styleName] << SPACE
                             break
                         }
                     }
@@ -246,8 +245,7 @@ class Export {
                         isHeading = true
                         def hashCount = styleLevelNum - minStyleLevelNum + 1
                         assert hashCount > 0
-                        outputStream.write((HASH * hashCount).getBytes(charset))
-                        outputStream.write(bSPACE)
+                        appendable << (HASH * hashCount) << SPACE
                     }
                 }
                 default -> println("** Unexpected mdLevelStyles: ${mdH1}")
@@ -260,8 +258,7 @@ class Export {
             } else {
                 (coreText, indent) = _mdGetPossiblyIndentedCoreTextAndIndent(n, ulOlStyles, nodeToStyles)
             }
-            outputStream.write(coreText.getBytes(charset))
-            outputStream.write(bNL)
+            appendable << coreText << NL
 
             // process details and note
             [[settings.details, n.details?.plain], [settings.note, n.note?.plain]].each { tuple ->
@@ -269,7 +266,7 @@ class Export {
                 def mdIn = mdInObj as MdInclude
                 if (mdIn != MdInclude.NONE && text) {
                     // add details/note as a separate paragraph
-                    outputStream.write(bNL)
+                    appendable << NL
                     def processedText = switch (mdIn) {
                         case MdInclude.HLB -> _replaceNewLinesWithHardLineBreaks(text)
                         case MdInclude.PLAIN -> text
@@ -280,8 +277,7 @@ class Export {
                     }
                     if (indent && processedText)
                         processedText = processedText.split(NL).collect { indent + it }.join(NL)
-                    outputStream.write(processedText.getBytes(charset))
-                    outputStream.write(bNL)
+                    appendable << processedText << NL
                 }
             }
         }
@@ -448,19 +444,24 @@ class Export {
     }
 
     static void toRumarTomlFile(File file, Node node) {
-        def outputStream = new BufferedOutputStream(new FileOutputStream(file))
-        toRumarTomlOutputStream(outputStream, node)
-        outputStream.close()
+        def writer = new OutputStreamWriter(file.newOutputStream(), charset)
+        _toRumarTomlAppendable(writer, node)
+        writer.close()
     }
 
     static String toRumarTomlString(Node node) {
-        def outputStream = new ByteArrayOutputStream()
-        toRumarTomlOutputStream(outputStream, node)
-        outputStream.toString(charset)
+        def sb = new StringBuilder()
+        _toRumarTomlAppendable(sb, node)
+        return sb.toString()
     }
 
-    static void toRumarTomlOutputStream(OutputStream outputStream, Node node) {
-        byte[] nlBytes = NL.getBytes(charset)
+//    static void toRumarTomlOutputStream(OutputStream outputStream, Node node) {
+//        def writer = new OutputStreamWriter(outputStream, charset)
+//        _toRumarTomlAppendable(writer, node)
+//        writer.close()
+//    }
+
+    static void _toRumarTomlAppendable(Appendable appendable, Node node) {
         GString text
         GString profile
         String entries
@@ -477,8 +478,7 @@ class Export {
                     entries = nChildren.collect { _toRumarTomlEntry(it) }.join(NL)
                     text = "$NL$profile$NL$entries"
                 }
-                outputStream.write(text.getBytes(charset))
-                outputStream.write(nlBytes)
+                appendable << text << NL
             }
         }
     }
