@@ -8,4 +8,4 @@ import org.freeplane.api.Controller
 import org.freeplane.api.Node
 
 c = c as Controller
-c.selecteds.each { Node n -> Import.fromClipboardHtmlTable(n) }
+c.selecteds.each { Node n -> Import.fromHtmlTableClipboard(n) }
