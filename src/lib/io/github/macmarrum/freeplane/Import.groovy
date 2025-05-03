@@ -18,6 +18,7 @@ package io.github.macmarrum.freeplane
 
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
+import org.freeplane.api.Controller
 import org.freeplane.api.Node
 import org.freeplane.core.util.FreeplaneVersion
 import org.freeplane.core.util.Hyperlink
@@ -43,6 +44,8 @@ class Import {
     private static final String DOUBLE_QUOTE = '"'
     private static final String HASH = '#'
     private static final String NL = '\n'
+    private static final String CR = '\r'
+    private static final String PILCROW = '\u00B6'
     private static final String SPACE = ' '
     private static final String TWO_DOUBLE_QUOTES = '""'
     private static final Pattern RX_TWO_DOUBLE_QUOTES = ~/""/
@@ -63,9 +66,10 @@ class Import {
     private static final String FORMATTED_FORMULA = FormattedFormula.class.simpleName
     private static final String FORMATTED_OBJECT = FormattedObject.class.simpleName
     public static Charset charset = StandardCharsets.UTF_8
+    private static final Controller c = ScriptUtils.c()
     private static final FreeplaneVersion FP_VER = FreeplaneVersion.version
     private static final FreeplaneVersion FP_1_12_1 = FreeplaneVersion.getVersion('1.12.1')
-    public static csvSettings = [sep: COMMA, np: NodePart.CORE]
+    public static csvSettings = [sep: COMMA, np: NodePart.CORE, nl: null]
 
     enum NodePart {
         CORE, DETAILS, NOTE
@@ -361,22 +365,35 @@ class Import {
     }
 
     static void fromCsvString(String content, Node node, HashMap<String, Object> settings = null) {
-        def inputStream = new ByteArrayInputStream(content.getBytes(charset))
-        fromCsvInputStream(inputStream, node, settings)
+        def reader = new StringReader(content)
+        _fromCsvReader(reader, node, settings)
     }
 
     static void fromCsvFile(File file, Node node, HashMap<String, Object> settings = null) {
-        fromCsvInputStream(file.newInputStream(), node, settings)
+        def reader = new InputStreamReader(file.newInputStream(), charset)
+        _fromCsvReader(reader, node, settings)
     }
 
-    static void fromCsvInputStream(InputStream inputStream, Node node, HashMap<String, Object> settings) {
+//    static void fromCsvInputStream(InputStream inputStream, Node node, HashMap<String, Object> settings) {
+//        def reader = new InputStreamReader(inputStream, charset)
+//        _fromCsvReader(reader, node, settings)
+//    }
+
+    static void _fromCsvReader(Reader reader, Node node, HashMap<String, Object> settings) {
         settings = !settings ? csvSettings.clone() : csvSettings + settings
-        def sep = settings.sep as String
-        def nodePart = settings.getOrDefault('nodePart', settings.np) as NodePart
-        inputStream.eachLine(charset.name()) { line -> if (line) _fromCsvLine(line, node, sep, nodePart) }
+        try {
+            def csvFormat = (Class.forName('org.apache.commons.csv.CSVFormat').EXCEL).builder().setDelimiter(settings.sep as String).build()
+            csvFormat.parse(reader).each { csvRecord -> _fromCsvRow(csvRecord.values() as Iterable<String>, node, settings) }
+        } catch (ClassNotFoundException ignored) {
+            def msg = "(!) 'Apache Commons CSV' (optional) not found in classpath - download it to `<user-dir>/lib`: https://repo1.maven.org/maven2/org/apache/commons/commons-csv/1.10.0/commons-csv-1.10.0.jar"
+            c.statusInfo = msg
+            println(msg)
+            reader.eachLine { line -> if (line) _fromCsvLine(line, node, settings) }
+        }
     }
 
-    static void _fromCsvLine(String line, Node node, String sep = COMMA, NodePart nodePart = NodePart.CORE) {
+    static void _fromCsvLine(String line, Node node, HashMap<String, Object> settings) {
+        def sep = settings.sep as String
         assert sep != DOUBLE_QUOTE
         def row = new LinkedList<String>()
         def cell = new StringBuilder()
@@ -415,11 +432,15 @@ class Import {
         if (isQtOpen)
             throw new IllegalArgumentException("unterminated quote in: ${line}")
         row << cell.replaceAll(RX_TWO_DOUBLE_QUOTES, DOUBLE_QUOTE)
-        _fromCsvRow(row, node, nodePart)
+        _fromCsvRow(row, node, settings)
     }
 
-    static void _fromCsvRow(List<String> row, Node node, NodePart nodePart = NodePart.CORE) {
+    static void _fromCsvRow(Iterable<String> row, Node node, HashMap<String, Object> settings) {
+        def nodePart = settings.getOrDefault('nodePart', settings.np) as NodePart
+        def newlineReplacement = settings.getOrDefault('newlineReplacement', settings.nl) as String
         row.each { text ->
+            if (newlineReplacement != null)
+                text = text.replaceAll(newlineReplacement, NL)
             node = node.createChild()
             switch (nodePart) {
                 case NodePart.CORE -> node.text = text
