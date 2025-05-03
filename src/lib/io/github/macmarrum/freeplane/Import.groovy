@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023, 2024  macmarrum (at) outlook (dot) ie
+ * Copyright (C) 2023 - 2025  macmarrum (at) outlook (dot) ie
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ import org.freeplane.features.format.FormattedNumber
 import org.freeplane.features.format.FormattedObject
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
+import java.awt.Toolkit
+import java.awt.datatransfer.DataFlavor
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
@@ -447,6 +449,29 @@ class Import {
                 case NodePart.DETAILS -> node.details = text
                 case NodePart.NOTE -> node.note = text
                 default -> node.text = '#ERR!'
+            }
+        }
+    }
+
+    static void fromHtmlTableClipboard(Node node, HashMap<String, Object> settings = null) {
+        def transferable = Toolkit.defaultToolkit.systemClipboard.getContents(null)
+        if (transferable.isDataFlavorSupported(DataFlavor.allHtmlFlavor)) {
+            try {
+                def Jsoup = Class.forName('org.jsoup.Jsoup')
+                def html = transferable.getTransferData(DataFlavor.allHtmlFlavor)
+                def doc = Jsoup.parse(html)
+                def lol = doc.select('table').first().select('tr').collect { row -> row.select('th, td').collect { it.wholeText() } }
+                Node child
+                for (Collection<String> tableRow in lol) {
+                    child = node
+                    for (String cellText in tableRow) {
+                        child = child.createChild(cellText)
+                    }
+                }
+            } catch (ClassNotFoundException ignored) {
+                def msg = '(!) Jsoup not found in classpath - add `<Freeplane-install-dir>/plugins/org.freeplane.plugin.markdown/lib` to `Preferences…->Plugins->Scripting->Script classpath: Additional directories containing classes and/or JARs (see tooltip)`'
+                c.statusInfo = msg
+                println(msg)
             }
         }
     }
