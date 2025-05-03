@@ -82,7 +82,7 @@ class Import {
     }
 
     static Node fromJsonFile(File file, Node parent = null, Boolean shouldFold = null) {
-        fromJsonString(file.getText(charset.name()), parent, shouldFold)
+        return fromJsonString(file.getText(charset.name()), parent, shouldFold)
     }
 
     static Node fromJsonStringBase64(String base64, Node parent = null, Boolean shouldFold = null) {
@@ -374,11 +374,13 @@ class Import {
     static void fromCsvFile(File file, Node node, HashMap<String, Object> settings = null) {
         def reader = new InputStreamReader(file.newInputStream(), charset)
         _fromCsvReader(reader, node, settings)
+        reader.close()
     }
 
 //    static void fromCsvInputStream(InputStream inputStream, Node node, HashMap<String, Object> settings) {
 //        def reader = new InputStreamReader(inputStream, charset)
 //        _fromCsvReader(reader, node, settings)
+//        reader.close()
 //    }
 
     static void _fromCsvReader(Reader reader, Node node, HashMap<String, Object> settings) {
