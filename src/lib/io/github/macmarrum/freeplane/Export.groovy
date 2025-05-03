@@ -525,8 +525,7 @@ class Export {
     }
 
     /**
-     * Export to JSON, in UTF-8 encoding, with the assumption that each node on the same level has a unique core text,
-     * because it is used as Key in JSON
+     * Export to JSON, in UTF-8 encoding
      * @param node - the starting node of the branch to be exported -- see also settings.skip1
      * @param settings - a hashMap -- see jsonSettings for default values
      *  - details -- whether to include details;
@@ -741,11 +740,13 @@ class Export {
         // Use transformed value if requested
         // Convertible is the result of a formula accessing another attribute's value: node['key']
         // FormattedDate is when accessing another attribute's value which is a date (but not a formula)
+        // Don't transform Hyperlinks - the "raw" uri string is the correct representation
+        //  plus internal links are represented as ObjectIcon (nodeShortText, Icon) which causes StackOverflowError in JsonGenerator/JsonOutput
         if (settings.transformed) {
             attributes.transformed.eachWithIndex { Map.Entry entry, int i ->
                 def value = entry.value
                 def entryList = attributesList[i]
-                if (value != entryList[1]) {
+                if (value != entryList[1] && entryList[2] != Hyperlink.class.simpleName) {
                     def entryListSize = entryList.size()
                     if (value instanceof ConvertibleText) {
                         value = value.text
