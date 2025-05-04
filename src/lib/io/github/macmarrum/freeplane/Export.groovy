@@ -589,7 +589,7 @@ class Export {
         def detailsContentType = settings.details && settings.format ? node.detailsContentType : null
         def note = settings.note ? (settings.transformed ? node.note?.text : HtmlUtils.htmlToPlain(node.noteText ?: '')) : null
         def noteContentType = settings.note && settings.format ? node.noteContentType : null
-        def attributes = _toJson_getAttributes(node, settings)
+        def attributes = settings.attributes ? _toJson_getAttributes(node, settings) : null
         URI link = settings.link ? node.link.uri : null
         def style = settings.style ? node.style.name : null
         def backgroundColor = settings.formatting && node.style.isBackgroundColorSet() ? colorToRGBAString(node.style.backgroundColor) : null
