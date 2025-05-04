@@ -110,7 +110,7 @@ class Export {
     ]
     public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
     public static csvSettings = [sep: COMMA, eol: NL, nl: null, np: NodePart.CORE, skip1: false, tail: false, quote: 'MINIMAL']
-    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, plain: true, format: false, dateFmt: DateFmt.ISO_LOCAL, style: false, formatting: false, icons: false, tags: false, link: false, skip1: false, denullify: false, pretty: false, forceId: false, forceAttribList: false]
+    public static jsonSettings = [core: true, details: true, note: true, attributes: true, transformed: true, plain: true, format: false, dateFmt: DateFmt.ISO_LOCAL, style: false, formatting: false, icons: false, tags: false, link: false, skip1: false, denullify: false, pretty: false, forceId: false, forceAttribList: false]
 
     enum NodePart {
         CORE, DETAILS, NOTE
@@ -562,7 +562,7 @@ class Export {
         settings = !settings ? jsonSettings.clone() : jsonSettings + settings
         def forceId = settings.forceId as boolean
         def core = _toJson_calcCore(node, settings)
-        def useAtCore = forceId || core instanceof List || core as String in JSON_RESERVED_CORE
+        def useAtCore = forceId || core == null || core instanceof List || core as String in JSON_RESERVED_CORE
         def mapOrList = _toJson_getBodyRecursively(node, settings, 1, useAtCore ? core : null)
         if (!settings.skip1)
             mapOrList = [(useAtCore ? node.id : core): mapOrList]
@@ -632,9 +632,8 @@ class Export {
             Object atCore
             children.each { Node childNode ->
                 childCore = childToCalcCore[childNode]
-                assert childCore !== null
                 // use ID for this child's core, i.e. put core value either as key or as @core
-                def useIdForThisChildCore = useIdForChildren || childCore instanceof List || childCore as String in JSON_RESERVED_CORE
+                def useIdForThisChildCore = useIdForChildren || childCore == null || childCore instanceof List || childCore as String in JSON_RESERVED_CORE
                 key = useIdForThisChildCore ? childNode.id : childCore
                 atCore = useIdForThisChildCore ? childCore : null
                 result[key] = _toJson_getBodyRecursively(childNode, settings, level + 1, atCore)
@@ -644,6 +643,8 @@ class Export {
     }
 
     static _toJson_calcCore(Node node, Map<String, Object> settings) {
+        if (!settings.core)
+            return null
         def text = node.text
         // formula can be stored as HTML, so plainText is needed to perform an is-formula check
         def plainText = HtmlUtils.htmlToPlain(text)
