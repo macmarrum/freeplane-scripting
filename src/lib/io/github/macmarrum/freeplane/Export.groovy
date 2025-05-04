@@ -85,6 +85,7 @@ class Export {
     private static final String STYLE = '@style'
     private static final String TAGS = '@tags'
     private static final String TEXT_COLOR = '@textColor'
+    private static final List<String> JSON_RESERVED_CORE = [ATTRIBUTES, BACKGROUND_COLOR, CORE, DETAILS, ICONS, LINK, NOTE, TAGS, TEXT_COLOR]
     private static final String STANDARD_FORMAT = 'STANDARD_FORMAT'
     private static final String AUTO = 'auto'
     public static Charset charset = StandardCharsets.UTF_8
@@ -109,7 +110,7 @@ class Export {
     ]
     public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
     public static csvSettings = [sep: COMMA, eol: NL, nl: null, np: NodePart.CORE, skip1: false, tail: false, quote: 'MINIMAL']
-    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, format: false, dateFmt: DateFmt.ISO_LOCAL, style: true, formatting: true, icons: true, tags: true, link: true, skip1: false, denullify: false, pretty: false, forceId: false, forceAttribList: false]
+    public static jsonSettings = [details: true, note: true, attributes: true, transformed: true, plain: true, format: false, dateFmt: DateFmt.ISO_LOCAL, style: false, formatting: false, icons: false, tags: false, link: false, skip1: false, denullify: false, pretty: false, forceId: false, forceAttribList: false]
 
     enum NodePart {
         CORE, DETAILS, NOTE
@@ -145,6 +146,16 @@ class Export {
      */
     enum MdH1 {
         NONE, ROOT, NODE
+    }
+
+    /**
+     * Make a settings-verification regex to be used in IDE for finding misspelled attributes
+     * e.g. settings.tranformd instead of transformed
+     */
+    static String mkSettingsRegex() {
+        def s = mdSettings + csvSettings + jsonSettings
+        def attribs = s.keySet() + ['getOrDefault\\(']
+        return "\\bsettings\\.(?!${attribs.join('|')})"
     }
 
     static File askForFile(File suggestedFile = null) {
@@ -531,24 +542,27 @@ class Export {
      *  - details -- whether to include details;
      *  - note -- whether to include note;
      *  - attributes -- whether to include attributes;
-     *  - link -- whether to include link;
      *  - transformed -- whether to use transformed text, i.e. after formula/numbering/format evaluation;
+     *  - plain -- whether to force plain text for core; TODO for details and note
+     *  - format -- whether to include node/attribute format, details/note content type;
+     *  - dateFmt -- how to format values of type Date: DISPLAYED, ISO_LOCAL (without offset), ISO (with offset);
      *  - style -- whether to include the individually-assigned style;
      *  - formatting -- whether to include formatting: backgroundColor, textColor;
      *  - icons -- whether to include icons;
+     *  - tags -- whether to include tags;
+     *  - link -- whether to include link;
      *  - skip1 -- whether to skip the first node;
      *  - denullify -- whether to try to avoid `{"Node text": null}` by replacing it with `"Node text"` where possible;
      *  - pretty -- whether to use pretty output format;
-     *  - dateFmt -- how to format values of type Date: DISPLAYED, ISO_LOCAL, ISO;
-     *  - format -- whether to include node/attribute format, details/note content type;
      *  - forceId -- whether to force the usage of node IDs as JSON keys (used regardless in case of non-unique siblings) and @core for core value;
+     *  - forceAttribList -- whether to force the usage of attribute as a list when a (simple) hashMap would suffice;
      * @return JSON representation of the branch, in UTF-8 encoding
      */
     static String toJsonString(Node node, HashMap<String, Object> settings = null) {
         settings = !settings ? jsonSettings.clone() : jsonSettings + settings
         def forceId = settings.forceId as boolean
         def core = _toJson_calcCore(node, settings)
-        def useAtCore = forceId || core instanceof List
+        def useAtCore = forceId || core instanceof List || core as String in JSON_RESERVED_CORE
         def mapOrList = _toJson_getBodyRecursively(node, settings, 1, useAtCore ? core : null)
         if (!settings.skip1)
             mapOrList = [(useAtCore ? node.id : core): mapOrList]
@@ -570,6 +584,7 @@ class Export {
     }
 
     static HashMap<Object, Object> _toJson_getBodyRecursively(Node node, HashMap<String, Object> settings, int level = 1, core = null) {
+        // TODO non-plain for details and note
         def details = settings.details ? (settings.transformed ? node.details?.text : HtmlUtils.htmlToPlain(node.detailsText ?: '')) : null
         def detailsContentType = settings.details && settings.format ? node.detailsContentType : null
         def note = settings.note ? (settings.transformed ? node.note?.text : HtmlUtils.htmlToPlain(node.noteText ?: '')) : null
@@ -577,9 +592,8 @@ class Export {
         def attributes = _toJson_getAttributes(node, settings)
         URI link = settings.link ? node.link.uri : null
         def style = settings.style ? node.style.name : null
-        def formatting = settings.formatting as boolean
-        def backgroundColor = formatting && node.style.isBackgroundColorSet() ? colorToRGBAString(node.style.backgroundColor) : null
-        def textColor = formatting && node.style.isTextColorSet() ? colorToRGBAString(node.style.textColor) : null
+        def backgroundColor = settings.formatting && node.style.isBackgroundColorSet() ? colorToRGBAString(node.style.backgroundColor) : null
+        def textColor = settings.formatting && node.style.isTextColorSet() ? colorToRGBAString(node.style.textColor) : null
         def icons = settings.icons ? node.icons.icons : Collections.emptyList()
         def tags = settings.tags && FP_VER >= FP_1_12_1 ? node.tags.tags : Collections.emptyList()
         def children = node.children.findAll { it.visible }
@@ -619,9 +633,10 @@ class Export {
             children.each { Node childNode ->
                 childCore = childToCalcCore[childNode]
                 assert childCore !== null
-                // put core value either as key or as @core
-                key = useIdForChildren || childCore instanceof List ? childNode.id : childCore
-                atCore = useIdForChildren || childCore instanceof List ? childCore : null
+                // use ID for this child's core, i.e. put core value either as key or as @core
+                def useIdForThisChildCore = useIdForChildren || childCore instanceof List || childCore as String in JSON_RESERVED_CORE
+                key = useIdForThisChildCore ? childNode.id : childCore
+                atCore = useIdForThisChildCore ? childCore : null
                 result[key] = _toJson_getBodyRecursively(childNode, settings, level + 1, atCore)
             }
             return result
@@ -629,7 +644,9 @@ class Export {
     }
 
     static _toJson_calcCore(Node node, Map<String, Object> settings) {
-        def plainText = node.plainText
+        def text = node.text
+        // formula can be stored as HTML, so plainText is needed to perform an is-formula check
+        def plainText = HtmlUtils.htmlToPlain(text)
         def format = node.format
         if (!(plainText =~ RX_FORMULA)) {
             def conv = node.to
@@ -652,7 +669,13 @@ class Export {
             }
         }
         // a formula or text
-        def value = settings.transformed ? node.transformedText : plainText
+        String value
+        if (settings.transformed) {
+            // transformedText of core with in-line formatting or format:Markdown is rich-text
+            value = settings.plain ? HtmlUtils.htmlToPlain(node.transformedText) : node.transformedText
+        } else {
+            value = settings.plain ? plainText : text
+        }
         return !settings.format || format == STANDARD_FORMAT ? value : [value, node.object.class.simpleName, format]
     }
 
@@ -742,6 +765,7 @@ class Export {
         // FormattedDate is when accessing another attribute's value which is a date (but not a formula)
         // Don't transform Hyperlinks - the "raw" uri string is the correct representation
         //  plus internal links are represented as ObjectIcon (nodeShortText, Icon) which causes StackOverflowError in JsonGenerator/JsonOutput
+        //  like in the old bug in case of File: https://issues.apache.org/jira/browse/GROOVY-7519
         if (settings.transformed) {
             attributes.transformed.eachWithIndex { Map.Entry entry, int i ->
                 def value = entry.value
