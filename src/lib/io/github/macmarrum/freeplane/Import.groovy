@@ -167,13 +167,24 @@ class Import {
                 }
                 case STYLE -> {
                     if (isValueString) {
+                        // deprecated in favor of style map
                         try {
                             node.style.name = value
                         } catch (IllegalArgumentException e) {
                             LogUtils.severe("${node.id} ${STYLE}: ${e}")
                         }
+                    } else if (isValueMap) {
+                        def map = value as Map<String, Object>
+                        def style = node.style
+                        for (entry in map.entrySet()) {
+                            try {
+                                style."${entry.key}" = entry.value
+                            } catch (IllegalArgumentException e) {
+                                LogUtils.severe("${node.id} ${entry.key}: ${e}")
+                            }
+                        }
                     } else
-                        throw new IllegalArgumentException("${node.id}: got ${STYLE} of type ${value.class.simpleName} - expected String")
+                        throw new IllegalArgumentException("${node.id}: got ${STYLE} of type ${value.class.simpleName} - expected Map<String, Object>")
                 }
                 case ICONS -> {
                     if (isValueList)

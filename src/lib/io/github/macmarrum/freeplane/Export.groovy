@@ -35,6 +35,7 @@ import org.freeplane.plugin.script.proxy.ConvertibleText
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import javax.swing.*
+import java.awt.Color
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.time.format.DateTimeFormatter
@@ -42,6 +43,7 @@ import java.time.temporal.ChronoUnit
 import java.util.regex.Pattern
 
 import static org.freeplane.core.util.ColorUtils.colorToRGBAString
+import static org.freeplane.core.util.ColorUtils.colorToString
 
 class Export {
     private static final String COMMA = ','
@@ -591,7 +593,7 @@ class Export {
         def noteContentType = settings.note && settings.format ? node.noteContentType : null
         def attributes = settings.attributes ? _toJson_getAttributes(node, settings) : null
         URI link = settings.link ? node.link.uri : null
-        def style = settings.style ? node.style.name : null
+        def style = settings.style ? _toJson_getStyle(node) : null
         def backgroundColor = settings.formatting && node.style.isBackgroundColorSet() ? colorToRGBAString(node.style.backgroundColor) : null
         def textColor = settings.formatting && node.style.isTextColorSet() ? colorToRGBAString(node.style.textColor) : null
         def icons = settings.icons ? node.icons.icons : Collections.emptyList()
@@ -818,6 +820,36 @@ class Export {
         }
     }
 
+    static HashMap<String, Object> _toJson_getStyle(Node node) {
+        def styleHash = new HashMap<String, Object>()
+        def style = node.style
+        for (attrib in ['backgroundColorCode', 'textColorCode']) {
+            if (style."is${attrib.capitalize().replaceFirst(/Code$/, '')}Set"()) {
+                def color = style."${attrib.replaceFirst(/Code$/, '')}" as Color
+                def isTranslucent = color.alpha > 0 && color.alpha < 255
+                def colorCode = isTranslucent ? colorToRGBAString(color) : colorToString(color)
+                styleHash.put(attrib, colorCode)
+            }
+        }
+        for (attrib in ['css', 'maxNodeWidth', 'minNodeWidth']) {
+            if (style."is${attrib.capitalize()}Set"())
+                styleHash.put(attrib, style."$attrib")
+        }
+        for (attrib in ['numberingEnabled']) {
+            def value = style."$attrib"
+            if (value)
+                styleHash.put(attrib, value)
+        }
+        // TODO border, edge, font, horizontalTextAlignment
+        def styleName = style.name
+        if (styleName)
+            styleHash.put('name', styleName)
+        return styleHash
+    }
+
+    /** Convert each hashMap with all-elem null values to a list,
+     * i.e. [core1: null, core2: null] => [core1, core2]
+     */
     static HashMap<Object, Object> _toJson_denullify(HashMap<String, Object> hashMap) {
         def newHashMap = [:]
         hashMap.each { k, v ->
