@@ -836,7 +836,11 @@ class Export {
                 styleHash.put(attrib, style."$attrib")
         }
         for (attrib in ['numberingEnabled']) {
-            def value = style."$attrib"
+            def value = false
+            try { // try-catch because of a bug in Freeplane
+                value = style."$attrib"
+            } catch (NullPointerException ignored) {
+            }
             if (value)
                 styleHash.put(attrib, value)
         }
