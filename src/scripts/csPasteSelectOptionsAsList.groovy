@@ -30,6 +30,9 @@ if (text) {
             def n = lst.createChild(t)
             if (XmlUtil.escapeXml(t) != t)
                 n.icons.add(ConfluenceStorage.icon.xmlEscape_broom)
+            n = ConfluenceStorage.createFormat(n, '(%s)')[1]
+            def v = it.attribute('value')
+            n.createChild(v)
         }
     }
 }
