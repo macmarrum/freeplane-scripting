@@ -46,6 +46,7 @@ import static org.freeplane.core.util.ColorUtils.colorToRGBAString
 import static org.freeplane.core.util.ColorUtils.colorToString
 
 class Export {
+    private static final String BACKSLASH = '\\'
     private static final String COMMA = ','
     private static final String PIPE = '|'
     private static final String TAB = '\t'
@@ -416,7 +417,7 @@ class Export {
         def csvFormat = null
         try {
             def quoteMode = Class.forName('org.apache.commons.csv.QuoteMode').valueOf(quote)
-            csvFormat = Class.forName('org.apache.commons.csv.CSVFormat').EXCEL.builder().setQuoteMode(quoteMode).setDelimiter(sep).build()
+            csvFormat = Class.forName('org.apache.commons.csv.CSVFormat').EXCEL.builder().setDelimiter(sep).setQuoteMode(quoteMode).setEscape(BACKSLASH as char).build()
         } catch (ClassNotFoundException e) {
             def msg = "(!) 'Apache Commons CSV' (optional) not found in classpath - download it to `<user-dir>/lib`: https://repo1.maven.org/maven2/org/apache/commons/commons-csv/1.10.0/commons-csv-1.10.0.jar"
             c.statusInfo = msg
