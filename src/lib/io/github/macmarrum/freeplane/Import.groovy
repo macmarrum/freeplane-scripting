@@ -71,6 +71,7 @@ class Import {
     private static final Controller c = ScriptUtils.c()
     private static final FreeplaneVersion FP_VER = FreeplaneVersion.version
     private static final FreeplaneVersion FP_1_12_1 = FreeplaneVersion.getVersion('1.12.1')
+    private static final FreeplaneVersion FP_1_12_12 = FreeplaneVersion.getVersion('1.12.12')
     public static csvSettings = [sep: COMMA, np: NodePart.CORE, nl: null]
 
     enum NodePart {
@@ -177,6 +178,14 @@ class Import {
                         def map = value as Map<String, Object>
                         def style = node.style
                         for (entry in map.entrySet()) {
+                            if (entry.key == 'numbering' && FP_VER < FP_1_12_12) {
+                                try {
+                                    style.setNumberingEnabled(entry.value)
+                                } catch (IllegalArgumentException e) {
+                                    LogUtils.severe("${node.id} ${entry.key}: ${e}")
+                                }
+                                continue
+                            }
                             try {
                                 style."${entry.key}" = entry.value
                             } catch (IllegalArgumentException e) {

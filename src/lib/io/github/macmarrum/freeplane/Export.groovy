@@ -95,6 +95,7 @@ class Export {
     private static final Controller c = ScriptUtils.c()
     private static final FreeplaneVersion FP_VER = FreeplaneVersion.version
     private static final FreeplaneVersion FP_1_12_1 = FreeplaneVersion.getVersion('1.12.1')
+    private static final FreeplaneVersion FP_1_12_12 = FreeplaneVersion.getVersion('1.12.12')
     private static final TextUtils textUtils = new TextUtils()
     private static final FreeplaneScriptBaseClass fsbc = new FreeplaneScriptBaseClass() {
         @Override
@@ -836,19 +837,27 @@ class Export {
             if (style."is${attrib.capitalize()}Set"())
                 styleHash.put(attrib, style."$attrib")
         }
-        for (attrib in ['numberingEnabled']) {
-            def value = false
-            try { // try-catch because of a bug in Freeplane
-                value = style."$attrib"
-            } catch (NullPointerException ignored) {
+        for (attrib in ['numbering']) {
+            if (FP_VER >= FP_1_12_12) {
+                if (style."is${attrib.capitalize()}Set"())
+                    styleHash.put(attrib, style."$attrib")
+            } else {
+                // isNumberingEnabled() doubles as isNumberingSet() and getNumbering()/setNumbering(), throwing NPL if not set
+                Boolean value = null
+                try {
+                    value = style."is${attrib.capitalize()}Enabled"()
+                } catch (NullPointerException ignored) {
+                }
+                if (value != null)
+                    styleHash.put(attrib, value)
             }
-            if (value)
-                styleHash.put(attrib, value)
         }
         // TODO border, edge, font, horizontalTextAlignment
-        def styleName = style.name
-        if (styleName)
-            styleHash.put('name', styleName)
+        for (attrib in ['name']) {
+            def value = style."$attrib"
+            if (value != null)
+                styleHash.put(attrib, value)
+        }
         return styleHash
     }
 
