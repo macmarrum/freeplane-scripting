@@ -11,7 +11,7 @@
 node.children.any { hasMoreThanOneChild(it) }</script>
             </script_condition>
         </conditional_style>
-        <conditional_style ACTIVE="false" STYLE_REF="?singleInTree" LAST="false">
+        <conditional_style ACTIVE="true" STYLE_REF="?singleInTree" LAST="false">
             <script_condition user_name="single clone in a clone tree">
                 <script>def t = (node.delegate.subtreeClones().size() - 1)
 t &amp;&amp; (node.delegate.allClones().size() - 1) &gt; t</script>
@@ -377,7 +377,7 @@ ol {
 <stylenode TEXT="=Green" COLOR="#52d273">
 <icon BUILTIN="emoji-1F7E2"/>
 </stylenode>
-<stylenode TEXT="markdown" FORMAT="markdownPatternFormat"/>
+<stylenode TEXT=".md" FORMAT="markdownPatternFormat"/>
 <stylenode TEXT="=Blue" COLOR="#7fd4ff">
 <icon BUILTIN="emoji-1F535"/>
 </stylenode>
@@ -651,5 +651,6 @@ ol {
 <attribute NAME="runMe" VALUE="menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node" OBJECT="java.net.URI|menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node"/>
 </node>
 </node>
+<node TEXT="" ID="ID_1235760522"/>
 </node>
 </map>
