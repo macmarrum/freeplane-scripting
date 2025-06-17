@@ -2,7 +2,7 @@
 <!--To view this file, download free mind mapping software Freeplane from https://www.freeplane.org -->
 <node TEXT="macmarrum-dark" LOCALIZED_STYLE_REF="AutomaticLayout.level.root" FOLDED="false" ID="ID_1939172785" VGAP_QUANTITY="20 pt" CHILD_NODES_LAYOUT="AUTO_FIRST" NodeVisibilityConfiguration="SHOW_HIDDEN_NODES"><hook NAME="MapStyle" background="#2b2b2bff">
     <conditional_styles>
-        <conditional_style ACTIVE="true" STYLE_REF="?bigChildGap" LAST="false">
+        <conditional_style ACTIVE="false" STYLE_REF="?bigChildGap" LAST="false">
             <script_condition user_name="any child has more than one child">
                 <script>def hasMoreThanOneChild(n) {
  def ch = n.children
@@ -11,21 +11,21 @@
 node.children.any { hasMoreThanOneChild(it) }</script>
             </script_condition>
         </conditional_style>
-        <conditional_style ACTIVE="true" STYLE_REF="?singleInTree" LAST="false">
+        <conditional_style ACTIVE="false" STYLE_REF="?singleInTree" LAST="false">
             <script_condition user_name="single clone in a clone tree">
                 <script>def t = (node.delegate.subtreeClones().size() - 1)
 t &amp;&amp; (node.delegate.allClones().size() - 1) &gt; t</script>
             </script_condition>
         </conditional_style>
     </conditional_styles>
-    <properties show_icon_for_attributes="true" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff" show_tags="UNDER_NODES" show_note_icons="true" fit_to_viewport="false" show_icons="BESIDE_NODES"/>
+    <properties show_icon_for_attributes="true" edgeColorConfiguration="#a9b7c6ff,#4cc46bff,#e95065ff,#d7b84dff,#c54499ff,#41b1d1ff,#d76b4fff" show_tags="UNDER_NODES" show_note_icons="true" fit_to_viewport="false" show_icons="BESIDE_NODES" showTagCategories="false"/>
     <tags category_separator="::"/>
 
 <map_styles>
 <stylenode LOCALIZED_TEXT="styles.root_node" ID="ID_680156716" STYLE="oval" UNIFORM_SHAPE="true" VGAP_QUANTITY="24 pt">
 <font SIZE="24"/>
 <stylenode LOCALIZED_TEXT="styles.predefined" POSITION="bottom_or_right" STYLE="bubble">
-<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="24 px" FORMAT_AS_HYPERLINK="false" COLOR="#bbbbbb" BACKGROUND_COLOR="#333333" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" TEXT_WRITING_DIRECTION="LEFT_TO_RIGHT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="0 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="192" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" COMMON_HGAP_QUANTITY="14 pt" CHILD_NODES_LAYOUT="AUTO" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
+<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="26 px" FORMAT_AS_HYPERLINK="false" COLOR="#bbbbbb" BACKGROUND_COLOR="#333333" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" TEXT_WRITING_DIRECTION="LEFT_TO_RIGHT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="0 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="192" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" COMMON_HGAP_QUANTITY="14 pt" CHILD_NODES_LAYOUT="AUTO" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
 <arrowlink SHAPE="CUBIC_CURVE" COLOR="#a89984" WIDTH="2" TRANSPARENCY="255" DASH="" FONT_SIZE="9" FONT_FAMILY="SansSerif" DESTINATION="ID_602083445" STARTINCLINATION="102.77419 pt;0 pt;" ENDINCLINATION="102.77419 pt;2.90323 pt;" STARTARROW="NONE" ENDARROW="DEFAULT"/>
 <font NAME="Lato" SIZE="12" BOLD="false" STRIKETHROUGH="false" ITALIC="false"/>
 <edge COLOR="#808080"/>
@@ -377,7 +377,19 @@ ol {
 <stylenode TEXT="=Green" COLOR="#52d273">
 <icon BUILTIN="emoji-1F7E2"/>
 </stylenode>
-<stylenode TEXT="md" FORMAT="markdownPatternFormat"/>
+<stylenode TEXT="markdown" FORMAT="markdownPatternFormat"/>
+<stylenode TEXT="=Blue" COLOR="#7fd4ff">
+<icon BUILTIN="emoji-1F535"/>
+</stylenode>
+<stylenode TEXT="=Purple" COLOR="#c5a3cc">
+<icon BUILTIN="emoji-1F7E3"/>
+</stylenode>
+<stylenode TEXT="=Brown" COLOR="#cc8666">
+<icon BUILTIN="emoji-1F7E4"/>
+</stylenode>
+<stylenode TEXT="=Orange" COLOR="#ffa856">
+<icon BUILTIN="emoji-1F7E0"/>
+</stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="bottom_or_right" STYLE="bubble">
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level.root" ID="ID_1659178249" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="10 pt" VGAP_QUANTITY="20 pt">
