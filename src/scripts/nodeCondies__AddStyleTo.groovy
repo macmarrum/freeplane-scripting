@@ -1,10 +1,8 @@
-/**
- * Copyright (C) 2024  macmarrum (at) outlook (dot) ie
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
+// Copyright (C) 2024, 2025  macmarrum (at) outlook (dot) ie
+// SPDX-License-Identifier: GPL-3.0-or-later
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/NodeCondies"})
 
-import io.github.macmarrum.swing.AutoCompletionComboDialog
+import io.github.macmarrum.swing.ComboBoxDialog
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
@@ -31,7 +29,7 @@ static findSinglesAndCloneLeaders(Iterable<Node> nodes) {
     def singlesAndLeaders = new LinkedList<Node>()
     def subtrees = new HashSet<Node>()
     def clones = new HashSet<Node>()
-    nodes.each { Node n ->
+    for (Node n in nodes) {
         if (n !in subtrees) { // not a tree clone or a clone leader
             def nodesSharingContentAndSubtree = n.nodesSharingContentAndSubtree
             subtrees.addAll(nodesSharingContentAndSubtree)
@@ -44,17 +42,17 @@ static findSinglesAndCloneLeaders(Iterable<Node> nodes) {
     return singlesAndLeaders
 }
 
-def node = node as Node
-def c = c as Controller
+node = node as Node
+c = c as Controller
 def selectedSinglesAndCloneLeaders = findSinglesAndCloneLeaders(c.selecteds)
 
 List<IStyle> currentConditionalStyles
 if (selectedSinglesAndCloneLeaders.size() == 1) {
     def ncsItems = node.conditionalStyles.collect()
     currentConditionalStyles = new ArrayList<IStyle>(ncsItems.size())
-    ncsItems.each {
-        if (it.active && it.always && !it.last)
-            currentConditionalStyles << (it as AConditionalStyleProxy).style
+    for (item in ncsItems) {
+        if (item.active && item.always && !item.last)
+            currentConditionalStyles << (item as AConditionalStyleProxy).style
     }
 } else {
     currentConditionalStyles = Collections.emptyList()
@@ -73,7 +71,7 @@ stylesForComboBox.eachWithIndex { style, i ->
 
 def onEntryAccepted = { JComboBox<String> comboBox ->
     def style = stylesForComboBox[comboBox.selectedIndex]
-    selectedSinglesAndCloneLeaders.each { Node n ->
+    for (n in selectedSinglesAndCloneLeaders) {
         def ncs = n.conditionalStyles
         if (!ncs.find { it.active && it.always && (it as AConditionalStyleProxy).style == style && !it.last }) {
             // use NodeConditionalStyleProxy to add iStyle,
@@ -86,5 +84,5 @@ def onEntryAccepted = { JComboBox<String> comboBox ->
 }
 
 SwingUtilities.invokeLater {
-    new AutoCompletionComboDialog(UITools.currentFrame, 'Add style', styleNamesForComboBox, onEntryAccepted)
+    new ComboBoxDialog(UITools.currentFrame, 'Add style', null, styleNamesForComboBox, onEntryAccepted, true)
 }

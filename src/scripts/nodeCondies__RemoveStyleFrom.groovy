@@ -1,10 +1,8 @@
-/**
- * Copyright (C) 2024  macmarrum (at) outlook (dot) ie
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
+// Copyright (C) 2024, 2025  macmarrum (at) outlook (dot) ie
+// SPDX-License-Identifier: GPL-3.0-or-later
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/NodeCondies"})
 
-import io.github.macmarrum.swing.AutoCompletionComboDialog
+import io.github.macmarrum.swing.ComboBoxDialog
 import org.freeplane.api.ConditionalStyle
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
@@ -28,7 +26,7 @@ static findSinglesAndCloneLeaders(Iterable<Node> nodes) {
     def singlesAndLeaders = new LinkedList<Node>()
     def subtrees = new HashSet<Node>()
     def clones = new HashSet<Node>()
-    nodes.each { Node n ->
+    for (Node n in nodes) {
         if (n !in subtrees) { // not a tree clone or a clone leader
             def nodesSharingContentAndSubtree = n.nodesSharingContentAndSubtree
             subtrees.addAll(nodesSharingContentAndSubtree)
@@ -41,7 +39,7 @@ static findSinglesAndCloneLeaders(Iterable<Node> nodes) {
     return singlesAndLeaders
 }
 
-def c = c as Controller
+c = c as Controller
 def selectedSinglesAndCloneLeaders = findSinglesAndCloneLeaders(c.selecteds)
 
 def stylesForComboBox = new LinkedList<IStyle>()
@@ -51,9 +49,9 @@ IStyle style
 String displayName
 
 selectedSinglesAndCloneLeaders.each { Node n ->
-    n.conditionalStyles.each { ConditionalStyle it ->
-        if (it.active && it.always && !it.last) {
-            style = (it as AConditionalStyleProxy).style
+    for (ConditionalStyle condi in n.conditionalStyles) {
+        if (condi.active && condi.always && !condi.last) {
+            style = (condi as AConditionalStyleProxy).style
             stylesForComboBox << style
             displayName = style as String
             styleNamesForComboBox << (style instanceof StyleTranslatedObject ? "$displayName   (${style.object})".toString() : displayName)
@@ -64,7 +62,7 @@ selectedSinglesAndCloneLeaders.each { Node n ->
 def onEntryAccepted = { JComboBox<String> comboBox ->
     int idx = styleNamesForComboBox.indexOf(comboBox.selectedItem)
     style = stylesForComboBox[idx]
-    selectedSinglesAndCloneLeaders.each { Node n ->
+    for (Node n in selectedSinglesAndCloneLeaders) {
         def ncs = n.conditionalStyles
         ncs.find { ConditionalStyle it ->
             it.active && it.always && (it as AConditionalStyleProxy).style == style && !it.last
@@ -77,8 +75,8 @@ def onEntryAccepted = { JComboBox<String> comboBox ->
 if (styleNamesForComboBox.isEmpty()) {
     UITools.showMessage('No condi styles to remove', JOptionPane.WARNING_MESSAGE)
 } else {
-    def uniqueStyleNamesForComboBox = selectedSinglesAndCloneLeaders.size() == 1 ? styleNamesForComboBox : new TreeSet<String>(styleNamesForComboBox)
+    def uniqueStyleNamesForComboBox = (selectedSinglesAndCloneLeaders.size() == 1 ? styleNamesForComboBox : new TreeSet<String>(styleNamesForComboBox)) as String[]
     SwingUtilities.invokeLater {
-        new AutoCompletionComboDialog(UITools.currentFrame, 'Remove style', uniqueStyleNamesForComboBox.toArray(new String[0]), onEntryAccepted)
+        new ComboBoxDialog(UITools.currentFrame, 'Remove style', null, uniqueStyleNamesForComboBox, onEntryAccepted, true)
     }
 }
