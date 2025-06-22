@@ -1,42 +1,53 @@
-/*
- * Copyright (C) 2022, 2024  macmarrum (at) outlook (dot) ie
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+// Copyright (C) 2022, 2024, 2025  macmarrum (at) outlook (dot) ie
+// SPDX-License-Identifier: GPL-3.0-or-later
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
 
+
+import io.github.macmarrum.swing.ComboBoxDialog
+import io.github.macmarrum.swing.ComboBoxEnricher
+import org.freeplane.api.Controller
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
-import org.freeplane.features.map.NodeModel
-import org.freeplane.plugin.script.proxy.ScriptUtils
 
 import javax.swing.*
 
-final c = ScriptUtils.c()
-final nodeModel = c.selected.delegate as NodeModel
-final regexPattern = UITools.showInputDialog(nodeModel, 'NB Special characters <([{\\^-=$!|]})?*+.>', 'Split On Regex', JOptionPane.QUESTION_MESSAGE)
-if (regexPattern !in [null, '']) {
+c = c as Controller
+def title = 'Split On Regex'
+def checkboxText = 'V&ertically'
+def message = 'NB Special characters <([{\\^-=$!|]})?*+.>'
+def regexPatterns = [
+        $/\s+(?=([^"'\[]*["'\[][^"'\]]*["'\]])*[^"'\[\]]*$)/$,
+        /\n+/,
+        /,\s*/,
+        /\s+/,
+]
+
+def onEntryAccepted = { JComboBox<String> comboBox, JCheckBox checkBox ->
+    def regexPattern = comboBox.editor.item as String
+    def isVertically = checkBox.isSelected()
     c.selecteds.each { Node nodeToBeSplit ->
-        def newlyCreatedChild = nodeToBeSplit  // the initial one is the original node
+        def newlyCreatedChild = nodeToBeSplit
         def children = nodeToBeSplit.children
-        nodeToBeSplit.text.split(regexPattern).each {
-            newlyCreatedChild = newlyCreatedChild.createChild(it.trim())
-            newlyCreatedChild.style.name = nodeToBeSplit.style.name
-            nodeToBeSplit.conditionalStyles.each {
-                newlyCreatedChild.conditionalStyles.add(it)
+        def textSegments = nodeToBeSplit.text.split(regexPattern)
+        if (textSegments.size() > 1) {
+            for (textSegment in textSegments) {
+                def nodeForCreateChild = isVertically ? nodeToBeSplit : newlyCreatedChild
+                newlyCreatedChild = nodeForCreateChild.createChild(textSegment.trim())
+                newlyCreatedChild.style.name = nodeToBeSplit.style.name
+                nodeToBeSplit.conditionalStyles.each {
+                    newlyCreatedChild.conditionalStyles.add(it)
+                }
+            }
+            nodeToBeSplit.text = null
+            for (child in children) {
+                child.moveTo(newlyCreatedChild)
             }
         }
-        children.each { it.moveTo(newlyCreatedChild) }
     }
+}
+
+def onCheckboxToggled = onEntryAccepted
+
+SwingUtilities.invokeLater {
+    new ComboBoxDialog(UITools.currentFrame, ComboBoxEnricher, title, regexPatterns as String[], onEntryAccepted, message, checkboxText, onCheckboxToggled)
 }
