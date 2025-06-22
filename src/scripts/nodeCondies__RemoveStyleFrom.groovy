@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/NodeCondies"})
 
+
+import io.github.macmarrum.swing.AutoCompletionComboBoxEnricher
 import io.github.macmarrum.swing.ComboBoxDialog
 import org.freeplane.api.ConditionalStyle
 import org.freeplane.api.Controller
@@ -59,7 +61,7 @@ selectedSinglesAndCloneLeaders.each { Node n ->
     }
 }
 
-def onEntryAccepted = { JComboBox<String> comboBox ->
+def onEntryAccepted = { JComboBox<String> comboBox, JCheckBox _ ->
     int idx = styleNamesForComboBox.indexOf(comboBox.selectedItem)
     style = stylesForComboBox[idx]
     for (Node n in selectedSinglesAndCloneLeaders) {
@@ -77,6 +79,6 @@ if (styleNamesForComboBox.isEmpty()) {
 } else {
     def uniqueStyleNamesForComboBox = (selectedSinglesAndCloneLeaders.size() == 1 ? styleNamesForComboBox : new TreeSet<String>(styleNamesForComboBox)) as String[]
     SwingUtilities.invokeLater {
-        new ComboBoxDialog(UITools.currentFrame, 'Remove style', null, uniqueStyleNamesForComboBox, onEntryAccepted, true)
+        new ComboBoxDialog(UITools.currentFrame, AutoCompletionComboBoxEnricher, 'Remove style', uniqueStyleNamesForComboBox, onEntryAccepted)
     }
 }

@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/NodeCondies"})
 
+
+import io.github.macmarrum.swing.AutoCompletionComboBoxEnricher
 import io.github.macmarrum.swing.ComboBoxDialog
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
@@ -69,7 +71,7 @@ stylesForComboBox.eachWithIndex { style, i ->
     styleNamesForComboBox[i] = style instanceof StyleTranslatedObject ? "$displayName   (${style.object})".toString() : displayName
 }
 
-def onEntryAccepted = { JComboBox<String> comboBox ->
+def onEntryAccepted = { JComboBox<String> comboBox, JCheckBox _ ->
     def style = stylesForComboBox[comboBox.selectedIndex]
     for (n in selectedSinglesAndCloneLeaders) {
         def ncs = n.conditionalStyles
@@ -84,5 +86,5 @@ def onEntryAccepted = { JComboBox<String> comboBox ->
 }
 
 SwingUtilities.invokeLater {
-    new ComboBoxDialog(UITools.currentFrame, 'Add style', null, styleNamesForComboBox, onEntryAccepted, true)
+    new ComboBoxDialog(UITools.currentFrame, AutoCompletionComboBoxEnricher, 'Add style', styleNamesForComboBox, onEntryAccepted)
 }
