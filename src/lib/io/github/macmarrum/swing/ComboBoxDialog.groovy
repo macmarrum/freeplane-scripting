@@ -17,13 +17,13 @@ class ComboBoxDialog {
      * JDialog with an editable comboBox
      *
      * @param parent component for {@code locationRelativeTo}, can be null
-     * @param comboboxEnricher {@link ComboBox} (default) or {@link AutoCompletionComboBox}
+     * @param comboboxEnricher {@link ComboBoxEnricher} (default) or {@link AutoCompletionComboBoxEnricher}
      * @param title window title
      * @param elements an array of combobox elements
-     * @param onEntryAccepted closure accepting comboBox, checkBox as its arguments - see {@link ComboBox}, {@link AutoCompletionComboBox}
+     * @param onEntryAccepted closure accepting comboBox, checkBox as its arguments - see {@link ComboBoxEnricher}, {@link AutoCompletionComboBoxEnricher}
      * @param message (optional) text above combobox
      * @param checkboxText (optional) checkbox above message
-     * @param onCheckboxToggled closure accepting comboBox, checkBox as its arguments - see {@link ComboBox}, {@link AutoCompletionComboBox}
+     * @param onCheckboxToggled closure accepting comboBox, checkBox as its arguments - see {@link ComboBoxEnricher}, {@link AutoCompletionComboBoxEnricher}
      */
     ComboBoxDialog(final Component parent, Class comboboxEnricher = null, final String title, final String[] elements, Closure onEntryAccepted, final String message = null, final String checkboxText = null, Closure onCheckboxToggled = null) {
         dialog = new JDialog()
@@ -62,7 +62,7 @@ class ComboBoxDialog {
         }
         // enrich comboBox
         if (comboboxEnricher == null)
-            comboboxEnricher = ComboBox.class
+            comboboxEnricher = ComboBoxEnricher.class
         def enricherConstructor = comboboxEnricher.getConstructor(Window.class, JComboBox.class, Closure.class)
         def _enricher = enricherConstructor.newInstance(dialog, comboBox, onEntryAcceptedWithoutCheckBox)
         dialog.visible = true
