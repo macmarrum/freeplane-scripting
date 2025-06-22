@@ -1,7 +1,6 @@
-/**
- * Copyright (C) 2024  macmarrum (at) outlook (dot) ie
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
+// Copyright (C) 2024, 2025  macmarrum (at) outlook (dot) ie
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
 // Based on http://www.orbital-computer.de/JComboBox/
 // which contains the following notice:
 //* This work is hereby released into the Domain.
@@ -34,16 +33,15 @@ class AutoCompletionComboBox extends PlainDocument {
     private FocusListener editorFocusListener
 
     /**
-     * Enriches the supplied JComboBox with auto-completion
+     * Enriches the supplied (editable) JComboBox with auto-completion
      *
-     * @param window (optional) JFrame or JDialog, where the comboBox is part of. Window will be closed on Ctrl+L/ENTER or Ctrl+H/ESCAPE
-     * @param comboBox (mandatory) JComboBox to be enriched with auto-completion
-     * @param onEntryAccepted (mandatory) closure accepting comboBox as its argument. It'll be called before WINDOW_CLOSING is emitted
+     * @param comboBox (mandatory) editable JComboBox to be enriched with auto-completion
+     * @param onEntryAccepted (mandatory) closure accepting comboBox as its argument; called before WINDOW_CLOSING is emitted
+     * @param window (optional) JFrame or JDialog, where the comboBox is part of; will be closed on Ctrl+L/ENTER or Ctrl+H/ESCAPE
      */
     AutoCompletionComboBox(final Window window, final JComboBox comboBox, final Closure onEntryAccepted) {
         this.window = window
         this.comboBox = comboBox
-        comboBox.editable = true
         model = comboBox.model
         comboBox.addActionListener(new ActionListener() {
             void actionPerformed(ActionEvent e) {
@@ -64,44 +62,39 @@ class AutoCompletionComboBox extends PlainDocument {
                 if (comboBox.isDisplayable())
                     comboBox.popupVisible = true
                 hitBackspace = false
-                if (e.modifiersEx & KeyEvent.CTRL_DOWN_MASK) {
-                    switch (e.keyCode) {
-                        case KeyEvent.VK_J -> {
-                            comboBox.selectedIndex = comboBox.selectedIndex == comboBox.itemCount - 1 ? 0 : comboBox.selectedIndex + 1
-                        }
-                        case KeyEvent.VK_K -> {
-                            comboBox.selectedIndex = comboBox.selectedIndex == 0 ? comboBox.itemCount - 1 : comboBox.selectedIndex - 1
-                        }
-                        case KeyEvent.VK_L -> {
+                def isCtrl = (e.modifiersEx & KeyEvent.CTRL_DOWN_MASK) != 0
+                switch (e.keyCode) {
+                    case KeyEvent.VK_J:
+                        comboBox.selectedIndex = comboBox.selectedIndex == comboBox.itemCount - 1 ? 0 : comboBox.selectedIndex + 1
+                        break
+                    case KeyEvent.VK_K:
+                        comboBox.selectedIndex = comboBox.selectedIndex == 0 ? comboBox.itemCount - 1 : comboBox.selectedIndex - 1
+                        break
+                    case KeyEvent.VK_L:
+                    case KeyEvent.VK_ENTER:
+                        if (isCtrl || e.keyCode == KeyEvent.VK_ENTER) {
                             onEntryAccepted(comboBox)
                             if (window)
                                 window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING))
                         }
-                        case KeyEvent.VK_H -> {
+                        break
+                    case KeyEvent.VK_H:
+                    case KeyEvent.VK_ESCAPE:
+                        if (isCtrl || e.keyCode == KeyEvent.VK_ESCAPE) {
                             if (window)
                                 window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING))
                         }
-                    }
-                } else {
-                    switch (e.keyCode) {
-                        case KeyEvent.VK_BACK_SPACE -> {
-                            // determine if the pressed key is backspace (needed by the remove method)
-                            hitBackspace = true
-                            hitBackspaceOnSelection = editor.selectionStart != editor.selectionEnd
-                        }
-                        case KeyEvent.VK_DELETE -> {
-                            // ignore delete key
-                            e.consume()
-                            comboBox.toolkit.beep()
-                        }
-                        case KeyEvent.VK_ENTER -> {
-                            editor.dispatchEvent(new KeyEvent(editor, e.ID, e.when, KeyEvent.CTRL_DOWN_MASK, KeyEvent.VK_L, 'l' as char))
-                        }
-                        case KeyEvent.VK_ESCAPE -> {
-                            editor.dispatchEvent(new KeyEvent(editor, e.ID, e.when, KeyEvent.CTRL_DOWN_MASK, KeyEvent.VK_H, 'h' as char))
-                        }
-
-                    }
+                        break
+                    case KeyEvent.VK_BACK_SPACE:
+                        // determine if the pressed key is backspace (needed by the remove method)
+                        hitBackspace = true
+                        hitBackspaceOnSelection = editor.selectionStart != editor.selectionEnd
+                        break
+                    case KeyEvent.VK_DELETE:
+                        // ignore delete key
+                        e.consume()
+                        comboBox.toolkit.beep()
+                        break
                 }
             }
         }
@@ -117,7 +110,6 @@ class AutoCompletionComboBox extends PlainDocument {
         if (selected != null)
             text = selected.toString()
         highlightCompletedText(0)
-        window.visible = true
     }
 
     void configureEditor(ComboBoxEditor newEditor) {
@@ -172,7 +164,7 @@ class AutoCompletionComboBox extends PlainDocument {
             // provide feedback to the user that his input has been received but can not be accepted
             comboBox.toolkit.beep() // when available use: UIManager.getLookAndFeel().provideErrorFeedback(comboBox)
         }
-        text = item.toString()
+        setText(item.toString())
         // select the completed part
         highlightCompletedText(offs + str.length())
     }
