@@ -13,10 +13,16 @@ class ComboBox {
     private JComboBox comboBox
     private Window window
 
+    /**
+     * Enriches the supplied (editable) JComboBox with a keyListener
+     *
+     * @param comboBox (mandatory) editable JComboBox to be enriched with auto-completion
+     * @param onEntryAccepted (mandatory) closure accepting comboBox as its argument; called before WINDOW_CLOSING is emitted
+     * @param window (optional) JFrame or JDialog, where the comboBox is part of; will be closed on Ctrl+L/ENTER or Ctrl+H/ESCAPE
+     */
     ComboBox(final Window window, final JComboBox comboBox, final Closure onEntryAccepted) {
         this.window = window
         this.comboBox = comboBox
-        comboBox.editable = true
 
         def editorKeyListener = new KeyAdapter() {
             void keyPressed(KeyEvent e) {
@@ -35,7 +41,6 @@ class ComboBox {
                     case KeyEvent.VK_L:
                     case KeyEvent.VK_ENTER:
                         if (isCtrl || e.keyCode == KeyEvent.VK_ENTER) {
-                            e.consume() // Consume the event to prevent it from propagating further (e.g., newline in editor)
                             onEntryAccepted(comboBox)
                             if (window)
                                 window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING))
@@ -44,7 +49,6 @@ class ComboBox {
                     case KeyEvent.VK_H:
                     case KeyEvent.VK_ESCAPE:
                         if (isCtrl || e.keyCode == KeyEvent.VK_ESCAPE) {
-                            e.consume() // Consume ESCAPE to prevent default behavior
                             if (window)
                                 window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING))
                         }
@@ -55,9 +59,5 @@ class ComboBox {
 
         def editorComponent = comboBox.getEditor().getEditorComponent()
         editorComponent.addKeyListener(editorKeyListener)
-
-        if (window != null) {
-            window.visible = true
-        }
     }
 }
