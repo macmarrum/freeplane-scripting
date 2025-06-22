@@ -18,7 +18,7 @@ import java.awt.event.*
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
-class AutoCompletionComboBox extends PlainDocument {
+class AutoCompletionComboBoxEnricher extends PlainDocument {
     private JComboBox comboBox
     private Window window
     private ComboBoxModel model
@@ -39,7 +39,7 @@ class AutoCompletionComboBox extends PlainDocument {
      * @param onEntryAccepted (mandatory) closure accepting comboBox as its argument; called before WINDOW_CLOSING is emitted
      * @param window (optional) JFrame or JDialog, where the comboBox is part of; will be closed on Ctrl+L/ENTER or Ctrl+H/ESCAPE
      */
-    AutoCompletionComboBox(final Window window, final JComboBox comboBox, final Closure onEntryAccepted) {
+    AutoCompletionComboBoxEnricher(final Window window, final JComboBox comboBox, final Closure onEntryAccepted) {
         this.window = window
         this.comboBox = comboBox
         model = comboBox.model

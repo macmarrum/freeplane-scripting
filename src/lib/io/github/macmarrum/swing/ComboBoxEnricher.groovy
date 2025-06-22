@@ -9,7 +9,7 @@ import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.WindowEvent
 
-class ComboBox {
+class ComboBoxEnricher {
     private JComboBox comboBox
     private Window window
 
@@ -20,7 +20,7 @@ class ComboBox {
      * @param onEntryAccepted (mandatory) closure accepting comboBox as its argument; called before WINDOW_CLOSING is emitted
      * @param window (optional) JFrame or JDialog, where the comboBox is part of; will be closed on Ctrl+L/ENTER or Ctrl+H/ESCAPE
      */
-    ComboBox(final Window window, final JComboBox comboBox, final Closure onEntryAccepted) {
+    ComboBoxEnricher(final Window window, final JComboBox comboBox, final Closure onEntryAccepted) {
         this.window = window
         this.comboBox = comboBox
 
