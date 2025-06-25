@@ -1,30 +1,48 @@
+/*
+ * Copyright (C) 2023-2025  macmarrum (at) outlook (dot) ie
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Select"})
 // https://github.com/freeplane/freeplane/issues/316
 
 
+import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
+import org.freeplane.core.util.FreeplaneVersion
 import org.freeplane.core.util.MenuUtils
 import org.freeplane.features.map.MapModel
 import org.freeplane.features.map.NodeModel
 import org.freeplane.features.mode.Controller
 import org.freeplane.features.url.NodeAndMapReference
-import org.freeplane.plugin.script.proxy.ScriptUtils
 import org.freeplane.view.swing.map.MapViewController
 
+import javax.swing.Timer
 import javax.swing.JOptionPane
 import java.nio.charset.StandardCharsets
 
-def c = ScriptUtils.c()
-def node = ScriptUtils.node()
+c = c as org.freeplane.api.Controller
+node = node as Node
+def FP_VER = FreeplaneVersion.version
+def FP_1_12_9 = FreeplaneVersion.getVersion('1.12.9')
+
+def toggleSpotlight() {
+    // org.freeplane.features.styles.SetBooleanMapViewPropertyAction.actionPerformed
+    def propertyName = 'spotlight'
+    def mapViewComponent = Controller.getCurrentController().getMapViewManager().getMapViewComponent()
+    final Boolean value = Boolean.TRUE.equals(mapViewComponent.getClientProperty(propertyName))
+    boolean newValue = !value.booleanValue()
+    mapViewComponent.putClientProperty(propertyName, newValue)
+}
+
 def targetNode = node.link.node // resolves #ID and #at
-def linkText = node.link.text?.replaceAll($/^freeplane:/%20/$, '') // remove the prefix because it messes up nodeAndMapReference
+def linkText = node.link.text?.replaceFirst($/^freeplane:/%20/$, '') // remove the prefix because it messes up nodeAndMapReference
 if (!targetNode) { // not the case of same-map target node or a full node URI is used as the link
     // work out what the target node is
     if (linkText && node.link.uri.scheme !in ['menuitem', 'file', 'https', 'http']) {
         def nodeAndMapReference = new NodeAndMapReference(linkText)
         if (nodeAndMapReference.hasFreeplaneFileExtension() && nodeAndMapReference.hasNodeReference()) {
             def thisFile = node.mindMap.file
-            def mapReferenceDecoded = URLDecoder.decode(nodeAndMapReference.mapReference, StandardCharsets.UTF_8.name())
+            def mapReferenceDecoded = URLDecoder.decode(nodeAndMapReference.getMapReference(), StandardCharsets.UTF_8.name())
             def targetFile = new File(mapReferenceDecoded)
             if (!targetFile.absolute) {
                 if (!thisFile) {
@@ -54,15 +72,16 @@ if (!targetNode) { // not the case of same-map target node or a full node URI is
 if (targetNode) { // same-map target node
     def targetNodeModel = targetNode.delegate as NodeModel
     // based on org.freeplane.plugin.script.proxy.ControllerProxy#getMapViewManager
-    def mvc = Controller.currentController.mapViewManager as MapViewController
+    def mvc = Controller.getCurrentController().getMapViewManager() as MapViewController
     def thisMapModel = node.mindMap.delegate as MapModel
-    def thisMapView = mvc.mapView
+    def thisMapView = mvc.getMapView()
+    def allMapViews = FP_VER >= FP_1_12_9 ? mvc.getMapViews() : mvc.getMapViewVector()
     def findOtherMapView = {
-        mvc.mapViewVector.find {
+        allMapViews.find {
             try {
-                it !== thisMapView && it.map === thisMapModel
+                it !== thisMapView && it.getMap() === thisMapModel
             } catch (MissingPropertyException ignore) { // before 1.11.8-pre01
-                it !== thisMapView && it.model === thisMapModel
+                it !== thisMapView && it.getModel() === thisMapModel
             }
         }
     }
@@ -77,7 +96,10 @@ if (targetNode) { // same-map target node
     Controller.getCurrentModeController().getMapController().displayNode(targetNodeModel)
     Controller.getCurrentController().getSelection().selectAsTheOnlyOneSelected(targetNodeModel)
     c.statusInfo = "${this.class.simpleName}:  $linkText "
+    // flash spotlight
+    toggleSpotlight()
+    // Timer executes its listeners on the Event Dispatch Thread (EDT), which is crucial for Swing's thread safety
+    new Timer(400, { evt -> toggleSpotlight(); evt.source.stop() }).start()
 } else {
     c.statusInfo = "${this.class.simpleName}:  no link found! "
 }
-
