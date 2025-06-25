@@ -113,8 +113,9 @@ class Export {
             'AutomaticLayout.level,6'   : '#######',
     ]
     public static mdSettings = [h1: MdH1.ROOT, details: MdInclude.HLB, note: MdInclude.PLAIN, lsToH: LEVEL_STYLE_TO_HEADING, skip1: false, ulStyle: 'ulBullet', olStyle: 'olBullet']
-    public static csvSettings = [sep: COMMA, eol: NL, nl: null, np: NodePart.CORE, skip1: false, tail: false, quote: 'MINIMAL']
+    public static csvSettings = [sep: COMMA, eol: NL, nl: null, np: NodePart.CORE, skip1: false, frame: false, quote: 'MINIMAL']
     public static jsonSettings = [core: true, details: true, note: true, attributes: true, transformed: true, plain: true, format: false, dateFmt: DateFmt.ISO_LOCAL, style: false, formatting: false, icons: false, tags: false, link: false, skip1: false, denullify: false, pretty: false, forceId: false, forceAttribList: false]
+    public static bulletSettings = [mkBullet: null, transformed: true, plain: true, nl: PILCROW, link: true, skip1: false]
 
     enum NodePart {
         CORE, DETAILS, NOTE
@@ -218,7 +219,7 @@ class Export {
      *  olStyle -- the style of nodes to be output as ol bullets;
      */
     static String _toMarkdownAppendable(Appendable appendable, Node node, HashMap<String, Object> settings = null) {
-        settings = !settings ? mdSettings.clone() : mdSettings + settings
+        settings = settings ? mdSettings + settings : mdSettings.clone()
         def mdH1 = settings.h1 as MdH1
         def ulOlStyles = [settings.ulStyle as String, settings.olStyle as String]
         def levelStyleToHeading = settings.getOrDefault('levelStyleToHeading', settings.lsToH) as Map<String, String>
@@ -387,16 +388,16 @@ class Export {
      * @param appendable the object to append to
      * @param node the starting node for the export (see also settings.skip1)
      * @param settings a hashMap -- see csvSettings for default values =>
-     *  sep -- separator to use;
-     *  eol -- end of line to use;
-     *  nl -- in-value new-line replacement (e.g. CR in place on NL);
-     *  np -- NodePart to take the value from;
-     *  skip1 -- whether to skip the first node;
-     *  tail -- whether to put Separator after the last value;
+     *  sep -- String: separator to use;
+     *  eol -- String: end of line to use;
+     *  nl -- String: in-value new-line replacement (e.g. CR in place on NL);
+     *  np -- String or NodePart to take the value from, CORE by default - ['CORE' | 'DETAILS' | 'NOTE'];
+     *  skip1 -- boolean: whether to skip the first node;
+     *  frame -- boolean: whether to put Separator before the first and after the last value;
      *  quote -- org.apache.commons.csv.QuoteMode name or (boolean to force quotes around each value | default: auto-quote when sep or NL or CR in value);
      */
     static void _toCsvAppendable(Appendable appendable, Node node, HashMap<String, Object> settings) {
-        settings = !settings ? csvSettings.clone() : csvSettings + settings
+        settings = settings ? csvSettings + settings : csvSettings.clone()
         def sep = settings.sep as String
         def eol = settings.eol as String
         def newlineReplacement = settings.getOrDefault('newlineReplacement', settings.nl) as String
@@ -411,7 +412,7 @@ class Export {
         }
         def skip1 = settings.skip1 as boolean
         def numOfNodesToIgnore = skip1 ? 1 : settings.getOrDefault('numOfNodesToIgnore', settings.getOrDefault('skip', 0)) as int
-        def sepAtRowEnds = settings.getOrDefault('sepAtRowEnds', settings.tail) as boolean
+        def sepAtRowEnds = settings.getOrDefault('sepAtRowEnds', settings.getOrDefault('frame', settings.tail)) as boolean
         def rows = createListOfRows(node, numOfNodesToIgnore)
         def rowSizes = rows.collect { it.size() }
         def maxRowSize = rowSizes.max()
@@ -563,7 +564,7 @@ class Export {
      * @return JSON representation of the branch, in UTF-8 encoding
      */
     static String toJsonString(Node node, HashMap<String, Object> settings = null) {
-        settings = !settings ? jsonSettings.clone() : jsonSettings + settings
+        settings = settings ? jsonSettings + settings : jsonSettings.clone()
         def forceId = settings.forceId as boolean
         def core = _toJson_calcCore(node, settings)
         def useAtCore = forceId || core == null || core instanceof List || core as String in JSON_RESERVED_CORE
@@ -880,4 +881,41 @@ class Export {
         }
         return newHashMap
     }
+
+    static void _toBulletListAppendable(Appendable appendable, Node node, HashMap<String, Object> settings = null, int level = 1) {
+        settings = settings ? bulletSettings + settings : bulletSettings.clone()
+        if (settings.skip1 && level == 1) {
+            settings.skip1 = false
+            level = 0
+        } else {
+            def mkBullet = settings.mkBullet as Closure<String>
+            appendable << (mkBullet ? mkBullet(level, node) : '  ' * (level - 1) + '- ')
+            String value
+            if (settings.transformed)
+                value = settings.plain ? HtmlUtils.htmlToPlain(node.transformedText) : node.transformedText
+            else
+                value = settings.plain ? node.plainText : node.text
+            def newlineReplacement = settings.getOrDefault('newlineReplacement', settings.nl) as String
+            if (newlineReplacement)
+                value = value.replace(NL, newlineReplacement)
+            appendable << value
+            if (settings.link) {
+                def linkText = node.link.text
+                if (linkText)
+                    appendable << ' <' << linkText << '>'
+            }
+            appendable << NL
+        }
+        for (child in node.children) {
+            if (child.isVisible())
+                _toBulletListAppendable(appendable, child, settings, level + 1)
+        }
+    }
+
+    static String toBulletListString(Node node, HashMap<String, Object> settings = null) {
+        def sb = new StringBuilder()
+        _toBulletListAppendable(sb, node, settings)
+        return sb.toString()
+    }
+
 }
