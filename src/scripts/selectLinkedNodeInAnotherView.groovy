@@ -16,16 +16,17 @@ import org.freeplane.features.mode.Controller
 import org.freeplane.features.url.NodeAndMapReference
 import org.freeplane.view.swing.map.MapViewController
 
-import javax.swing.Timer
-import javax.swing.JOptionPane
+import javax.swing.*
 import java.nio.charset.StandardCharsets
+
+import static org.freeplane.plugin.script.GroovyStaticImports.config
 
 c = c as org.freeplane.api.Controller
 node = node as Node
 def FP_VER = FreeplaneVersion.version
 def FP_1_12_9 = FreeplaneVersion.getVersion('1.12.9')
 
-def toggleSpotlight() {
+static def toggleSpotlight() {
     // org.freeplane.features.styles.SetBooleanMapViewPropertyAction.actionPerformed
     def propertyName = 'spotlight'
     def mapViewComponent = Controller.getCurrentController().getMapViewManager().getMapViewComponent()
@@ -34,8 +35,12 @@ def toggleSpotlight() {
     mapViewComponent.putClientProperty(propertyName, newValue)
 }
 
-def targetNode = node.link.node // resolves #ID and #at
-def linkText = node.link.text?.replaceFirst($/^freeplane:/%20/$, '') // remove the prefix because it messes up nodeAndMapReference
+Node targetNode = null
+String linkText = null
+if (config.getBooleanProperty('_select_linked_node_in_another_view', true)) {
+    targetNode = node.link.node // resolves #ID and #at
+    linkText = node.link.text?.replaceFirst($/^freeplane:/%20/$, '') // remove the prefix because it messes up nodeAndMapReference
+}
 if (!targetNode) { // not the case of same-map target node or a full node URI is used as the link
     // work out what the target node is
     if (linkText && node.link.uri.scheme !in ['menuitem', 'file', 'https', 'http']) {
