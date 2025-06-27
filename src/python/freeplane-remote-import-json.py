@@ -1,18 +1,6 @@
 #!/usr/bin/python3
-# Copyright (C) 2023, 2024  macmarrum (at) outlook (dot) ie
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# Copyright (C) 2023-2025  macmarrum (at) outlook (dot) ie
+# SPDX-License-Identifier: GPL-3.0-or-later
 import os
 import socket
 import sys
@@ -21,8 +9,6 @@ from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
 from typing import Union
-
-via_base64 = False
 
 host = os.environ.get('FREEPLANE_REMOTE_CONTROL_HOST', '127.0.0.1')
 port = int(port) if (port := os.environ.get('FREEPLANE_REMOTE_CONTROL_PORT')) else 48112
@@ -52,27 +38,27 @@ def quote_path(path: Union[str, Path]) -> str:
     raise ValueError(f"unable to quote path `{path}`")
 
 
-# path to the json file is the first argument to the script
-json_path = Path(sys.argv[1]).absolute()
+def import_json(json_path: Path, via_base64=False):
+    if via_base64:
+        json_data = json_path.read_text(encoding=encoding)
+        json_base64 = base64.b64encode(json_data.encode(encoding)).decode('L1')
+        groovy_script = dedent(f"""\
+        import io.github.macmarrum.freeplane.Import
+        def n = Import.fromJsonStringBase64('{json_base64}', node)
+        c.select(n)
+        """)
+    else:
+        groovy_script = dedent(f"""\
+        import io.github.macmarrum.freeplane.Import
+        def file = new File({quote_path(json_path)})
+        def n = Import.fromJsonFile(file, node)
+        c.select(n)
+        """)
+    return transfer(groovy_script)
 
-if via_base64:
-    json_data = json_path.read_text(encoding=encoding)
-    json_base64 = base64.b64encode(json_data.encode(encoding)).decode('L1')
-    groovy_script = dedent(f"""\
-    import io.github.macmarrum.freeplane.Import
-    def parent = node.mindMap.root.createChild()
-    parent.text = '{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
-    def n = Import.fromJsonStringBase64('{json_base64}', parent)
-    c.select(n)
-    """)
-else:
-    groovy_script = dedent(f"""\
-    import io.github.macmarrum.freeplane.Import
-    def parent = node.mindMap.root.createChild()
-    parent.text = '{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
-    def file = new File({quote_path(json_path)})
-    def n = Import.fromJsonFile(file, parent)
-    c.select(n)
-    """)
-result = transfer(groovy_script)
-print(result)
+
+if __name__ == '__main__':
+    # path to the json file is the first argument to the script
+    json_path = Path(sys.argv[1]).absolute()
+    result = import_json(json_path)
+    print(result)
