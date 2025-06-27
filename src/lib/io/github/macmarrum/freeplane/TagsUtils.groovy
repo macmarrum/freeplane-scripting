@@ -1,5 +1,7 @@
-// Copyright (C) 2024  macmarrum (at) outlook (dot) ie
-// SPDX-License-Identifier: GPL-3.0-or-later
+/*
+ * Copyright (C) 2024-2025  macmarrum (at) outlook (dot) ie
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 package io.github.macmarrum.freeplane
 
 import groovy.json.JsonGenerator
@@ -8,6 +10,7 @@ import org.freeplane.api.Node
 
 class TagsUtils {
     public static final String preBranchTags = 'preBranchTags'
+    public static final String preHideTags = 'preHideTags'
     private static final JsonGenerator jsonGenerator = new JsonGenerator.Options().disableUnicodeEscaping().build()
     private static final JsonSlurper jsonSlurper = new JsonSlurper()
 
@@ -18,8 +21,8 @@ class TagsUtils {
         }
         def nodeTags = node.tags.tags
         if (branchTags != new TreeSet(nodeTags)) {
-            node[preBranchTags] = jsonGenerator.toJson(nodeTags)
             node.tags.tags = branchTags
+            node[preBranchTags] = jsonGenerator.toJson(nodeTags)
         }
     }
 
@@ -27,7 +30,27 @@ class TagsUtils {
         if (preBranchTagsJson === null)
             preBranchTagsJson = node[preBranchTags].text
         def originalTags = jsonSlurper.parseText(preBranchTagsJson)
-        node.tags.tags = originalTags
-        node[preBranchTags] = null
+        if (originalTags) {
+            node.tags.tags = originalTags
+            node[preBranchTags] = null
+        }
+    }
+
+    static void hideNodeTags(Node node) {
+        def nodeTags = node.tags.tags
+        if (nodeTags) {
+            node.tags.tags = []
+            node[preHideTags] = jsonGenerator.toJson(nodeTags)
+        }
+    }
+
+    static void showNodeTags(Node node, String preTagsHiddenJson = null) {
+        if (preTagsHiddenJson == null)
+            preTagsHiddenJson = node[preHideTags].text
+        def originalTags = jsonSlurper.parseText(preTagsHiddenJson)
+        if (originalTags) {
+            node.tags.tags = originalTags
+            node[preHideTags] = null
+        }
     }
 }
