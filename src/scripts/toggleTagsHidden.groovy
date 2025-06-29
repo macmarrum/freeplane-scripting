@@ -9,10 +9,10 @@ import org.freeplane.api.Node
 
 c = c as Controller
 c.selecteds.each { Node node ->
-    def preTagsHiddenJson = node[TagsUtils.preHideTags].text
-    if (preTagsHiddenJson) {
-        TagsUtils.showNodeTags(node, preTagsHiddenJson)
+    def preStashTagsJson = node[TagsUtils.preStashTags].text
+    if (preStashTagsJson) {
+        TagsUtils.unstashNodeTags(node, preStashTagsJson)
     } else {
-        TagsUtils.hideNodeTags(node)
+        TagsUtils.stashNodeTags(node)
     }
 }

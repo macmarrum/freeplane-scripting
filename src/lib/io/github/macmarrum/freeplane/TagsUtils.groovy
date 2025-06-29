@@ -10,7 +10,7 @@ import org.freeplane.api.Node
 
 class TagsUtils {
     public static final String preBranchTags = 'preBranchTags'
-    public static final String preHideTags = 'preHideTags'
+    public static final String preStashTags = 'preStashTags'
     private static final JsonGenerator jsonGenerator = new JsonGenerator.Options().disableUnicodeEscaping().build()
     private static final JsonSlurper jsonSlurper = new JsonSlurper()
 
@@ -36,21 +36,21 @@ class TagsUtils {
         }
     }
 
-    static void hideNodeTags(Node node) {
+    static void stashNodeTags(Node node) {
         def nodeTags = node.tags.tags
         if (nodeTags) {
             node.tags.tags = []
-            node[preHideTags] = jsonGenerator.toJson(nodeTags)
+            node[preStashTags] = jsonGenerator.toJson(nodeTags)
         }
     }
 
-    static void showNodeTags(Node node, String preTagsHiddenJson = null) {
-        if (preTagsHiddenJson == null)
-            preTagsHiddenJson = node[preHideTags].text
-        def originalTags = jsonSlurper.parseText(preTagsHiddenJson)
+    static void unstashNodeTags(Node node, String preStashTagsJson = null) {
+        if (preStashTagsJson == null)
+            preStashTagsJson = node[preStashTags].text
+        def originalTags = jsonSlurper.parseText(preStashTagsJson)
         if (originalTags) {
             node.tags.tags = originalTags
-            node[preHideTags] = null
+            node[preStashTags] = null
         }
     }
 }
