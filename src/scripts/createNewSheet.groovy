@@ -6,6 +6,7 @@
 
 
 import org.freeplane.api.Node
+import org.freeplane.api.Side
 import org.freeplane.core.util.MenuUtils
 
 node = node as Node
@@ -25,6 +26,9 @@ def name = "Sheet${maxNum + 1}" as String
 // create it
 def sheet = root.createChild(name)
 sheet.id // after 1.12.12-pre08 it won't be needed - fixed in d87b619f
+sheet.createChild().setSideAtRoot(Side.TOP_OR_LEFT)
+sheet.createChild().setSideAtRoot(Side.BOTTOM_OR_RIGHT)
+sheet.folded = true
 sheet.setBookmark(name, 'ROOT')
 sheet.bookmark.open()
 MenuUtils.executeMenuItems(['NodeEnumerationAction.NodeVisibility.HIDDEN'])
