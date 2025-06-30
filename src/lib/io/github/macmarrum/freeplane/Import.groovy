@@ -58,6 +58,7 @@ class Import {
     private static final String ICONS = '@icons'
     private static final String LINK = '@link'
     private static final String NOTE = '@note'
+    private static final String PROPS = '@props'
     private static final String STYLE = '@style'
     private static final String TAGS = '@tags'
     private static final String TEXT_COLOR = '@textColor'
@@ -186,14 +187,37 @@ class Import {
                                 }
                                 continue
                             }
+                            // key can be a chain of props, e.g. border.colorCode
+                            def current = style
+                            def props = entry.key.tokenize('.')
+                            for (prop in props[0..<-1])
+                                current = current."$prop"
                             try {
-                                style."${entry.key}" = entry.value
+                                current."${props[-1]}" = entry.value
                             } catch (IllegalArgumentException e) {
                                 LogUtils.severe("${node.id} ${entry.key}: ${e}")
                             }
                         }
                     } else
                         throw new IllegalArgumentException("${node.id}: got ${STYLE} of type ${value.class.simpleName} - expected Map<String, Object>")
+                }
+                case PROPS -> {
+                    if (isValueMap) {
+                        def map = value as Map<String, Object>
+                        for (entry in map.entrySet()) {
+                            // key can be a chain of props, e.g. cloud.shape
+                            def current = node
+                            def props = entry.key.tokenize('.')
+                            for (prop in props[0..<-1])
+                                current = current."$prop"
+                            try {
+                                current."${props[-1]}" = entry.value
+                            } catch (IllegalArgumentException e) {
+                                LogUtils.severe("${node.id} ${entry.key}: ${e}")
+                            }
+                        }
+                    } else
+                        throw new IllegalArgumentException("${node.id}: got ${PROPS} of type ${value.class.simpleName} - expected Map<String, Object>")
                 }
                 case ICONS -> {
                     if (isValueList)
@@ -210,12 +234,14 @@ class Import {
                     }
                 }
                 case BACKGROUND_COLOR -> {
+                    // deprecated in favor of @style
                     if (isValueString)
                         node.style.backgroundColorCode = value
                     else
                         throw new IllegalArgumentException("${node.id}: got ${BACKGROUND_COLOR} of type ${value.class.simpleName} - expected String")
                 }
                 case TEXT_COLOR -> {
+                    // deprecated in favor of @style
                     if (isValueString)
                         node.style.textColorCode = value
                     else
