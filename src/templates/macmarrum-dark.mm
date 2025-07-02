@@ -216,7 +216,7 @@ ol {
   margin-right-rtl: 15px;
 }</hook>
 </stylenode>
-<stylenode TEXT="=Markdown" FORMAT="markdownPatternFormat" MAX_WIDTH="20 cm">
+<stylenode TEXT="=Markdown" FORMAT="markdownPatternFormat">
 <icon BUILTIN="emoji-24C2"/>
 <hook NAME="NodeConditionalStyles">
     <conditional_style ACTIVE="true" STYLE_REF="^CSS" LAST="false"/>
@@ -651,6 +651,5 @@ ol {
 <attribute NAME="runMe" VALUE="menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node" OBJECT="java.net.URI|menuitem:_MinimizeAllNodesIfTextIsLonger_on_single_node"/>
 </node>
 </node>
-<node TEXT="" ID="ID_1235760522"/>
 </node>
 </map>
