@@ -29,6 +29,7 @@ import org.freeplane.features.format.FormattedNumber
 import org.freeplane.features.format.FormattedObject
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
+import javax.swing.JFileChooser
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.nio.charset.Charset
@@ -77,6 +78,18 @@ class Import {
 
     enum NodePart {
         CORE, DETAILS, NOTE
+    }
+
+    static File askForFile(File suggestedFile = null) {
+        final fileChooser = new JFileChooser()
+        fileChooser.multiSelectionEnabled = false
+        if (suggestedFile)
+            fileChooser.selectedFile = suggestedFile
+        final returnVal = fileChooser.showOpenDialog()
+        if (returnVal != JFileChooser.APPROVE_OPTION) {
+            return
+        }
+        return fileChooser.getSelectedFile()
     }
 
     static String decodeBase64(String base64) {
