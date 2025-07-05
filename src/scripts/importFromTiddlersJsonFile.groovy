@@ -45,6 +45,7 @@ static def convertTiddlersToFreeplane(File inputFile) {
 
     // This regex captures [[tags with spaces]] and individual tags
     def rxSplitTags = ~/\[\[(.*?)]]|(\S+)/
+    def rxTitleNoFormat = ~/^[=']/
 
     int idx = 0
     for (item in tiddlers) {
@@ -58,7 +59,7 @@ static def convertTiddlersToFreeplane(File inputFile) {
             hmParent[key]['@tags'] = parseTags(item.tags ?: "", rxSplitTags)
         }
         def props = [:]
-        if (item?.title?.startsWith('=')) {
+        if (item?.title =~ rxTitleNoFormat) {
             props['format'] = 'NO_FORMAT'
         }
         if (item?.type == 'text/markdown') {
