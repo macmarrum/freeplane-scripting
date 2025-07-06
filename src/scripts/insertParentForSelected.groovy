@@ -1,5 +1,14 @@
+/*
+ * Copyright (C) 2021-2023,2025  macmarrum (at) outlook (dot) ie
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Insert"})
-import org.freeplane.api.Node as FPN
+
+import org.freeplane.api.Controller
+import org.freeplane.api.Node
+import org.freeplane.core.util.MenuUtils
+
+import static org.freeplane.plugin.script.GroovyStaticImports.config
 
 /*
  * If copyFormatToNewChild, format is copied from the parent
@@ -8,29 +17,35 @@ import org.freeplane.api.Node as FPN
  * No format is copied if both options are off
  * If copyFormatToNewNodeIncludesIcons, icons are copied alongside the format (part of FormatCopy/FormatPaste)
  */
-boolean canCopyFormatToNewChild = config.getBooleanProperty("copyFormatToNewChild")
-boolean canCopyFormatToNewSibling = config.getBooleanProperty("copyFormatToNewSibling")
-FPN parent
-FPN newParent
-FPN source
-def selecteds = c.selecteds.collect()
-def positions = selecteds.collect { FPN it -> it.parent.getChildPosition(it) }
-Integer position
-def toBeSelected = new HashSet<FPN>()
-
-selecteds.eachWithIndex { FPN selected, idx ->
+c = c as Controller
+boolean copyFormatToNewChild = config.getBooleanProperty("copyFormatToNewChild")
+boolean copyFormatToNewSibling = config.getBooleanProperty("copyFormatToNewSibling")
+Node parent
+int position
+Node newParent
+Node source
+def selectedToParentAndPosition = new HashMap<Node, List<Object>>()
+for (selected in c.selecteds) {
     parent = selected.parent
-    position = positions[idx]
+    selectedToParentAndPosition[selected] = [parent, parent.getChildPosition(selected)]
+}
+def toBeSelected = new HashSet<Node>()
+
+Node selected
+for (entry in selectedToParentAndPosition.entrySet()) {
+    selected = entry.key
+    parent = entry.value[0] as Node
+    position = entry.value[1] as int
     newParent = parent.createChild(position)
-    if (parent.root)
+    if (parent.isRoot())
         newParent.left = selected.left
     selected.moveTo(newParent)
-    if (canCopyFormatToNewChild || canCopyFormatToNewSibling) {
-        source = canCopyFormatToNewChild ? parent : canCopyFormatToNewSibling ? selected : null
+    if (copyFormatToNewChild || copyFormatToNewSibling) {
+        source = copyFormatToNewChild ? parent : copyFormatToNewSibling ? selected : null
         c.select(source)
-        menuUtils.executeMenuItems(['FormatCopy'])
+        MenuUtils.executeMenuItems(['FormatCopy'])
         c.select(newParent)
-        menuUtils.executeMenuItems(['FormatPaste'])
+        MenuUtils.executeMenuItems(['FormatPaste'])
     }
     toBeSelected.add(newParent)
 }
