@@ -30,14 +30,14 @@ for (selected in c.selecteds) {
     selectedToParentAndPosition[selected] = [parent, parent.getChildPosition(selected)]
 }
 def toBeSelected = new HashSet<Node>()
-
+def viewRoot = c.viewRoot
 Node selected
 for (entry in selectedToParentAndPosition.entrySet()) {
     selected = entry.key
     parent = entry.value[0] as Node
     position = entry.value[1] as int
     newParent = parent.createChild(position)
-    if (parent.isRoot())
+    if (parent == viewRoot)
         newParent.left = selected.left
     selected.moveTo(newParent)
     if (copyFormatToNewChild || copyFormatToNewSibling) {
