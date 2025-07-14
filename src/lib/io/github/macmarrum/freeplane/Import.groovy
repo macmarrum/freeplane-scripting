@@ -135,13 +135,14 @@ class Import {
 
     static void _fromJsonMapRecursively(Map<String, Object> jMap, Node node) {
         jMap.each { key, value ->
-            def isValueString = value instanceof String
+            def isValueNull = value == null
+            def isValueString = !isValueNull && value instanceof String
             def isValueStrOrNum = isValueString || value instanceof Number
-            def isValueMap = !isValueStrOrNum && value instanceof Map
-            def isValueList = !isValueStrOrNum && !isValueMap && value instanceof List
+            def isValueMap = !isValueNull && !isValueStrOrNum && value instanceof Map
+            def isValueList = !isValueNull && !isValueStrOrNum && !isValueMap && value instanceof List
             switch (key) {
                 case CORE -> {
-                    if (isValueStrOrNum)
+                    if (isValueStrOrNum || isValueNull)
                         node.object = value
                     else if (isValueList)
                         _fromJson_setCoreFromList(value as List, node)
@@ -149,7 +150,7 @@ class Import {
                         throw new IllegalArgumentException("${node.id}: got ${CORE} of type ${value.class.simpleName} - expected String, Number, List")
                 }
                 case DETAILS -> {
-                    if (isValueString)
+                    if (isValueString || isValueNull)
                         node.details = value
                     else if (isValueList) {
                         node.detailsContentType = value[1]
@@ -158,7 +159,7 @@ class Import {
                         throw new IllegalArgumentException("${node.id}: got ${DETAILS} of type ${value.class.simpleName} - expected String, List")
                 }
                 case NOTE -> {
-                    if (isValueString)
+                    if (isValueString || isValueNull)
                         node.note = value
                     else if (isValueList) {
                         node.noteContentType = value[1]
@@ -172,9 +173,11 @@ class Import {
                     else if (isValueList)
                         value.each { List<Object> l -> _fromJson_setAttributeFromList(node, l) }
                     else
-                        throw new IllegalArgumentException("${node.id}: got ${ATTRIBUTES} of type ${value.class.simpleName} - expected Map, List")
+                        throw new IllegalArgumentException("${node.id}: got ${ATTRIBUTES} of type ${value != null ? value.class.simpleName : null} - expected Map, List")
                 }
                 case LINK -> {
+                    if (isValueNull)
+                        node.link.uri = value
                     if (isValueString)
                         node.link.uri = new URI(value as String)
                     else
@@ -212,7 +215,7 @@ class Import {
                             }
                         }
                     } else
-                        throw new IllegalArgumentException("${node.id}: got ${STYLE} of type ${value.class.simpleName} - expected Map<String, Object>")
+                        throw new IllegalArgumentException("${node.id}: got ${STYLE} of type ${value != null ? value.class.simpleName : null} - expected Map<String, Object>")
                 }
                 case PROPS -> {
                     if (isValueMap) {
@@ -230,20 +233,20 @@ class Import {
                             }
                         }
                     } else
-                        throw new IllegalArgumentException("${node.id}: got ${PROPS} of type ${value.class.simpleName} - expected Map<String, Object>")
+                        throw new IllegalArgumentException("${node.id}: got ${PROPS} of type ${value != null ? value.class.simpleName : null} - expected Map<String, Object>")
                 }
                 case ICONS -> {
                     if (isValueList)
                         node.icons.addAll(value as List<String>)
                     else
-                        throw new IllegalArgumentException("${node.id}: got ${STYLE} of type ${value.class.simpleName} - expected List<String>")
+                        throw new IllegalArgumentException("${node.id}: got ${STYLE} of type ${value != null ? value.class.simpleName : null} - expected List<String>")
                 }
                 case TAGS -> {
                     if (FP_VER >= FP_1_12_1) {
                         if (isValueList)
                             node.tags.tags = value as List<String>
                         else
-                            throw new IllegalArgumentException("${node.id}: got ${TAGS} of type ${value.class.simpleName} - expected List<String>")
+                            throw new IllegalArgumentException("${node.id}: got ${TAGS} of type ${value != null ? value.class.simpleName : null} - expected List<String>")
                     }
                 }
                 case BACKGROUND_COLOR -> {
@@ -251,14 +254,14 @@ class Import {
                     if (isValueString)
                         node.style.backgroundColorCode = value
                     else
-                        throw new IllegalArgumentException("${node.id}: got ${BACKGROUND_COLOR} of type ${value.class.simpleName} - expected String")
+                        throw new IllegalArgumentException("${node.id}: got ${BACKGROUND_COLOR} of type ${value != null ? value.class.simpleName : null} - expected String")
                 }
                 case TEXT_COLOR -> {
                     // deprecated in favor of @style
                     if (isValueString)
                         node.style.textColorCode = value
                     else
-                        throw new IllegalArgumentException("${node.id}: got ${TEXT_COLOR} of type ${value.class.simpleName} - expected String")
+                        throw new IllegalArgumentException("${node.id}: got ${TEXT_COLOR} of type ${value != null ? value.class.simpleName : null} - expected String")
                 }
                 default -> {
                     def n = node.createChild(key)
