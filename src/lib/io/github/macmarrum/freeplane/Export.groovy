@@ -74,10 +74,10 @@ class Export {
     private static final Pattern RX_MD_LIST_ITEM = ~/\s*(-|\*|\d+\.)\s+\S.*/
     private static final Pattern RX_FORMULA = ~/^=(?!=).+/
     private static final String MARKDOWN_FORMAT = 'markdownPatternFormat'
-    private static final RUMAR_TOML_INTEGER_SETTINGS = ['version', 'tar_format', 'compression_level', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_week_to_keep', 'number_of_backups_per_month_to_keep']
-    private static final RUMAR_TOML_BOOLEAN_SETTINGS = ['checksum_comparison_if_same_size', 'file_deduplication']
-    private static final RUMAR_TOML_STRING_SETTINGS = ['backup_base_dir', 'source_dir', 'backup_base_dir_for_profile', 'archive_format', 'password', 'no_compression_suffixes_default', 'no_compression_suffixes']
-    private static final RUMAR_TOML_ARRAY_SETTINGS = ['included_top_dirs', 'excluded_top_dirs', 'included_dirs_as_regex', 'excluded_dirs_as_regex', 'included_files_as_glob', 'excluded_files_as_glob', 'included_files_as_regex', 'excluded_files_as_regex', 'commands_using_filters']
+    public static final RUMAR_TOML_ARRAY_SETTINGS = ['commands_using_filters', 'excluded_dirs_as_regex', 'excluded_files_as_glob', 'excluded_files_as_regex', 'excluded_top_dirs', 'included_dirs_as_regex', 'included_files_as_glob', 'included_files_as_regex', 'included_top_dirs']
+    public static final RUMAR_TOML_BOOLEAN_SETTINGS = ['checksum_comparison_if_same_size', 'file_deduplication']
+    public static final RUMAR_TOML_INTEGER_SETTINGS = ['compression_level', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_month_to_keep', 'number_of_backups_per_week_to_keep', 'tar_format', 'version', 'zip_compression_method']
+    public static final RUMAR_TOML_STRING_SETTINGS = ['archive_format', 'backup_base_dir', 'backup_base_dir_for_profile', 'db_path', 'no_compression_suffixes', 'no_compression_suffixes_default', 'password', 'source_dir']
     private static final String ATTRIBUTES = '@attributes'
     private static final String BACKGROUND_COLOR = '@backgroundColor'
     private static final String CORE = '@core'
