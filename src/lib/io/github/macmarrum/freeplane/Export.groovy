@@ -85,10 +85,11 @@ class Export {
     private static final String ICONS = '@icons'
     private static final String LINK = '@link'
     private static final String NOTE = '@note'
+    private static final String PROPS = '@props'
     private static final String STYLE = '@style'
     private static final String TAGS = '@tags'
     private static final String TEXT_COLOR = '@textColor'
-    private static final List<String> JSON_RESERVED_CORE = [ATTRIBUTES, BACKGROUND_COLOR, CORE, DETAILS, ICONS, LINK, NOTE, TAGS, TEXT_COLOR]
+    private static final List<String> JSON_RESERVED_CORE = [ATTRIBUTES, BACKGROUND_COLOR, CORE, DETAILS, ICONS, LINK, NOTE, PROPS, STYLE, TAGS, TEXT_COLOR]
     private static final String STANDARD_FORMAT = 'STANDARD_FORMAT'
     private static final String AUTO = 'auto'
     public static Charset charset = StandardCharsets.UTF_8
