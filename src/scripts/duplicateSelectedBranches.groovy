@@ -12,8 +12,9 @@ c = c as Controller
 def differentSubtrees = true
 c.getSortedSelection(differentSubtrees).each { Node n ->
     def parent = n.parent
-    parent.appendBranch(n)
-    def newNode = parent.children[-1]
+    def newNode = parent.appendBranch(n)
+    newNode.sideAtRoot = n.sideAtRoot
     def nPosition = parent.getChildPosition(n)
     newNode.moveTo(parent, nPosition + 1)
+    c.select(newNode)
 }
