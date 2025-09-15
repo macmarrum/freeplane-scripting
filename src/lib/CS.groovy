@@ -1,17 +1,20 @@
+/*
+ * Copyright (C) 2021, 2022, 2025  macmarrum (at) outlook (dot) ie
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 import org.freeplane.api.NodeRO
 
 class CS {
-    final static String ATTRIB_NAME = 'condiStyle'
-    final static String attr = ATTRIB_NAME
+    private static final String ATTRIB_NAME = 'CS.apply'
+    public static final String ATTR = ATTRIB_NAME
 
-    def static canApply(NodeRO node, String condiStyle, Boolean condition) {
+    static boolean apply(NodeRO node, boolean condition, String style) {
         if (condition) {
-            node[ATTRIB_NAME] = condiStyle
-            return true
+            node[ATTRIB_NAME] = style
         } else {
-            if (node[ATTRIB_NAME].text == condiStyle)
+            if (node[ATTRIB_NAME].text == style)
                 node[ATTRIB_NAME] = null
-            return false
         }
+        return condition
     }
 }
