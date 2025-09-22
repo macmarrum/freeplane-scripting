@@ -20,6 +20,7 @@ import javax.swing.*
 import java.nio.charset.StandardCharsets
 
 import static org.freeplane.plugin.script.GroovyStaticImports.config
+import static org.freeplane.plugin.script.GroovyStaticImports.menuUtils
 
 c = c as org.freeplane.api.Controller
 node = node as Node
@@ -94,7 +95,9 @@ if (targetNode) { // same-map target node
     if (!otherMapView) { // open another map view if not exists
         Controller.getCurrentModeController().getMapController().createMapView(thisMapModel)
         otherMapView = findOtherMapView()
-        UITools.showMessage('A new map view has been created', JOptionPane.INFORMATION_MESSAGE)
+        if (config.getBooleanProperty('_select_linked_node_in_another_view__new_view_notification', false)) {
+            UITools.showMessage('A new map view has been created', JOptionPane.INFORMATION_MESSAGE)
+        }
     }
     otherMapView.select()
     // based on org.freeplane.plugin.script.proxy.ControllerProxy#select(org.freeplane.api.Node)
