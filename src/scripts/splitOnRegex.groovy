@@ -17,6 +17,7 @@ def checkboxText = 'V&ertically'
 def message = 'NB Special characters <([{\\^-=$!|]})?*+.>'
 def regexPatterns = [
         $/\s+(?=([^"'\[]*["'\[][^"'\]]*["'\]])*[^"'\[\]]*$)/$,
+        $/(?<=/)/$,
         /\n+/,
         /,\s*/,
         /\s+/,
