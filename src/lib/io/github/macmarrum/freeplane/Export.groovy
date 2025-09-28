@@ -74,7 +74,7 @@ class Export {
     private static final Pattern RX_MD_LIST_ITEM = ~/\s*(-|\*|\d+\.)\s+\S.*/
     private static final Pattern RX_FORMULA = ~/^=(?!=).+/
     private static final String MARKDOWN_FORMAT = 'markdownPatternFormat'
-    public static final RUMAR_TOML_ARRAY_SETTINGS = ['commands_using_filters', 'excluded_dirs_as_regex', 'excluded_files_as_glob', 'excluded_files_as_regex', 'excluded_top_dirs', 'included_dirs_as_regex', 'included_files_as_glob', 'included_files_as_regex', 'included_top_dirs']
+    public static final RUMAR_TOML_ARRAY_SETTINGS = ['commands_using_filters', 'excluded_dirs_as_regex', 'excluded_files', 'excluded_files_as_glob', 'excluded_files_as_regex', 'excluded_top_dirs', 'included_dirs_as_regex', 'included_files', 'included_files_as_glob', 'included_files_as_regex', 'included_top_dirs']
     public static final RUMAR_TOML_BOOLEAN_SETTINGS = ['checksum_comparison_if_same_size', 'file_deduplication']
     public static final RUMAR_TOML_INTEGER_SETTINGS = ['compression_level', 'min_age_in_days_of_backups_to_sweep', 'number_of_backups_per_day_to_keep', 'number_of_backups_per_month_to_keep', 'number_of_backups_per_week_to_keep', 'tar_format', 'version', 'zip_compression_method']
     public static final RUMAR_TOML_STRING_SETTINGS = ['archive_format', 'backup_base_dir', 'backup_base_dir_for_profile', 'db_path', 'no_compression_suffixes', 'no_compression_suffixes_default', 'password', 'source_dir']
