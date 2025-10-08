@@ -542,6 +542,28 @@ class Import {
         }
     }
 
+    static void fromHtmlLinksClipboard(Node node, HashMap<String, Object> settings = null) {
+        def transferable = Toolkit.defaultToolkit.systemClipboard.getContents(null)
+        if (transferable.isDataFlavorSupported(DataFlavor.allHtmlFlavor)) {
+            try {
+                def Jsoup = Class.forName('org.jsoup.Jsoup')
+                def html = transferable.getTransferData(DataFlavor.allHtmlFlavor)
+                def doc = Jsoup.parse(html)
+                def links = doc.select('a')
+                for (link in links) {
+                    def child = node.createChild(link.text())
+                    child.link.uri = new URI(link.attr('href'))
+                }
+            } catch (ClassNotFoundException ignored) {
+                def msg = '(!) Jsoup not found in classpath - add `<Freeplane-install-dir>/plugins/org.freeplane.plugin.markdown/lib` to `Preferences…->Plugins->Scripting->Script classpath: Additional directories containing classes and/or JARs (see tooltip)`'
+                c.statusInfo = msg
+                println(msg)
+            }
+        } else {
+            c.statusInfo = '(!) no HTML in clipboard'
+        }
+    }
+
     static void fromMarkdownString(String markdown, Node node) {
         def topNodeLevel = node.getNodeLevel(true)
         def n = node
