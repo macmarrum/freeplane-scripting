@@ -4,7 +4,7 @@
 import io.github.macmarrum.freeplane.Export
 import org.freeplane.core.util.TextUtils
 
-def settings = [skip1: true, sep: '|', tail: true, nl: '\u00B6', quote: 'NONE']
+def settings = [skip1: true, sep: '|', frame: true, nl: '\u00B6', quote: 'NONE']
 def text = Export.toCsvString(node, settings)
 def line = text.split(/\n/, 2)[0]
 def numOfSeps = line.count('|')
