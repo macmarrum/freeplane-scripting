@@ -29,6 +29,7 @@ class PlantUml {
         defaultSettings.skip1 = true // whether to consider the first node a "PlantUml-code parent" and skip it
         defaultSettings.noEntryIconName = 'emoji-26D4' // no entry - ignore the entire branch
         defaultSettings.ignoredIconName = 'emoji-274C' // cross mark - ignore the node
+        defaultSettings.ghostIconName = 'emoji-1F47B' // ghost - ignore the node
         defaultSettings.sinkIconName = 'emoji-1F300' // cyclone - form one line from the node and all its descendants
         defaultSettings.taskIconName = 'emoji-1F532' // black square button - make it a Gantt-chart task by enclosing it in square brackets
         defaultSettings.quotedIconName = 'links/file/txt' // text-file icon - quote the node's content
@@ -116,7 +117,7 @@ class PlantUml {
     }
 
     static boolean isIgnored(Node n, HashMap<String, Object> settings) {
-        return n.icons.contains(settings.ignoredIconName as String)
+        return n.icons.contains(settings.ghostIconName as String) || n.icons.contains(settings.ignoredIconName as String)
     }
 
     static boolean isTask(Node n, HashMap<String, Object> settings) {
