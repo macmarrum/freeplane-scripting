@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - 2025  macmarrum (at) outlook (dot) ie
+ * Copyright (C) 2023 - 2026  macmarrum (at) outlook (dot) ie
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -523,13 +523,13 @@ class Export {
 
     static String _quote(String text) {
         String quote
-        if (SINGLE_QUOTE !in text)
+        if (!text.contains(SINGLE_QUOTE))
             quote = SINGLE_QUOTE
-        else if (DOUBLE_QUOTE !in text)
+        else if (!text.contains(DOUBLE_QUOTE))
             quote = DOUBLE_QUOTE
-        else if (MULTILINE_SINGLE_QUOTE !in text)
+        else if (!text.contains(MULTILINE_SINGLE_QUOTE))
             quote = MULTILINE_SINGLE_QUOTE
-        else if (MULTILINE_DOUBLE_QUOTE !in text)
+        else if (!text.contains(MULTILINE_DOUBLE_QUOTE))
             quote = MULTILINE_DOUBLE_QUOTE
         else
             throw new IllegalArgumentException("cannot quote `${text}` because it already contains all possible quote options")
