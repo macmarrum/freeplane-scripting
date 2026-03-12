@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025  macmarrum (at) outlook (dot) ie
+ * Copyright (C) 2025, 2026  macmarrum (at) outlook (dot) ie
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@ import org.freeplane.api.Node
 import java.util.function.Function
 
 class PlantUml {
+    private static final String SINGLE_QUOTE = '\''
+    private static final String DOUBLE_QUOTE = '"'
     public static HashMap<String, Object> defaultSettings = new HashMap<>()
     static {
         defaultSettings.skip1 = true // whether to consider the first node a "PlantUml-code parent" and skip it
@@ -29,6 +31,7 @@ class PlantUml {
         defaultSettings.ignoredIconName = 'emoji-274C' // cross mark - ignore the node
         defaultSettings.sinkIconName = 'emoji-1F300' // cyclone - form one line from the node and all its descendants
         defaultSettings.taskIconName = 'emoji-1F532' // black square button - make it a Gantt-chart task by enclosing it in square brackets
+        defaultSettings.quotedIconName = 'links/file/txt' // text-file icon - quote the node's content
     }
 
     static String makeUml(Node node, HashMap<String, Object> settings = null) {
@@ -120,6 +123,10 @@ class PlantUml {
         return n.icons.contains(settings.taskIconName as String)
     }
 
+    static boolean isQuoted(Node n, HashMap<String, Object> settings) {
+        return n.icons.contains(settings.quotedIconName as String)
+    }
+
     /** sink
      */
     static void appendMeAndDescendants(Node node, LinkedList<LinkedList<String>> lol, HashMap<String, Object> settings, Function<Node, String> extractContent) {
@@ -152,12 +159,14 @@ class PlantUml {
 
 /** get node's text
  * - transformed text
- * -- additionally surrounded in [] if it's a task
+ * -- additionally surrounded in [] if it's a task or in quotes if it's Txt
  * - ISO date format if it's a date
  */
     static String extractTextOrIsoDate(Node n, HashMap<String, Object> settings) {
         if (isTask(n, settings)) {
             return "[${n.transformedText}]" as String
+        } else if (isQuoted(n, settings)) {
+            return _quote(n.transformedText)
         }
         try {
             return n.to.date.format('yyyy-MM-dd')
@@ -166,4 +175,14 @@ class PlantUml {
         }
     }
 
+    static String _quote(String text) {
+        String quote
+        if (!text.contains(DOUBLE_QUOTE))
+            quote = DOUBLE_QUOTE
+        else if (!text.contains(SINGLE_QUOTE))
+            quote = SINGLE_QUOTE
+        else
+            throw new IllegalArgumentException("cannot quote `${text}` because it already contains all possible quote options")
+        quote + text + quote
+    }
 }
