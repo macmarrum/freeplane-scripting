@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022, 2024  macmarrum (at) outlook (dot) ie
+ * Copyright (C) 2022, 2024, 2026  macmarrum (at) outlook (dot) ie
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Width"})
@@ -7,8 +7,9 @@
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
 import org.freeplane.features.map.NodeModel
+import org.freeplane.view.swing.map.NodeView
 
-def c = c as Controller
+c = c as Controller
 
 static findSinglesAndCloneLeaders(Iterable<Node> nodes) {
     def singlesAndLeaders = new LinkedList<Node>()
@@ -29,7 +30,7 @@ static findSinglesAndCloneLeaders(Iterable<Node> nodes) {
 
 static int getWidth(Node node, float zoom) {
     def m = node.delegate as NodeModel
-    def v = m.viewers
+    def v = m.viewers.findAll { it instanceof NodeView }
     def viewCount = v.size()
     assert viewCount == 1, "Only one view is supported, got ${viewCount}"
     // add 1% as a buffer, because nodes and fonts scale differently, i.e.
