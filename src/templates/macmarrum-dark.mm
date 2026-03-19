@@ -26,8 +26,8 @@ t &amp;&amp; (node.delegate.allClones().size() - 1) &gt; t</script>
 <font SIZE="24"/>
 <stylenode LOCALIZED_TEXT="styles.predefined" POSITION="bottom_or_right" STYLE="bubble">
 <stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="26 px" FORMAT_AS_HYPERLINK="false" COLOR="#bbbbbb" BACKGROUND_COLOR="#333333" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" TEXT_WRITING_DIRECTION="LEFT_TO_RIGHT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="0 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="192" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" COMMON_HGAP_QUANTITY="14 pt" CHILD_NODES_LAYOUT="AUTO" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
-<arrowlink SHAPE="CUBIC_CURVE" COLOR="#a89984" WIDTH="2" TRANSPARENCY="255" DASH="" FONT_SIZE="9" FONT_FAMILY="SansSerif" DESTINATION="ID_602083445" STARTINCLINATION="102.77419 pt;0 pt;" ENDINCLINATION="102.77419 pt;2.90323 pt;" STARTARROW="NONE" ENDARROW="DEFAULT"/>
-<font NAME="Lato" SIZE="12" BOLD="false" STRIKETHROUGH="false" ITALIC="false"/>
+<arrowlink SHAPE="CUBIC_CURVE" COLOR="#a89984" WIDTH="2" TRANSPARENCY="255" DASH="" FONT_SIZE="9" FONT_FAMILY="SansSerif" DESTINATION="ID_602083445" STARTINCLINATION="102.85715 pt;0 pt;" ENDINCLINATION="102.85715 pt;2.93878 pt;" STARTARROW="NONE" ENDARROW="DEFAULT"/>
+<font NAME="Lato" SIZE="12" BOLD="false" UNDERLINED="false" STRIKETHROUGH="false" ITALIC="false"/>
 <edge COLOR="#808080"/>
 <richcontent TYPE="DETAILS" CONTENT-TYPE="xml/auto">
 <html>
@@ -268,11 +268,11 @@ ol {
 </html></richcontent>
 </stylenode>
 <stylenode TEXT="=Table">
-<cloud COLOR="#152242" SHAPE="RECT"/>
 <hook NAME="NodeConditionalStyles">
     <conditional_style ACTIVE="true" STYLE_REF="^Table" LAST="false"/>
 </hook>
-<font SIZE="14" BOLD="true"/>
+<font BOLD="true"/>
+<edge STYLE="bezier" DASH="CLOSE_DOTS"/>
 </stylenode>
 <stylenode TEXT="=Table.row">
 <cloud COLOR="#333333" SHAPE="RECT"/>
@@ -287,14 +287,15 @@ ol {
     <conditional_style ACTIVE="true" STYLE_REF="=Table.cell.accent" LAST="false"/>
 </hook>
 <cloud COLOR="#282828" SHAPE="RECT"/>
+<edge STYLE="bezier" DASH="CLOSE_DOTS"/>
 </stylenode>
 <stylenode TEXT="=Table.cell">
 <hook NAME="NodeConditionalStyles">
     <conditional_style ACTIVE="true" STYLE_REF="^Table" LAST="false"/>
 </hook>
 </stylenode>
-<stylenode TEXT="=Table.cell.accent" COLOR="#c62e2e">
-<font SIZE="14" BOLD="true"/>
+<stylenode TEXT="=Table.cell.accent">
+<font BOLD="true"/>
 <richcontent TYPE="DETAILS">
 <html>
   <head>
