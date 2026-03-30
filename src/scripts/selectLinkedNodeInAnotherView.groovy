@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2025  macmarrum (at) outlook (dot) ie
+ * Copyright (C) 2023-2026  macmarrum (at) outlook (dot) ie
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Select"})
@@ -34,6 +34,12 @@ static def toggleSpotlight() {
     final Boolean value = Boolean.TRUE.equals(mapViewComponent.getClientProperty(propertyName))
     boolean newValue = !value.booleanValue()
     mapViewComponent.putClientProperty(propertyName, newValue)
+}
+
+static def flashSpotlight() {
+    toggleSpotlight()
+    // Timer executes its listeners on the Event Dispatch Thread (EDT), which is crucial for Swing's thread safety
+    new Timer(400, { evt -> toggleSpotlight(); evt.source.stop() }).start()
 }
 
 Node targetNode = null
@@ -104,10 +110,7 @@ if (targetNode) { // same-map target node
     Controller.getCurrentModeController().getMapController().displayNode(targetNodeModel)
     Controller.getCurrentController().getSelection().selectAsTheOnlyOneSelected(targetNodeModel)
     c.statusInfo = "${this.class.simpleName}:  $linkText "
-    // flash spotlight
-    toggleSpotlight()
-    // Timer executes its listeners on the Event Dispatch Thread (EDT), which is crucial for Swing's thread safety
-    new Timer(400, { evt -> toggleSpotlight(); evt.source.stop() }).start()
+    flashSpotlight()
 } else {
     c.statusInfo = "${this.class.simpleName}:  no link found! "
 }
