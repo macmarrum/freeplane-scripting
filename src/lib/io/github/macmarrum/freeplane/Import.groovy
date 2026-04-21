@@ -564,6 +564,7 @@ class Import {
         }
     }
 
+    /** Imports each Markdown Heading as a new node and all other content as details */
     static void fromMarkdownString(String markdown, Node node) {
         def topNodeLevel = node.getNodeLevel(true)
         def n = node
@@ -571,6 +572,7 @@ class Import {
         String hashes
         int level
         String text
+        def nodeToDetails = new LinkedHashMap<Node, StringBuilder>()
         markdown.split(NL).each { line ->
             if (line.startsWith(HASH)) {
                 // a heading
@@ -589,13 +591,20 @@ class Import {
                         throw new IllegalArgumentException("Heading ${level} was requested to be imported but no heading ${level - 1} was found to attach it to: ${line}")
                 }
                 n = parent.createChild(text)
+                nodeToDetails[n] = new StringBuilder()
             } else {
                 // not a heading -- import into details of the last heading
-                def detailsText = n.details?.text
-                if (detailsText || line) { // skip empty lines at the beginning
-                    n.details = detailsText ? detailsText + NL + line : line
+                if (nodeToDetails[n] || line) { // skip empty lines at the beginning
+                    if (n !in nodeToDetails) {
+                        // for text before any heading, use the top node
+                        nodeToDetails[n] = new StringBuilder()
+                    }
+                    nodeToDetails[n] << line << NL
                 }
             }
+        }
+        nodeToDetails.each { _n, details ->
+            _n.details = details.toString()
         }
     }
 }
