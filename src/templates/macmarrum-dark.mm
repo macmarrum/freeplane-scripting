@@ -25,7 +25,7 @@ t &amp;&amp; (node.delegate.allClones().size() - 1) &gt; t</script>
 <stylenode LOCALIZED_TEXT="styles.root_node" ID="ID_680156716" STYLE="oval" UNIFORM_SHAPE="true" VGAP_QUANTITY="24 pt">
 <font SIZE="24"/>
 <stylenode LOCALIZED_TEXT="styles.predefined" POSITION="bottom_or_right" STYLE="bubble">
-<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="26 px" FORMAT_AS_HYPERLINK="false" COLOR="#bbbbbb" BACKGROUND_COLOR="#333333" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" TEXT_WRITING_DIRECTION="LEFT_TO_RIGHT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="0 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="192" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" COMMON_HGAP_QUANTITY="14 pt" CHILD_NODES_LAYOUT="AUTO" MAX_WIDTH="10 cm" MIN_WIDTH="0 cm" VERTICAL_ALIGNMENT="AS_PARENT">
+<stylenode LOCALIZED_TEXT="default" ID="ID_602083445" ICON_SIZE="26 px" FORMAT_AS_HYPERLINK="false" COLOR="#bbbbbb" BACKGROUND_COLOR="#333333" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" NUMBERED="false" FORMAT="STANDARD_FORMAT" TEXT_ALIGN="DEFAULT" TEXT_WRITING_DIRECTION="LEFT_TO_RIGHT" BORDER_WIDTH_LIKE_EDGE="false" BORDER_WIDTH="1 px" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0" BORDER_DASH_LIKE_EDGE="true" BORDER_DASH="SOLID" VGAP_QUANTITY="3 pt" COMMON_HGAP_QUANTITY="14 pt" CHILD_NODES_LAYOUT="AUTO" VERTICAL_ALIGNMENT="AS_PARENT">
 <arrowlink SHAPE="CUBIC_CURVE" COLOR="#a89984" WIDTH="2" TRANSPARENCY="255" DASH="" FONT_SIZE="9" FONT_FAMILY="SansSerif" DESTINATION="ID_602083445" STARTINCLINATION="102.85715 pt;0 pt;" ENDINCLINATION="102.85715 pt;2.93878 pt;" STARTARROW="NONE" ENDARROW="DEFAULT"/>
 <font NAME="Lato" SIZE="12" BOLD="false" UNDERLINED="false" STRIKETHROUGH="false" ITALIC="false"/>
 <edge COLOR="#808080"/>
@@ -345,6 +345,7 @@ ol {
 <stylenode TEXT="=Seamless" ID="ID_218573881" BACKGROUND_COLOR="#2b2b2b" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0">
 <arrowlink DESTINATION="ID_218573881"/>
 </stylenode>
+<stylenode TEXT="=Borderless" BORDER_COLOR_LIKE_EDGE="false" BORDER_COLOR="#808080" BORDER_COLOR_ALPHA="0"/>
 <stylenode TEXT="fishboneR0" CHILD_NODES_LAYOUT="LEFTTORIGHT_BOTHSIDES_RIGHT" COMMON_HGAP_QUANTITY="25 pt" STYLE="narrow_hexagon" SHAPE_HORIZONTAL_MARGIN="6 pt" SHAPE_VERTICAL_MARGIN="4 pt" UNIFORM_SHAPE="true" TEXT_ALIGN="CENTER"/>
 <stylenode TEXT="fishboneR1B" CHILD_NODES_LAYOUT="TOPTOBOTTOM_RIGHT_BOTTOM" COMMON_HGAP_QUANTITY="7 pt">
 <edge STYLE="horizontal"/>
@@ -391,6 +392,21 @@ ol {
 <stylenode TEXT="=Orange" COLOR="#ffa856">
 <icon BUILTIN="emoji-1F7E0"/>
 </stylenode>
+<stylenode TEXT="-Task">
+<icon BUILTIN="emoji-1F532"/>
+</stylenode>
+<stylenode TEXT="-Activity">
+<icon BUILTIN="emoji-1F463"/>
+</stylenode>
+<stylenode TEXT="-Quoted">
+<icon BUILTIN="links/file/txt"/>
+</stylenode>
+<stylenode TEXT="-Invisible">
+<icon BUILTIN="emoji-1F47B"/>
+</stylenode>
+<stylenode TEXT="-NoEntry">
+<icon BUILTIN="emoji-26D4"/>
+</stylenode>
 </stylenode>
 <stylenode LOCALIZED_TEXT="styles.AutomaticLayout" POSITION="bottom_or_right" STYLE="bubble">
 <stylenode LOCALIZED_TEXT="AutomaticLayout.level.root" ID="ID_1659178249" COLOR="#a9b7c6" BACKGROUND_COLOR="#282828" STYLE="bubble" SHAPE_HORIZONTAL_MARGIN="10 pt" SHAPE_VERTICAL_MARGIN="10 pt" VGAP_QUANTITY="20 pt">
@@ -430,8 +446,8 @@ ol {
 </stylenode>
 </map_styles>
 </hook>
-<hook NAME="accessories/plugins/AutomaticLayout.properties" VALUE="ALL"/>
 <attribute_layout VALUE_WIDTH="100 pt"/>
+<hook NAME="accessories/plugins/AutomaticLayout.properties" VALUE="ALL"/>
 <node TEXT="Showcase" FOLDED="true" POSITION="top_or_left" ID="ID_1068881056">
 <attribute_layout VALUE_WIDTH="100 pt"/>
 <node TEXT="1" OBJECT="java.lang.Long|1" ID="ID_1176543057">
