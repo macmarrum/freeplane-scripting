@@ -33,6 +33,7 @@ class PlantUml {
         defaultSettings.sinkIconName = 'emoji-1F300' // cyclone - form one line from the node and all its descendants
         defaultSettings.taskIconName = 'emoji-1F532' // black square button - make it a Gantt-chart task by enclosing it in square brackets
         defaultSettings.quotedIconName = 'links/file/txt' // text-file icon - quote the node's content
+        defaultSettings.activityIconName = 'emoji-1F463' // footprints - make it an Activity (step) by enclosing it in :...;
     }
 
     static String makeUml(Node node, HashMap<String, Object> settings = null) {
@@ -40,7 +41,8 @@ class PlantUml {
         def plantUmlCodeParent = findPlantUmlCodeParent(node, settings)
         def lol = new LinkedList<LinkedList<String>>()
         lol << new LinkedList<String>()
-        appendEachRow(plantUmlCodeParent, lol, settings, this::extractText)
+        def _extractContent = { Node n -> extractContentForUml(n, settings) }
+        appendEachRow(plantUmlCodeParent, lol, settings, _extractContent)
         def code = lol.collect { it.join(' ') }.join('\n')
         return (code =~ /^\n*@startuml\n/ && code =~ /\n@enduml\n*$/) ? code : "@startuml\n$code@enduml" as String
     }
@@ -67,8 +69,12 @@ class PlantUml {
         return plantUmlCodeParent
     }
 
-    static String extractText(Node n) {
-        return n.transformedText
+    static String extractContentForUml(Node n, HashMap<String, Object> settings) {
+        if (isActivity(n, settings)) {
+            return ":${n.transformedText};" as String
+        } else {
+            return n.transformedText
+        }
     }
 
     static void appendEachRow(Node node, LinkedList<LinkedList<String>> lol, HashMap<String, Object> settings, Function<Node, String> extractContent) {
@@ -128,6 +134,10 @@ class PlantUml {
         return n.icons.contains(settings.quotedIconName as String)
     }
 
+    static boolean isActivity(Node n, HashMap<String, Object> settings) {
+        return n.icons.contains(settings.activityIconName as String)
+    }
+
     /** sink
      */
     static void appendMeAndDescendants(Node node, LinkedList<LinkedList<String>> lol, HashMap<String, Object> settings, Function<Node, String> extractContent) {
@@ -143,8 +153,8 @@ class PlantUml {
         def plantUmlCodeParent = findPlantUmlCodeParent(node, settings)
         def lol = new LinkedList<LinkedList<String>>()
         lol << new LinkedList<String>()
-        def _extractTextOrIsoDate = { Node n -> extractTextOrIsoDate(n, settings) }
-        appendEachRow(plantUmlCodeParent, lol, settings, _extractTextOrIsoDate)
+        def _extractContent = { Node n -> extractContentForGantt(n, settings) }
+        appendEachRow(plantUmlCodeParent, lol, settings, _extractContent)
         // replace `???` with `???'s` if followed by `end` or `start`
         lol.each { listOfRowCells ->
             ['end', 'start'].each { end_or_start ->
@@ -163,7 +173,7 @@ class PlantUml {
  * -- additionally surrounded in [] if it's a task or in quotes if it's Txt
  * - ISO date format if it's a date
  */
-    static String extractTextOrIsoDate(Node n, HashMap<String, Object> settings) {
+    static String extractContentForGantt(Node n, HashMap<String, Object> settings) {
         if (isTask(n, settings)) {
             return "[${n.transformedText}]" as String
         } else if (isQuoted(n, settings)) {
