@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2023, 2026  macmarrum (at) outlook (dot) ie
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Toggle"})
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
 // https://github.com/freeplane/freeplane/issues/1405
 

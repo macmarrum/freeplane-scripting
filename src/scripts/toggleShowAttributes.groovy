@@ -1,4 +1,8 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1"})
+/*
+ * Copyright (C) 2021, 2026  macmarrum (at) outlook (dot) ie
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Toggle"})
 import org.freeplane.features.attribute.AttributeTableLayoutModel
 import org.freeplane.features.attribute.ModelessAttributeController
 import org.freeplane.features.map.MapModel
