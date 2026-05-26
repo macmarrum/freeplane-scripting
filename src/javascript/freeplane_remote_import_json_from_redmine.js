@@ -38,6 +38,7 @@ function autoAlert(message, durationMs = 5000) {
 font-family: Lato, Roboto, Arial, sans-serif;
 position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
 background: #333; color: #fff; padding: 16px 32px;
+border: 4px solid #ee5500;
 border-radius: 8px; font-size: 16px; z-index: 9999;
 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 transition: opacity 0.3s ease;
@@ -62,7 +63,7 @@ const apiKeyResp = await fetch(`${redmineUrl}/my/api_key`);
         .parseFromString(apiKeyHtml, 'text/html')
         .querySelector('#content pre');
 if (!preEl) {
-    const msg = 'Could not retrieve API key. Are you logged in to Redmine?'
+    const msg = 'Could not retrieve API key. Are you signed in to Redmine?'
     autoAlert(msg);
     throw new Error(msg);
 }
