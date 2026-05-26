@@ -54,7 +54,7 @@ const match = location.href.match(redmineIssueRegex);
 if (!match) {
     autoAlert('Run me while on an issue page in Redmine');
     return;
-} 
+}
 const issueId = match[1];
 const apiKeyResp = await fetch(`${redmineUrl}/my/api_key`);
     if (!apiKeyResp.ok) throw new Error(`Failed to fetch API key: ${apiKeyResp.status}`);
@@ -63,7 +63,7 @@ const apiKeyResp = await fetch(`${redmineUrl}/my/api_key`);
         .parseFromString(apiKeyHtml, 'text/html')
         .querySelector('#content pre');
 if (!preEl) {
-    const msg = 'Could not retrieve API key. Are you signed in to Redmine?'
+    const msg = 'Could not retrieve API key. Are you signed in to Redmine?';
     autoAlert(msg);
     throw new Error(msg);
 }
@@ -72,7 +72,7 @@ const issueResp = await fetch(`${redmineUrl}/issues/${issueId}.json`, {
     headers: { 'X-Redmine-API-Key': apiKey }
 });
 if (!issueResp.ok) {
-    const msg = `Failed to fetch issue: ${issueResp.status}`
+    const msg = `Failed to fetch issue: ${issueResp.status}`;
     autoAlert(msg);
     throw new Error(msg);
 }
