@@ -82,6 +82,7 @@ const fp = {
     [`ID_${issueId}`]: {
         '@core': `${issueId}  ${issue.assigned_to?.name ?? issue.author.name}`,
         '@details': issue.subject,
+        '@attributes': {[`proj.${(new Date()).toISOString().split('T')[0]}`]: issue.project.name},
         '@link': location.href
     }
 };
