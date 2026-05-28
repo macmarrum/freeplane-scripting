@@ -40,16 +40,17 @@ function extractGmailMessages(messageSelector) {
     return {[threadId]: threadInner};
  }
 
+const removeAfterSigHead = text => text.split(/^-- $/m, 1)[0];
+const removeAfterFromLine = text => text.split(/\r?\n\*From:\*/, 1)[0];
+const removeAfterWrote = text => text.split(/(?<=<[a-z0-9.-]+@[a-z0-9]+\.[a-z]+> (?:napisał\(a\)|wrote):)\r?\n/m, 1)[0];
+const removeBlockquotes = text => text.replace(/^>.*(\r?\n|\r)?/gm, '');
+
 function extractGmailMessageData(messageEl) {
     if (!messageEl) {
         const msg = 'Gmail message element not found.';
         autoAlert(msg);
         throw new Error(msg);
     }
-    const removeAfterSigHead = text => text.split(/^-- $/m, 1)[0];
-    const removeAfterFromLine = text => text.split(/\r?\n\*From:\*/, 1)[0];
-    const removeAfterWrote = text => text.split(/(?<=<[a-z0-9.-]+@[a-z0-9]+\.[a-z]+> (?:napisał\(a\)|wrote):)\r?\n/m, 1)[0];
-    const removeBlockquotes = text => text.replace(/^>.*(\r?\n|\r)?/gm, '');
     const msgId = messageEl.getAttribute('data-message-id') || `${Date.now()}`;
     const fromEl = messageEl.querySelector('.gD[email]');
     const from_emailAddressOnly = fromEl ? fromEl.getAttribute('email').trim() : '';
@@ -93,7 +94,7 @@ function extractGmailMessageData(messageEl) {
     const bodyEl = messageEl.querySelector('.a3s');
 //    const body = bodyEl ? bodyEl.innerHTML.trim() : '';
 //    const body = bodyEl ? convertHtmlToMarkdown(bodyEl) : '';
-    const body = bodyEl ? removeBlockquotes(removeAfterFromLine(removeAfterSigHead(removeAfterWrote(convertHtmlToPlainText(bodyEl))))) : '';
+    const body = bodyEl ? removeBlockquotes(removeAfterSigHead(removeAfterFromLine(removeAfterWrote(convertHtmlToPlainText(bodyEl))))) : '';
     return { [msgId]: {
         '@core': '|from|' + from_emailAddressOnly + '|\n' +
                  '|-|-|\n' +
