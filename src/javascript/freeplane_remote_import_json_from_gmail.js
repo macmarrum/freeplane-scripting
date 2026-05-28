@@ -40,10 +40,11 @@ function extractGmailMessages(messageSelector) {
     return {[threadId]: threadInner};
  }
 
-const removeAfterSigHead = text => text.split(/^-- $/m, 1)[0];
-const removeAfterFromLine = text => text.split(/\r?\n\*From:\*/, 1)[0];
 const removeAfterWrote = text => text.split(/(?<=<[a-z0-9.-]+@[a-z0-9]+\.[a-z]+> (?:napisał\(a\)|wrote):)\r?\n/m, 1)[0];
+const removeAfterFromLine = text => text.split(/\r?\n\*From:\*/, 1)[0];
+const removeAfterSigHead = text => text.split(/^-- $/m, 1)[0];
 const removeBlockquotes = text => text.replace(/^>.*(\r?\n|\r)?/gm, '');
+const removeExtraLines = text => text.replace(/\r?\n\r?\n[\u00A0 \t]*(\r?\n)/g, '$1');
 
 function extractGmailMessageData(messageEl) {
     if (!messageEl) {
@@ -94,7 +95,7 @@ function extractGmailMessageData(messageEl) {
     const bodyEl = messageEl.querySelector('.a3s');
 //    const body = bodyEl ? bodyEl.innerHTML.trim() : '';
 //    const body = bodyEl ? convertHtmlToMarkdown(bodyEl) : '';
-    const body = bodyEl ? removeBlockquotes(removeAfterSigHead(removeAfterFromLine(removeAfterWrote(convertHtmlToPlainText(bodyEl))))) : '';
+    const body = bodyEl ? removeExtraLines(removeBlockquotes(removeAfterSigHead(removeAfterFromLine(removeAfterWrote(convertHtmlToPlainText(bodyEl)))))) : '';
     return { [msgId]: {
         '@core': '|from|' + from_emailAddressOnly + '|\n' +
                  '|-|-|\n' +
