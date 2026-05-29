@@ -5,10 +5,14 @@
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Sort"})
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
-
+import org.freeplane.core.ui.components.UITools
 import org.freeplane.features.map.SummaryNode
 import org.freeplane.features.map.mindmapmode.MMapController
 
+if (config.getProperty('save_modification_times') != 'true') {
+    UITools.informationMessage(UITools.currentFrame, 'Preferences…->Environment->Save->Save modification times = false', 'Sort Children by Last Modified', 0)
+    return
+}
 c = c as Controller
 MMapController mapController = c.selected.modeController.mapController
 c.selecteds.each { n ->
