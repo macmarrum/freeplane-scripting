@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 (async () => {
 const redmineUrl = 'http://127.0.0.1:3020';
+const deriveCoreName = issue => issue.assignedTo?.name && issue.assignedTo.name !== 'NameToAvoid' ? issue.assignedTo.name : issue.author.name;
 const redmineIssueRegex = new RegExp(`^${redmineUrl}/issues/([0-9]+)`);
 function transfer(script) {
     return new Promise((resolve, reject) => {
@@ -80,7 +81,7 @@ const response = await issueResp.json();
 const issue = response.issue;
 const fp = {
     [`ID_${issueId}`]: {
-        '@core': `${issueId}  [${issue.assigned_to?.name ?? issue.author.name}]`,
+        '@core': `${issueId}  [${deriveCoreName(issue)}]`,
         '@link': location.href,
         '@details': issue.subject,
         '@attributes': {[`proj.${(new Date()).toISOString().split('T')[0]}`]: issue.project.name},
