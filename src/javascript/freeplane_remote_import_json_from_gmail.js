@@ -21,7 +21,7 @@ transition: opacity 0.3s ease;
 }
 
 function extractGmailMessages(messageSelector) {
-    const rxThreadId = new RegExp('https://mail.google.com/mail/u/\\d/#(?:inbox|all|sent)/FMfc([^/?#]+)');
+    const rxThreadId = new RegExp('https://mail.google.com/mail/u/\\d/#(?:inbox|all|sent)/([A-Za-z]+)');
     const m = location.href.match(rxThreadId);
     if (!m) {
         const msg = 'Could not find thread ID in URL.';
