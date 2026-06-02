@@ -3,6 +3,7 @@
 (async () => {
 const redmineUrl = 'http://127.0.0.1:3020';
 const deriveCoreName = issue => issue.assignedTo?.name && issue.assignedTo.name !== 'NameToAvoid' ? issue.assignedTo.name : issue.author.name;
+const coreCustomFieldId = 0;
 const redmineIssueRegex = new RegExp(`^${redmineUrl}/issues/([0-9]+)`);
 function transfer(script) {
     return new Promise((resolve, reject) => {
@@ -77,11 +78,19 @@ if (!issueResp.ok) {
     autoAlert(msg);
     throw new Error(msg);
 }
+function getCustomFieldValueById(issue, customFieldId) {
+    for (const cf of issue.custom_fields) {
+        if (cf.id === customFieldId) {
+            return cf.value;
+        }
+    }
+    return `${customFieldId}`;
+}
 const response = await issueResp.json();
 const issue = response.issue;
 const fp = {
     [`ID_${issueId}`]: {
-        '@core': `${issueId}  [${deriveCoreName(issue)}]`,
+        '@core': `${issueId}  [${deriveCoreName(issue)}]  ${getCustomFieldValueById(issue, coreCustomFieldId)}`,
         '@link': location.href,
         '@details': issue.subject,
         '@attributes': {[`proj.${(new Date()).toISOString().split('T')[0]}`]: issue.project.name},
