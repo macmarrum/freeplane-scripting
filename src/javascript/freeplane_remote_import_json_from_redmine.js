@@ -44,8 +44,20 @@ border: 4px solid #ee5500;
 border-radius: 8px; font-size: 16px; z-index: 9999;
 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 transition: opacity 0.3s ease;
-`;
+overflow: hidden;`;
     overlay.textContent = message;
+    const bar = document.createElement('div');
+    bar.style.cssText = `
+position: absolute; bottom: 0; left: 0;
+height: 2px; width: 100%; background: #ee5500;
+animation: _shrink ${durationMs}ms linear forwards;`;
+    if (!document.getElementById('_autoAlertStyle')) {
+        const style = document.createElement('style');
+        style.id = '_autoAlertStyle';
+        style.textContent = `@keyframes _shrink { from { width: 100% } to { width: 0% } }`;
+        document.head.appendChild(style);
+    }
+    overlay.appendChild(bar);
     document.body.appendChild(overlay);
     setTimeout(() => {
         overlay.style.opacity = '0';
@@ -100,5 +112,5 @@ const fpJson = JSON.stringify(fp);
 const toBase64 = str => btoa(unescape(encodeURIComponent(str)));
 const jsonBase64 = toBase64(fpJson);
 const script = `c.select(io.github.macmarrum.freeplane.Import.fromJsonStringBase64('${jsonBase64}', node))`;
-autoAlert(await transfer(script));
+autoAlert(await transfer(script), 2000);
 })().catch(console.error);
