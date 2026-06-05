@@ -12,7 +12,10 @@ border-radius: 8px; font-size: 16px; z-index: 9999;
 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 transition: opacity 0.3s ease;
 overflow: hidden;`;
-    overlay.textContent = message;
+    message.split('\n').forEach((line, i) => {
+        if (i > 0) overlay.appendChild(document.createElement('br'));
+        overlay.appendChild(document.createTextNode(line));
+    });
     const bar = document.createElement('div');
     bar.style.cssText = `
 position: absolute; bottom: 0; left: 0;

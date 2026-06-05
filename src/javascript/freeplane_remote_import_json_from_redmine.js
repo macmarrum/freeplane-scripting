@@ -45,7 +45,10 @@ border-radius: 8px; font-size: 16px; z-index: 9999;
 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 transition: opacity 0.3s ease;
 overflow: hidden;`;
-    overlay.textContent = message;
+    message.split('\n').forEach((line, i) => {
+        if (i > 0) overlay.appendChild(document.createElement('br'));
+        overlay.appendChild(document.createTextNode(line));
+    });
     const bar = document.createElement('div');
     bar.style.cssText = `
 position: absolute; bottom: 0; left: 0;
@@ -77,7 +80,7 @@ const apiKeyResp = await fetch(`${redmineUrl}/my/api_key`);
         .parseFromString(apiKeyHtml, 'text/html')
         .querySelector('#content pre');
 if (!preEl) {
-    const msg = 'Could not retrieve API key. Are you signed in to Redmine?';
+    const msg = 'Could not retrieve API key.\nAre you signed in to Redmine?';
     autoAlert(msg);
     throw new Error(msg);
 }
@@ -86,7 +89,7 @@ const issueResp = await fetch(`${redmineUrl}/issues/${issueId}.json`, {
     headers: { 'X-Redmine-API-Key': apiKey }
 });
 if (!issueResp.ok) {
-    const msg = `Failed to fetch issue: ${issueResp.status}`;
+    const msg = `Failed to fetch issue:\n${issueResp.status}`;
     autoAlert(msg);
     throw new Error(msg);
 }
