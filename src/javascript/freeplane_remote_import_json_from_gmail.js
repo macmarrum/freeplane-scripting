@@ -311,6 +311,10 @@ function transfer(script) {
 
 const messages = extractGmailMessages('div.adn.ads');
 const fpJson = JSON.stringify(messages);
+if (fpJson.length > 1_000_000) {
+    autoAlert('Too much data!\nOver 1,000,000 characters.');
+    return;
+}
 const toBase64 = str => btoa(unescape(encodeURIComponent(str)));
 const jsonBase64 = toBase64(fpJson);
 const script = `c.select(io.github.macmarrum.freeplane.Import.fromJsonStringBase64('${jsonBase64}', node))`;
