@@ -317,6 +317,15 @@ if (fpJson.length > 1_000_000) {
 }
 const toBase64 = str => btoa(unescape(encodeURIComponent(str)));
 const jsonBase64 = toBase64(fpJson);
-const script = `c.select(io.github.macmarrum.freeplane.Import.fromJsonStringBase64('${jsonBase64}', node))`;
+function splitIntoChunks(str, chunkSize = 65535) {
+    const chunks = [];
+    for (let i = 0; i < str.length; i += chunkSize) {
+        chunks.push(str.slice(i, i + chunkSize));
+    }
+    return chunks;
+}
+let script = 'def sb = new StringBuilder()\n';
+splitIntoChunks(jsonBase64, 65535).forEach(chunk => script += `sb.append('${chunk}')\n`);
+script += 'c.select(io.github.macmarrum.freeplane.Import.fromJsonStringBase64(sb.toString(), node))';
 autoAlert(await transfer(script), 2000);
 })().catch(console.error);
