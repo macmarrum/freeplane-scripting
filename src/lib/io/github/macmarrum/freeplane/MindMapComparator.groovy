@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023, 2024  macmarrum (at) outlook (dot) ie
+ * Copyright (C) 2023, 2024, 2026  macmarrum (at) outlook (dot) ie
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package io.github.macmarrum.freeplane
 
 import org.freeplane.api.MindMap
 import org.freeplane.api.Node
+import org.freeplane.core.util.HtmlUtils
 import org.freeplane.core.util.MenuUtils
 import org.freeplane.features.map.MapModel
 import org.freeplane.features.map.NodeModel
@@ -82,13 +83,17 @@ class MindMapComparator {
             // no such node in oldMindMap
             styleIt(node, style.NEW)
         } else {
-            if (node.text != oldNode.text) {
+            if (node.plainText != oldNode.plainText) {
                 styleIt(node, style.CH_text)
             }
-            if (node.detailsText != oldNode.detailsText) {
+            def nodeDetailsText = HtmlUtils.htmlToPlain(node.detailsText)
+            def oldNodeDetailsText = HtmlUtils.htmlToPlain(oldNode.detailsText)
+            if (nodeDetailsText != oldNodeDetailsText) {
                 styleIt(node, style.CH_details)
             }
-            if (node.noteText != oldNode.noteText) {
+            def nodeNoteText = HtmlUtils.htmlToPlain(node.noteText)
+            def oldNodeNoteText = HtmlUtils.htmlToPlain(oldNode.noteText)
+            if (nodeNoteText != oldNodeNoteText) {
                 styleIt(node, style.CH_note)
             }
             if (!node.isRoot() && !oldNode.isRoot()) {
