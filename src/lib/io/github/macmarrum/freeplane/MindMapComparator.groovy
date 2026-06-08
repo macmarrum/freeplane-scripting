@@ -173,4 +173,74 @@ class MindMapComparator {
         mapStyleModel.addStyleNode(styleNode)
         return styleNode
     }
+
+    static void compareBranches(Node oldBranchRoot, Node newBranchRoot) {
+        createStylesIfMissing(oldBranchRoot.mindMap.delegate)
+        compareBranchNodeRecursively(oldBranchRoot, newBranchRoot)
+        // add deleted nodes to mark them as DEL
+        def c = ScriptUtils.c()
+        oldBranchRoot.findAll().each { Node oldNode ->
+            if (_findNodeInBranchByTextAndDetails(newBranchRoot, oldNode) == null) {
+                def parent = _findNodeInBranchByTextAndDetails(newBranchRoot, oldNode.parent)
+                if (parent) {
+                    def node = parent.appendChild(oldNode)
+                    if (!oldNode.isRoot()) {
+                        node.left = oldNode.left
+                        node.moveTo(parent, oldNode.parent.getChildPosition(oldNode))
+                    }
+                    c.select(node)
+                    styleIt(node, style.DEL)
+                }
+            }
+        }
+        c.select(newBranchRoot)
+    }
+
+    static void compareBranchNodeRecursively(Node oldBranchRoot, Node node) {
+        def c = ScriptUtils.c()
+        def oldNode = _findNodeInBranchByTextAndDetails(oldBranchRoot, node)
+        if (node.isVisible())
+            c.select(node)
+        if (oldNode == null) {
+            // no such node in oldMindMap
+            styleIt(node, style.NEW)
+        } else {
+//            if (node.text != oldNode.text) {
+//                styleIt(node, style.CH_text)
+//            }
+//            if (node.detailsText != oldNode.detailsText) {
+//                styleIt(node, style.CH_details)
+//            }
+            if (HtmlUtils.htmlToPlain(node.noteText) != HtmlUtils.htmlToPlain(oldNode.noteText)) {
+                styleIt(node, style.CH_note)
+            }
+            if (!node.isRoot() && !oldNode.isRoot()) {
+                if (!_hasSameTextAndDetails(node.parent, oldNode.parent) && _findNodeInBranchByTextAndDetails(oldBranchRoot, node.parent)) {
+                    // parent changed
+                    styleIt(node, style.MV_parent)
+//                } else if (node.parent.getChildPosition(node) != oldNode.parent.getChildPosition(oldNode)) {
+                    // position changed
+//                    styleIt(node, style.MV_position)
+                }
+            }
+        }
+        node.children.each { Node nChild ->
+            compareBranchNodeRecursively(oldBranchRoot, nChild)
+        }
+    }
+
+    static Node _findNodeInBranchByTextAndDetails(Node branchRoot, Node node) {
+        def nodeList = branchRoot.find { _hasSameTextAndDetails(it, node) } as List<Node>
+        if (nodeList.size() == 0) {
+            return null
+        } else if (nodeList.size() == 1) {
+            return nodeList[0]
+        } else {
+            throw new RuntimeException("Expected 1, got ${nodeList.size()} nodes with text '${node.text}'")
+        }
+    }
+
+    static boolean _hasSameTextAndDetails(Node a, Node b) {
+        return a.plainText == b.plainText && HtmlUtils.htmlToPlain(a.detailsText) == HtmlUtils.htmlToPlain(b.detailsText)
+    }
 }
