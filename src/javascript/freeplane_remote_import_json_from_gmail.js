@@ -58,7 +58,7 @@ function extractGmailMessages(messageSelector) {
 
 const removeAfterWrote = text => stripHist === 0 ? text : text.split(/(?<=<[a-z0-9.-]+@[a-z0-9]+\.[a-z]+> (?:napisał\(a\)|wrote):)\r?\n/m, 1)[0];
 const removeAfterFromLine = text => stripHist === 0 ? text : text.split(/(?<=\r?\n(\*From:\*|From:) +[^<]+ +<[a-z0-9.-]+@[a-z0-9]+\.[a-z]+>)/, 1)[0];
-const removeAfterSigHead = text => text.split(/^-- $/m, 1)[0];
+const removeAfterSigHead = text => text.split(/^(-- |________________________________)$/m, 1)[0];
 const removeBlockquotes = text => text.replace(/^>.*(\r?\n|\r)?/gm, '');
 const removeExtraLines = text => text.replace(/\r?\n\r?\n[\u00A0 \t]*(\r?\n)/g, '$1');
 
