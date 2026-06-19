@@ -62,10 +62,19 @@ animation: _shrink ${durationMs}ms linear forwards;`;
     }
     overlay.appendChild(bar);
     document.body.appendChild(overlay);
-    setTimeout(() => {
+    const timer = setTimeout(() => {
         overlay.style.opacity = '0';
         setTimeout(() => overlay.remove(), 300);
     }, durationMs);
+    const btn = document.createElement('span');
+    btn.textContent = '×';
+    btn.title = 'Close (Esc)';
+    btn.style.cssText = 'position:absolute; top:4px; right:8px; cursor:pointer; font-weight:bold; padding:0 4px 0 4px; border: 1px solid #ee5500;';
+    const dismiss = () => { clearTimeout(timer); overlay.remove(); document.removeEventListener('keydown', onKey); };
+    const onKey = e => { if (e.key === 'Escape') dismiss(); };
+    btn.addEventListener('click', dismiss);
+    document.addEventListener('keydown', onKey);
+    overlay.appendChild(btn);
 }
 const match = location.href.match(redmineIssueRegex);
 if (!match) {
