@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2026  macmarrum (at) outlook (dot) ie
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
