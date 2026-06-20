@@ -3,15 +3,30 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/AI"})
-import io.github.macmarrum.freeplane.AiOllamaClient
+
+import io.github.macmarrum.swing.AiClient
 
 node = node as org.freeplane.api.Node
 
-String ollamaAddress = 'http://172.16.2.2:11434'
-String model = 'phi4-mini:latest'
-String system = 'You are an expert editor specializing in making text clearer, more concise, and more impactful. Your task is to rewrite the following text while maintaining the original meaning and intent.'
-new AiOllamaClient(ollamaAddress, model, system).generateAsync(
-        node.transformedText,
-        { response -> node.note = response },
-        { e -> node.note = "Error: ${e.message}" }
-)
+String url = 'http://172.16.2.2:11434'
+String model = 'ollama|phi4-mini:latest'
+String systemMessage = 'You are an expert editor specializing in making text clearer, more concise, and more impactful. Your task is to rewrite the text provided as user prompt while maintaining the original meaning and intent, and to change only what is necessary. Output ONLY the rewritten text.'
+String iconHourglass = 'emoji-23F3'
+
+def makeDetails = { String t -> "${new Date().format('yyyy-MM-dd HH:mm:ss')} ${model}${t ? '\n' + t : ''}" }
+
+def n = node
+def originalText = n.transformedText
+n.detailsText = makeDetails()
+n.icons.add(iconHourglass)
+
+new AiClient(url: url, model: model).chatAsync([systemMessage, originalText])
+        {
+            n.text = it.aiMessage().text()
+            n.details = makeDetails("${it.tokenUsage().inputTokenCount()} | ${it.tokenUsage().outputTokenCount()}\n${originalText}")
+            n.icons.remove(iconHourglass)
+        }
+        {
+            n.details = makeDetails("ERROR\n${it}")
+            n.icons.remove(iconHourglass)
+        }
