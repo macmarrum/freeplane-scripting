@@ -16,6 +16,7 @@ import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.SimpleType
 
 import javax.swing.*
+import java.time.Duration
 
 /**
  * Example usage:
@@ -28,6 +29,7 @@ class AiClient {
     public String url
     public String key
     public String model
+    public long timeout
 
     ChatModel buildModel() {
         if (!model?.contains('|')) {
@@ -38,10 +40,12 @@ class AiClient {
         (provider, modelName) = model.split('\\|', 2)
         return switch (provider) {
             case 'openrouter' -> {
-                OpenAiChatModel.builder().baseUrl(url ?: openRouterUrl).apiKey(key).modelName(modelName).build()
+                def tmout = Duration.ofSeconds(timeout ?: 60)
+                OpenAiChatModel.builder().timeout(tmout).baseUrl(url ?: openRouterUrl).apiKey(key).modelName(modelName).build()
             }
             case 'ollama' -> {
-                def builder = OllamaChatModel.builder().baseUrl(url ?: ollamaUrl).modelName(modelName)
+                def tmout = Duration.ofSeconds(timeout ?: 300)
+                def builder = OllamaChatModel.builder().timeout(tmout).baseUrl(url ?: ollamaUrl).modelName(modelName)
                 if (key)
                     builder = builder.customHeaders(['Authorization': "Bearer ${key}"])
                 builder.build()
