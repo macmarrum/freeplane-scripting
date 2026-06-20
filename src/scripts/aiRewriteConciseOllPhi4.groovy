@@ -8,8 +8,9 @@ import io.github.macmarrum.swing.AiClient
 
 node = node as org.freeplane.api.Node
 
-String url = 'http://172.16.2.2:11434'
-String model = 'ollama|phi4-mini:latest'
+String model = config.getProperty('ai_selected_model')
+String key = model.startsWith('openrouter|') ? config.getProperty('ai_openrouter_key') : null // default, i.e. none for ollama
+String url = model.startsWith('ollama|') ? config.getProperty('ai_ollama_service_address') : null // default for openrouter
 String systemMessage = 'You are an expert editor specializing in making text clearer, more concise, and more impactful. Your task is to rewrite the text provided as user prompt while maintaining the original meaning and intent, and to change only what is necessary. Output ONLY the rewritten text.'
 String iconHourglass = 'emoji-23F3'
 
@@ -20,7 +21,7 @@ def originalText = n.transformedText
 n.detailsText = makeDetails()
 n.icons.add(iconHourglass)
 
-new AiClient(url: url, model: model).chatAsync([systemMessage, originalText])
+new AiClient(url: url, key: key, model: model).chatAsync([systemMessage, originalText])
         {
             n.text = it.aiMessage().text()
             n.details = makeDetails("${it.tokenUsage().inputTokenCount()} | ${it.tokenUsage().outputTokenCount()}\n${originalText}")
