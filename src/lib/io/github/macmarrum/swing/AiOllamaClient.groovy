@@ -1,4 +1,4 @@
-package io.github.macmarrum.freeplane
+package io.github.macmarrum.swing
 /*
  * Copyright (C) 2026  macmarrum (at) outlook (dot) ie
  * SPDX-License-Identifier: GPL-3.0-or-later
