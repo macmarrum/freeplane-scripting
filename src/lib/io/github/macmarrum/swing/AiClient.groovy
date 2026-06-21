@@ -38,7 +38,7 @@ class AiClient {
         String provider
         String modelName
         (provider, modelName) = model.split('\\|', 2)
-        return switch (provider) {
+        return switch (provider.toLowerCase()) {
             case 'openrouter' -> {
                 def tmout = Duration.ofSeconds(timeout ?: 60)
                 OpenAiChatModel.builder().timeout(tmout).baseUrl(url ?: openRouterUrl).apiKey(key).modelName(modelName).build()
