@@ -26,10 +26,12 @@ import java.time.Duration
 class AiClient {
     public static String openRouterUrl = 'https://openrouter.ai/api/v1'
     public static String ollamaUrl = 'http://localhost:11434'
+    public static Collection<String> thinkEfforts = ['medium', 'high', 'xhigh']
     public String url
     public String key
     public String model
     public long timeout
+    public String effort
 
     ChatModel buildModel() {
         if (!model?.contains('|')) {
@@ -41,11 +43,12 @@ class AiClient {
         return switch (provider.toLowerCase()) {
             case 'openrouter' -> {
                 def tmout = Duration.ofSeconds(timeout ?: 60)
-                OpenAiChatModel.builder().timeout(tmout).baseUrl(url ?: openRouterUrl).apiKey(key).modelName(modelName).build()
+                OpenAiChatModel.builder().timeout(tmout).baseUrl(url ?: openRouterUrl).apiKey(key).modelName(modelName).reasoningEffort(effort).build()
             }
             case 'ollama' -> {
                 def tmout = Duration.ofSeconds(timeout ?: 300)
-                def builder = OllamaChatModel.builder().timeout(tmout).baseUrl(url ?: ollamaUrl).modelName(modelName)
+                def think = effort == null ? null : effort in thinkEfforts
+                def builder = OllamaChatModel.builder().timeout(tmout).baseUrl(url ?: ollamaUrl).modelName(modelName).think(think)
                 if (key)
                     builder = builder.customHeaders(['Authorization': "Bearer ${key}"])
                 builder.build()
