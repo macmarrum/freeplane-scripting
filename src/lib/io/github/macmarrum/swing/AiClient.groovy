@@ -60,7 +60,7 @@ class AiClient {
      * @param messages System Message followed by one or more User Messages
      * @param onSuccess Closure with ChatResponse as its argument
      * @param onError Closure with Exception as its argument
-     * @return response text or error
+     * @return response text or null on error
      */
     String chat(List<String> messages, @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess = null, Closure onError = null) {
         def chatMessages = new ChatMessage[messages.size()]
