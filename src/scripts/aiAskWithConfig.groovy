@@ -16,7 +16,7 @@ def node = c.selected
 def providerModel = config.getProperty('ai_selected_model').split('\\|', 2)
 
 def systemMessage = node.parent.text ?: null  // fall back to default if no parent text
-def prompt = node.text
+def userMessage = node.text
 
 def aiRequestOptions = AiRequestOptions.builder()
         .systemMessage(systemMessage)
@@ -25,11 +25,11 @@ def aiRequestOptions = AiRequestOptions.builder()
         .mode(AiRequestMode.SHOW_IN_NEW_CHAT)
         .timeout(Duration.ofSeconds(60))
         .build()
-//println("${new Date().format('HH:mm:ss')} askAi: ${prompt} | ${aiRequestOptions.mode.name()}")
-c.askAi(prompt, aiRequestOptions) { result ->
+//println("${new Date().format('HH:mm:ss')} askAi: ${userMessage} | ${aiRequestOptions.mode.name()}")
+c.askAi(userMessage, aiRequestOptions) { result ->
     if (result.status == AiRequestStatus.SUCCEEDED) {
         node.text = result.response
-        node.details = "askAi prompt: ${prompt}"
+        node.details = userMessage
     } else {
         node.details = "askAi status: ${result.status.name()}"
     }
