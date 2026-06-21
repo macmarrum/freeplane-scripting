@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2025  macmarrum (at) outlook (dot) ie
+/*
+ * Copyright (C) 2025, 2026  macmarrum (at) outlook (dot) ie
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Create"})
@@ -16,7 +16,8 @@ def mindMapFile = node.mindMap.file
 def settings = [
         mermaidCli         : '/usr/bin/mmdc',
 //        mermaidCli         : /C:\Users\Mac\AppData\Roaming\npm\mmdc.cmd/,
-//        mermaidCliExtraArgs: ['-t', 'dark'],
+        extension          : '.png', // supported values: .png .svg .pdf
+        mermaidCliExtraArgs: ['--scale', 2], // for PNG, to improve readability
 //        mermaidCliTimeoutSec: 30,
         mermaidCliVerbose  : false, // in the mind map, create a branch representing mermaid-cli arguments
         mermaidNodePart    : 'auto', // [auto|core|note|details]
@@ -25,6 +26,9 @@ def settings = [
 //        customSaveDir      : "${mindMapFile.parent}/my_images",
 //        imageFileNamePrefix: '',
 ]
+
+// use <text> instead of <foreignObject> for SVG, so that non-browser viewers can display labels
+mmdcConfigJson = '{"htmlLabels": false}'
 
 def mermaidCliFile = new File(settings.mermaidCli as String)
 if (!mermaidCliFile.canExecute()) {
@@ -44,26 +48,43 @@ def text = switch (mermaidNodePart) {
 if (text) {
     def customSaveDir = settings.get('customSaveDir', mindMapFile.parent) as String
     def imageFileNamePrefix = settings['imageFileNamePrefix'] ? "${settings.imageFileNamePrefix}_" : ''
-    def imageFileName = "${imageFileNamePrefix}${node.id}.png"
+    def imageFileName = "${imageFileNamePrefix}${node.id}${settings.extension ?: '.png'}"
     def imageFile = new File(customSaveDir, imageFileName)
-    def mermaidFile = new File("${imageFile}.mermaid")
+    def mermaidConfigFile = new File("${imageFile}.json")
+    if (imageFileName.endsWith('.svg')) {
+        mermaidConfigFile.setText(mmdcConfigJson, 'UTF-8')
+    }
+    def mermaidFile = new File("${imageFile}.mmd")
     mermaidFile.setText(text, 'UTF-8')
     def mermaidCliExtraArgs = settings.get('mermaidCliExtraArgs', [])
     def mermaidCliTimeoutSec = settings.mermaidCliTimeoutSec as Integer ?: 30
     def args = [mermaidCliFile, '-i', mermaidFile, '-o', imageFile, *mermaidCliExtraArgs]
+    if (imageFileName.endsWith('.svg')) {
+        args.addAll(['-c', mermaidConfigFile])
+    }
     if (settings['mermaidCliVerbose']) {
         def child = node.createChild(new Date())
         child.format = 'yyyy-MM-dd HH:mm:ss'
         child.createChild(args.join(' '))
     }
     args.execute().waitFor(mermaidCliTimeoutSec, TimeUnit.SECONDS)
+    if (imageFileName.endsWith('.svg')) {
+        mermaidConfigFile.delete()
+    }
     mermaidFile.delete()
+    node.externalObject.uri = null
     if (config.getProperty('links') == 'relative') {
         def imageFilePathRelativeToMindMapParent = mindMapFile.parentFile.relativePath(imageFile)
         def imageUri = makeUriRetainingRelative(imageFilePathRelativeToMindMapParent)
-        node.externalObject.uri = imageUri
+        if (imageFileName.endsWith('.png')) {
+            node.externalObject.uri = imageUri
+        }
+        node.link.uri = imageUri
     } else {
-        node.externalObject.file = imageFile
+        if (imageFileName.endsWith('.png')) {
+            node.externalObject.file = imageFile
+        }
+        node.link.file = imageFile
     }
 } else {
     UITools.showMessage("no Mermaid definition in ${mermaidNodePart == 'auto' ? 'core, note, details' : mermaidNodePart}", 2)
