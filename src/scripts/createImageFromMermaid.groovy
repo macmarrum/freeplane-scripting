@@ -45,6 +45,11 @@ def text = switch (mermaidNodePart) {
     default -> ''
 }
 
+text = text.stripIndent()
+if (text.startsWith('```mermaid') && text.endsWith('```')) {
+    text = text.drop(10).dropRight(3).strip()
+}
+
 if (text) {
     def customSaveDir = settings.get('customSaveDir', mindMapFile.parent) as String
     def imageFileNamePrefix = settings['imageFileNamePrefix'] ? "${settings.imageFileNamePrefix}_" : ''
