@@ -34,7 +34,15 @@ final defaultPort = "48${ver.maj}${ver.mid}" as Integer
 final PORT = FREEPLANE_REMOTE_CONTROL_PORT !== null ? System.env.FREEPLANE_REMOTE_CONTROL_PORT as Integer : defaultPort
 final FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT = System.env.FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT
 
-final REMINDER_REMOVAL_AFTER_MILIS = 200
+final REMINDER_AFTER_MILLIS = 100
+final REMINDER_REMOVAL_AFTER_MILIS = REMINDER_AFTER_MILLIS + 100
+final REMINDER_PERIOD_UNIT = 'YEAR'
+final REMINDER_PERIOD = 999
+
+final SCHEDULED = 'SCHEDULED'
+final ERROR = 'ERROR'
+
+final ENCODING = 'UTF-8'
 
 final SCRIPT_HEADER = '''\
 import javax.swing.SwingUtilities
@@ -46,14 +54,6 @@ if (__remoteControlReminderNode) {
     SwingUtilities.invokeLater { __remoteControlReminderNode.reminder.remove() }
 }
 """
-final REMINDER_AFTER_MILLIS = 100
-final REMINDER_PERIOD_UNIT = 'YEAR'
-final REMINDER_PERIOD = 999
-
-final SCHEDULED = 'SCHEDULED'
-final ERROR = 'ERROR'
-
-final ENCODING = 'UTF-8'
 
 new Thread({
     def server = new ServerSocket()
