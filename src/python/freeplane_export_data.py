@@ -15,6 +15,8 @@ class NodeData:
     note: str | None = None
     attributes: list[TAttributeElem] | dict[str, Any] | None = None
     icons: list[str] | None = None
+    tags: list[str] | None = None
+    link: str | None = None
     style: StyleData | None = None
     children: list[NodeData] | None = None
 
@@ -30,6 +32,10 @@ class NodeData:
             dct['@attributes'] = self.attributes
         if self.icons is not None:
             dct['@icons'] = self.icons
+        if self.tags is not None:
+            dct['@tags'] = self.tags
+        if self.link is not None:
+            dct['@link'] = self.link
         if self.style is not None:
             dct['@style'] = self.style.as_dict()
         if self.children is not None:
