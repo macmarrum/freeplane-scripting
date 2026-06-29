@@ -19,7 +19,13 @@
 
 import org.freeplane.core.util.FreeplaneVersion
 import org.freeplane.core.util.LogUtils
+import org.freeplane.features.mode.Controller
+import org.freeplane.features.script.IScriptStarter
 import org.freeplane.plugin.script.proxy.ScriptUtils
+
+import javax.swing.SwingUtilities
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 /*
  * Set FREEPLANE_REMOTE_CONTROL_HOST to '0.0.0.0' to enable access on all network interfaces
@@ -33,27 +39,8 @@ final ver = FreeplaneVersion.version
 final defaultPort = "48${ver.maj}${ver.mid}" as Integer
 final PORT = FREEPLANE_REMOTE_CONTROL_PORT !== null ? System.env.FREEPLANE_REMOTE_CONTROL_PORT as Integer : defaultPort
 final FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT = System.env.FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT
-
-final REMINDER_AFTER_MILLIS = 100
-final REMINDER_REMOVAL_AFTER_MILIS = REMINDER_AFTER_MILLIS + 100
-final REMINDER_PERIOD_UNIT = 'YEAR'
-final REMINDER_PERIOD = 999
-
-final SCHEDULED = 'SCHEDULED'
-final ERROR = 'ERROR'
-
 final ENCODING = 'UTF-8'
-
-final SCRIPT_HEADER = '''\
-import javax.swing.SwingUtilities
-def __remoteControlReminderNode = node
-'''
-final SCRIPT_FOOTER = """\
-if (__remoteControlReminderNode) {
-    sleep(${REMINDER_REMOVAL_AFTER_MILIS})
-    SwingUtilities.invokeLater { __remoteControlReminderNode.reminder.remove() }
-}
-"""
+def timeout = 30  // TIMEOUT= on first line of script overrides it
 
 new Thread({
     def server = new ServerSocket()
@@ -63,35 +50,57 @@ new Thread({
 
     while (true) {
         server.accept(false) { socket ->
-            LogUtils.info("Freeplane Remote Control connection: ${socket}")
             socket.withStreams { input, output ->
-                // Avoid using the Groovy readLine(), as it closes input
-                // and, apparently because of that,
-                // output cannot be written back to socket
-                def sb = new StringBuilder(SCRIPT_HEADER)
-                input.withReader(ENCODING) { sb << it.text << '\n' }
-                sb << SCRIPT_FOOTER
+//                def script = new String(input.readAllBytes(), ENCODING)  // readAllBytes() since Java 9
+                def reader = new InputStreamReader(input, ENCODING)
+                def sb = new StringBuilder()
+                def buf = new char[4096]
+                int n
+                while ((n = reader.read(buf)) != -1) {
+                    sb.append(buf, 0, n)
+                }
                 def script = sb.toString()
-                if (FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT == '1')
-                    print(script)
-                if (!ScriptUtils.c().openMindMaps) {
-                    output.withWriter(ENCODING) { it.write('ERROR: no mind map is open') }
-                    LogUtils.warn('Freeplane Remote Control - no mind map is open')
-                } else {
+
+                def scriptLines = script.split('\n', 2)
+                if (scriptLines[0].startsWith('TIMEOUT=')) {
                     try {
-                        def reminder = ScriptUtils.node().reminder
-                        reminder.remove()
-                        def remindAt = new Date(Calendar.instance.timeInMillis + REMINDER_AFTER_MILLIS)
-                        reminder.createOrReplace(remindAt, REMINDER_PERIOD_UNIT, REMINDER_PERIOD)
-                        reminder.script = script
-                        output.withWriter {it << SCHEDULED }
-                    } catch (Exception e) {
-                        output.withPrintWriter {
-                            it.println(ERROR)
-                            e.printStackTrace(it)
+                        timeout = scriptLines[0].split('=')[1] as Integer
+                    } catch (NumberFormatException ignored) {}
+                    script = scriptLines.length > 1 ? scriptLines[1] : ''
+                }
+
+                if (FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT == '1') {
+                    println(script)
+                }
+
+                def resultFuture = new CompletableFuture<String>()
+
+                SwingUtilities.invokeLater {
+                    try {
+                        if (!ScriptUtils.c().openMindMaps) {
+                            resultFuture.complete('ERROR: no mind map is open')
+                            return
                         }
-                        LogUtils.warn(e)
+                        def starter = Controller.currentModeController.getExtension(IScriptStarter.class)
+                        if (starter == null) {
+                            resultFuture.complete('ERROR: Scripting not available (IScriptStarter extension not found)')
+                            return
+                        }
+                        starter.executeScript(ScriptUtils.node().delegate, script)
+                        resultFuture.complete("SUCCESS: ${ScriptUtils.node().id}")
+                    } catch (Exception e) {
+                        LogUtils.warn("Remote Control Script Error: ${e}")
+                        resultFuture.complete("ERROR: ${e}")
                     }
+                }
+
+                try {
+                    def response = resultFuture.get(timeout, TimeUnit.SECONDS)
+                    output.write(response.getBytes(ENCODING))
+                    output.flush()
+                } catch (Exception e) {
+                    output.write("ERROR: ${e}".getBytes(ENCODING))
+                    output.flush()
                 }
             }
         }

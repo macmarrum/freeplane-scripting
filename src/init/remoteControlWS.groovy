@@ -19,9 +19,14 @@
 
 import org.freeplane.core.util.FreeplaneVersion
 import org.freeplane.core.util.LogUtils
+import org.freeplane.features.mode.Controller
+import org.freeplane.features.script.IScriptStarter
 import org.freeplane.plugin.script.proxy.ScriptUtils
 
+import javax.swing.SwingUtilities
 import java.security.MessageDigest
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 /*
  * Set FREEPLANE_REMOTE_CONTROL_HOST to '0.0.0.0' to enable access on all network interfaces
@@ -35,30 +40,10 @@ final ver = FreeplaneVersion.version
 final defaultPort = "48${ver.maj}${ver.mid}" as Integer
 final PORT = FREEPLANE_REMOTE_CONTROL_PORT !== null ? System.env.FREEPLANE_REMOTE_CONTROL_PORT as Integer : defaultPort
 final FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT = System.env.FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT
-
-final REMINDER_AFTER_MILLIS = 100
-final REMINDER_REMOVAL_AFTER_MILIS = REMINDER_AFTER_MILLIS + 100
-final REMINDER_PERIOD_UNIT = 'YEAR'
-final REMINDER_PERIOD = 999
-
-final SCHEDULED = 'SCHEDULED'
-final ERROR = 'ERROR'
-
-final SCRIPT_HEADER = '''\
-import javax.swing.SwingUtilities
-def __remoteControlReminderNode = node
-'''
-final SCRIPT_FOOTER = """\
-if (__remoteControlReminderNode) {
-    sleep(${REMINDER_REMOVAL_AFTER_MILIS})
-    SwingUtilities.invokeLater { __remoteControlReminderNode.reminder.remove() }
-}
-"""
+def timeout = 30  // TIMEOUT= on first line of script overrides it
 
 // RFC 6455 magic GUID used in the WebSocket opening handshake
 final WS_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
-
-// --- WebSocket helpers ---
 
 /** Computes the Sec-WebSocket-Accept value from the client's Sec-WebSocket-Key. */
 def wsAcceptKey(String clientKey, String guid) {
@@ -166,8 +151,6 @@ def wsSendText(OutputStream output, String text) {
     output.flush()
 }
 
-// --- Server thread ---
-
 new Thread({
     def server = new ServerSocket()
     server.bind(new InetSocketAddress(HOST, PORT), 1)
@@ -180,7 +163,6 @@ new Thread({
             def input = socket.inputStream
             def output = socket.outputStream
 
-            // Perform WebSocket handshake
             def wsKey = wsHandshake(input, output, WS_GUID)
             if (!wsKey) {
                 LogUtils.warn('Freeplane Remote Control - invalid WebSocket handshake')
@@ -188,40 +170,51 @@ new Thread({
                 return
             }
 
-            // Read one text frame containing the Groovy script
-            def scriptBody = wsReadFrame(input)
-            if (scriptBody == null) {
+            def script = wsReadFrame(input)
+            if (script == null) {
                 socket.close()
                 return
             }
 
-            def sb = new StringBuilder(SCRIPT_HEADER)
-            sb << scriptBody << '\n' << SCRIPT_FOOTER
-            def script = sb.toString()
+            def scriptLines = script.split('\n', 2)
+            if (scriptLines[0].startsWith('TIMEOUT=')) {
+                try {
+                    timeout = scriptLines[0].split('=')[1] as Integer
+                } catch (NumberFormatException ignored) {
+                }
+                script = scriptLines.length > 1 ? scriptLines[1] : ''
+            }
 
             if (FREEPLANE_REMOTE_CONTROL_PRINT_SCRIPT == '1')
                 print(script)
 
-            if (!ScriptUtils.c().openMindMaps) {
-                wsSendText(output, 'ERROR: no mind map is open')
-                LogUtils.warn('Freeplane Remote Control - no mind map is open')
-            } else {
+            def resultFuture = new CompletableFuture<String>()
+            SwingUtilities.invokeLater {
                 try {
-                    def reminder = ScriptUtils.node().reminder
-                    reminder.remove()
-                    def remindAt = new Date(Calendar.instance.timeInMillis + REMINDER_AFTER_MILLIS)
-                    reminder.createOrReplace(remindAt, REMINDER_PERIOD_UNIT, REMINDER_PERIOD)
-                    reminder.script = script
-                    wsSendText(output, SCHEDULED)
+                    if (!ScriptUtils.c().openMindMaps) {
+                        resultFuture.complete('ERROR: no mind map is open')
+                        return
+                    }
+
+                    def starter = Controller.currentModeController.getExtension(IScriptStarter.class)
+                    if (starter == null) {
+                        resultFuture.complete('ERROR: Scripting not available (IScriptStarter extension not found)')
+                        return
+                    }
+                    starter.executeScript(ScriptUtils.node().delegate, script)
+                    resultFuture.complete("SUCCESS: ${ScriptUtils.node().id}")
                 } catch (Exception e) {
-                    def sw = new StringWriter()
-                    e.printStackTrace(new PrintWriter(sw))
-                    wsSendText(output, "${ERROR}\n${sw}")
-                    LogUtils.warn(e)
+                    LogUtils.warn("Remote Control Script Error: ${e}")
+                    resultFuture.complete("ERROR: ${e}")
                 }
             }
 
-            socket.close()
+            try {
+                def response = resultFuture.get(timeout, TimeUnit.SECONDS)
+                wsSendText(output, response)
+            } catch (Exception e) {
+                wsSendText(output, "ERROR: ${e}")
+            }
         }
     }
 }, 'freeplane-remote-control-websocket').start()
