@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - 2025  macmarrum (at) outlook (dot) ie
+ * Copyright (C) 2023 - 2026  macmarrum (at) outlook (dot) ie
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,16 +105,22 @@ class Import {
     }
 
     static Node fromJsonString(String content, Node parent = null, Boolean shouldFold = null) {
+        def jObject = new JsonSlurper(type: JsonParserType.CHAR_BUFFER).parseText(content)
+        return fromJsonObject(jObject, parent, shouldFold)
+    }
+
+    static Node fromJsonObject(Object jObject, Node parent = null, Boolean shouldFold = null) {
         if (shouldFold == null)
             shouldFold = false
         if (!parent)
             parent = ScriptUtils.node().mindMap.root.createChild('JSON')
         fold(shouldFold, parent)
-        def jObject = new JsonSlurper(type: JsonParserType.CHAR_BUFFER).parseText(content)
         if (jObject instanceof Map)
             _fromJsonMapRecursively(jObject, parent)
         else if (jObject instanceof List)
             _fromJsonList(jObject, parent)
+        else
+            throw new IllegalArgumentException("Only Map and List are supported for jObject")
         unfold(shouldFold, parent)
         return parent
     }
