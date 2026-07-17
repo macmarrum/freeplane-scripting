@@ -320,22 +320,15 @@ function transfer(script) {
 }
 
 const messages = extractGmailMessages('div.adn.ads');
-const fpJson = JSON.stringify(messages);
-if (fpJson.length > 1_000_000) {
+const argumentsJson = JSON.stringify(messages);
+if (argumentsJson.length > 1_000_000) {
     autoAlert('Too much data!\nOver 1,000,000 characters.');
     return;
 }
-const toBase64 = str => btoa(unescape(encodeURIComponent(str)));
-const jsonBase64 = toBase64(fpJson);
-function splitIntoChunks(str, chunkSize = 65535) {
-    const chunks = [];
-    for (let i = 0; i < str.length; i += chunkSize) {
-        chunks.push(str.slice(i, i + chunkSize));
-    }
-    return chunks;
-}
-let script = 'def sb = new StringBuilder()\n';
-splitIntoChunks(jsonBase64, 65535).forEach(chunk => script += `sb.append('${chunk}')\n`);
-script += 'c.select(io.github.macmarrum.freeplane.Import.fromJsonStringBase64(sb.toString(), node))';
-autoAlert(await transfer(script), 2000);
+const payload = {
+    'script': 'c.select(io.github.macmarrum.freeplane.Import.fromJsonObject(args, node))',
+    'argumentsJson': argumentsJson,
+    };
+const payloadJson = JSON.stringify(payload);
+autoAlert(await transfer(payloadJson), 2000);
 })().catch(console.error);
