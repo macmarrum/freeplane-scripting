@@ -1,37 +1,40 @@
 // Copyright (C) 2026  macmarrum (at) outlook (dot) ie
 // SPDX-License-Identifier: GPL-3.0-or-later
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/AI"})
-
-
 import org.freeplane.api.Controller
-import org.freeplane.api.ai.*
+import org.freeplane.api.Node
+import org.freeplane.api.ai.AiModelConfiguration
+import org.freeplane.api.ai.AiRequestMode
+import org.freeplane.api.ai.AiRequestOptions
+import org.freeplane.api.ai.AiRequestStatus
+import org.freeplane.api.ai.AiThinkingEffort
+import org.freeplane.api.ai.AiToolAvailability
 
 import java.time.Duration
 
 c = c as Controller
-def node = c.selected
+node = node as Node
 
-//def providerModel = ['ollama', 'phi4-mini:latest']
-//def providerModel = ['OpenRouter', 'nex-agi/nex-n2-pro:free']
-def providerModel = config.getProperty('ai_selected_model').split('\\|', 2)
-
-def systemMessage = node.parent.text ?: null  // fall back to default if no parent text
-def userMessage = node.text
+def systemMessage = node.parent.text ?: config.getProperty('ai_system_message')
+def userMessage = node.note?.plain ?: node.text
 
 def aiRequestOptions = AiRequestOptions.builder()
-        .systemMessage(systemMessage)
-        .modelSelection(AiModelSelection.explicit(*providerModel))
+        // no model configuration — use what's selected in the UI
+        .exactSystemMessage(systemMessage)
         .toolAvailability(AiToolAvailability.DISABLED)
         .mode(AiRequestMode.SHOW_IN_NEW_CHAT)
-        .timeout(Duration.ofSeconds(60))
+        .timeout(Duration.ofSeconds(60 * 3))
         .build()
-//println("${new Date().format('HH:mm:ss')} askAi: ${userMessage} | ${aiRequestOptions.mode.name()}")
 c.askAi(userMessage, aiRequestOptions) { result ->
+    Node resultNode
     if (result.status == AiRequestStatus.SUCCEEDED) {
-        node.text = result.response
-        node.details = userMessage
+        resultNode = node.createChild(result.response)
+        def ncs = resultNode.conditionalStyles
+        ncs.add(true, null, '=Markdown', false)
+        ncs.add(true, null, '+max20cm', false)
     } else {
-        node.details = "askAi status: ${result.status.name()}"
+        resultNode = node.createChild()
+        resultNode.details = "askAi status: ${result.status.name()}"
     }
-    node.note = result.detail
+    resultNode.note = result.detail
 }
