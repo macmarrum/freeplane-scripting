@@ -9,10 +9,10 @@ import org.freeplane.features.map.NodeModel
 
 import javax.swing.JOptionPane
 
-def detailsInAttributesStyle = ''
-def detailsInAttributesIcon = 'emoji-1F539'
+def DETAILS_IN_ATTRIBUTES_STYLE = ''
+def DETAILS_IN_ATTRIBUTES_ICON = 'emoji-1F539'
 def DETAILS = 'details'
-def keepHtml = true
+def KEEP_HTML = true
 
 
 node = node as Node
@@ -25,25 +25,25 @@ if (detailsText) {
         UITools.showConfirmDialog(nodeModel, "The attribute '${DETAILS}' already contains data", 'Toggle Hide Details in Attributes', JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE)
     } else {
         def plainDetailsText = HtmlUtils.htmlToPlain(detailsText)
-        attributes.add(DETAILS, !keepHtml || plainDetailsText.startsWith('=') ? plainDetailsText : detailsText)
+        attributes.add(DETAILS, !KEEP_HTML || plainDetailsText.startsWith('=') ? plainDetailsText : detailsText)
         node.details = null
-        if (detailsInAttributesStyle) {
-            node.conditionalStyles.add(true, null, detailsInAttributesStyle, false)
+        if (DETAILS_IN_ATTRIBUTES_STYLE) {
+            node.conditionalStyles.add(true, null, DETAILS_IN_ATTRIBUTES_STYLE, false)
         }
-        if (detailsInAttributesIcon) {
-            node.icons.add(detailsInAttributesIcon)
+        if (DETAILS_IN_ATTRIBUTES_ICON) {
+            node.icons.add(DETAILS_IN_ATTRIBUTES_ICON)
         }
     }
 } else {
     if (attributeDetails) {
         node.details = attributeDetails
         attributes.removeAll(DETAILS)
-        if (detailsInAttributesStyle) {
+        if (DETAILS_IN_ATTRIBUTES_STYLE) {
             def ncs = node.conditionalStyles
-            ncs.find { ConditionalStyle it -> it.active && it.always && it.styleName == detailsInAttributesStyle && !it.last }.each { ConditionalStyle it -> it.remove() }
+            ncs.find { ConditionalStyle it -> it.active && it.always && it.styleName == DETAILS_IN_ATTRIBUTES_STYLE && !it.last }.each { ConditionalStyle it -> it.remove() }
         }
-        if (detailsInAttributesIcon) {
-            node.icons.remove(detailsInAttributesIcon)
+        if (DETAILS_IN_ATTRIBUTES_ICON) {
+            node.icons.remove(DETAILS_IN_ATTRIBUTES_ICON)
         }
     }
 }
