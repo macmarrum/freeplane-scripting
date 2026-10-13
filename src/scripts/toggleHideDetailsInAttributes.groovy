@@ -23,7 +23,7 @@ c.selecteds.each { Node node ->
     if (detailsText) {
         if (attributeDetails) {
             def nodeModel = node.delegate as NodeModel
-            UITools.showConfirmDialog(nodeModel, "The attribute '${DETAILS}' already contains data", 'Toggle Hide Details in Attributes', JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE)
+            UITools.showConfirmDialog(nodeModel, "${node.id}: The attribute '${DETAILS}' already contains data", 'Toggle Hide Details in Attributes', JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE)
         } else {
             def plainDetailsText = HtmlUtils.htmlToPlain(detailsText)
             attributes.add(DETAILS, !KEEP_HTML || plainDetailsText.startsWith('=') ? plainDetailsText : detailsText)
