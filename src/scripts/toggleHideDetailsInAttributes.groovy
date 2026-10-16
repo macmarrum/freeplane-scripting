@@ -16,7 +16,27 @@ def DETAILS = 'details'
 def KEEP_HTML = true
 
 c = c as Controller
-c.selecteds.each { Node node ->
+
+static findSinglesAndCloneLeaders(Iterable<Node> nodes) {
+    if (nodes.size() == 1)
+        return nodes
+    def singlesAndLeaders = new ArrayList<Node>()
+    def subtrees = new HashSet<Node>()
+    def clones = new HashSet<Node>()
+    nodes.each { Node n ->
+        if (n !in subtrees) { // not a tree clone or a clone leader
+            def nodesSharingContentAndSubtree = n.nodesSharingContentAndSubtree
+            subtrees.addAll(nodesSharingContentAndSubtree)
+            if (n !in clones) { // not a content clone or a clone leader
+                singlesAndLeaders << n
+                clones.addAll(n.nodesSharingContent - nodesSharingContentAndSubtree)
+            }
+        }
+    }
+    return singlesAndLeaders
+}
+
+findSinglesAndCloneLeaders(c.selecteds).each { Node node ->
     def attributes = node.attributes
     def detailsText = node.detailsText
     def attributeDetails = attributes.getFirst(DETAILS)
