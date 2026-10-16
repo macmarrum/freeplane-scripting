@@ -6,6 +6,7 @@ import org.freeplane.api.Controller
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
 import org.freeplane.core.util.HtmlUtils
+import org.freeplane.core.util.TextUtils
 import org.freeplane.features.map.NodeModel
 
 import javax.swing.JOptionPane
@@ -36,14 +37,14 @@ static findSinglesAndCloneLeaders(Iterable<Node> nodes) {
     return singlesAndLeaders
 }
 
+def errorNodes = new ArrayList<Node>()
 findSinglesAndCloneLeaders(c.selecteds).each { Node node ->
     def attributes = node.attributes
     def detailsText = node.detailsText
     def attributeDetails = attributes.getFirst(DETAILS)
     if (detailsText) {
         if (attributeDetails) {
-            def nodeModel = node.delegate as NodeModel
-            UITools.showConfirmDialog(nodeModel, "${node.id}: The attribute '${DETAILS}' already contains data", 'Toggle Hide Details in Attributes', JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE)
+            errorNodes << node
         } else {
             def plainDetailsText = HtmlUtils.htmlToPlain(detailsText)
             attributes.add(DETAILS, !KEEP_HTML || plainDetailsText.startsWith('=') ? plainDetailsText : detailsText)
@@ -68,4 +69,10 @@ findSinglesAndCloneLeaders(c.selecteds).each { Node node ->
             }
         }
     }
+}
+if (errorNodes) {
+    def nodeModel = c.selected.delegate as NodeModel
+    def message = "The attribute '${DETAILS}' already contains data!\n${errorNodes.size()} nodes in error — IDs copied to the clipboard"
+    UITools.showConfirmDialog(nodeModel, message, 'Toggle Hide Details in Attributes', JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE)
+    TextUtils.copyToClipboard(errorNodes.collect { "${it.id}" }.join(', '))
 }
