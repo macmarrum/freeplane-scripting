@@ -7,48 +7,74 @@ import org.freeplane.api.ai.AiRequestMode
 import org.freeplane.api.ai.AiRequestOptions
 import org.freeplane.api.ai.AiRequestStatus
 import org.freeplane.api.ai.AiToolAvailability
+import org.freeplane.core.ui.components.UITools
+import org.freeplane.features.map.NodeModel
+import org.freeplane.plugin.script.FreeplaneScriptBaseClass
 
+import javax.swing.JOptionPane
 import java.time.Duration
+
+SYSTEM_MESSAGE_STYLE = '-SystemMessage'
+PROMPT_STYLE = '-Prompt'
+RESPONSE_STYLE = '-Response'
 
 c = c as Controller
 node = node as Node
+FreeplaneScriptBaseClass.ConfigProperties config = config
 
-static String formattedNow() {
-    new Date().format('yyyy-MM-dd,E HH:mm:ss')
+def showError = { String message ->
+    NodeModel nodeModel = node.delegate
+    UITools.showConfirmDialog(nodeModel, message, 'Ai Ask With Config', JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE)
 }
 
-if (node['created_at'].text == null) {
-    node['created_at'] = formattedNow()
-    node.conditionalStyles.add(true, null, '+max20cm', false)
+if (node.style.name !in [null, PROMPT_STYLE]) {
+    showError("The node already has a style different than '${PROMPT_STYLE}'")
+    return
 }
+node.style.name = PROMPT_STYLE
 
-def systemMessage = node.parent.text ?: config.getProperty('ai_system_message')
+def systemMessageNode = node.pathToRoot.reverse().find { it.style.name == SYSTEM_MESSAGE_STYLE }
+if (!systemMessageNode) {
+    c.statusInfo = 'No system-message node found in pathToRoot'
+}
+def systemMessage = systemMessageNode?.text ?: config.getProperty('ai_system_message')
 
 def userMessage = node.note?.plain ?: node.text
-def provider, model = config.getProperty('ai_selected_model').split(/\|/, 2)
+def (provider, model) = config.getProperty('ai_selected_model').split(/\|/, 2)
 def effort = config.getProperty('ai_thinking_effort')
 String error
+
+static String getIsoNow() {
+    new Date().format('yyyy-MM-dd HH:mm:ss')
+}
+
+def isoNow = getIsoNow()
+node['modified_at'] = isoNow
+node[isoNow] = userMessage
+
+if (node.parent.style.name == RESPONSE_STYLE && !node.isLeaf()) {
+    showError('Mid-conversation branching is not supported')
+    return
+}
 
 // Note: no model or effort configuration — uses what's selected in the UI
 def aiRequestOptions = AiRequestOptions.builder()
         .exactSystemMessage(systemMessage)
         .toolAvailability(AiToolAvailability.DISABLED)
-        .mode(AiRequestMode.SHOW_IN_NEW_CHAT)
+        .mode(node.parent.style.name == RESPONSE_STYLE ? AiRequestMode.ADD_TO_CHAT : AiRequestMode.SHOW_IN_NEW_CHAT)
         .timeout(Duration.ofSeconds(60 * 3))
         .build()
 c.askAi(userMessage, aiRequestOptions) { result ->
-    Node resultNode
+    Node responseNode
     if (result.status == AiRequestStatus.SUCCEEDED) {
-        resultNode = node.createChild(result.response)
-        def ncs = resultNode.conditionalStyles
-        ncs.add(true, null, '=Markdown', false)
-        ncs.add(true, null, '+max20cm', false)
+        responseNode = node.createChild(result.response)
+        responseNode.style.name = RESPONSE_STYLE
     } else {
-        resultNode = node.createChild()
+        responseNode = node.createChild()
         error = "${result.status.name()}\n${result.detail}".replaceAll(/[ \n]+$/, '')
     }
-    resultNode['created_at'] = formattedNow()
-    resultNode['model'] = "${provider}/${model}"
-    resultNode['effort'] = effort
-    if (error) resultNode['error'] = error
+    responseNode['modified_at'] = getIsoNow()
+    responseNode['model'] = "${provider}/${model}"
+    responseNode['effort'] = effort
+    if (error) responseNode['error'] = error
 }
