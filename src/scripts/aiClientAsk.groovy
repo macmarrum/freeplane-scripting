@@ -1,9 +1,17 @@
-/*
- * Copyright (C) 2026  macmarrum (at) outlook (dot) ie
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
+// Copyright (C) 2026  macmarrum (at) outlook (dot) ie
+// SPDX-License-Identifier: GPL-3.0-or-later
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/AI"})
 
+/**
+ * askAi from a node, with SystemMessage in branch root and responses as children:
+ * <pre>
+ * SystemMessage → Prompt → Response [→ P → R ...]
+ *                       [→ Response [→ P → R ...]]
+ * </pre>
+ * Keeps history and chat metadata in nodes.
+ * Uses Provider+Model and Effort as selected in Freeplane AI Panel;
+ * apiKey and URL from Freeplane AI Preferences.
+ */
 
 import groovy.time.TimeCategory
 import io.github.macmarrum.swing.AiClient
@@ -87,10 +95,6 @@ chatNodePath.eachWithIndex { Node n, int i ->
 }
 
 
-def (provider, model) = config.getProperty('ai_selected_model').split(/\|/, 2)
-def effort = config.getProperty('ai_thinking_effort')
-String error
-
 def ISO_DATE_FMT = 'yyyy-MM-dd HH:mm:ss'
 
 def getNow = {
@@ -112,6 +116,9 @@ if (parentStyle !in expectedParentStyles) {
 def (promptDate, promptIsoDate) = getNow()
 node['modified_at'] = promptIsoDate
 node[promptIsoDate] = messages.last()
+
+def (provider, model) = config.getProperty('ai_selected_model').split(/\|/, 2)
+def effort = config.getProperty('ai_thinking_effort')
 
 String url = switch (provider) {
     case 'gemini' -> config.getProperty('ai_gemini_service_address')
