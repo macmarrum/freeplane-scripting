@@ -16,6 +16,7 @@ import org.freeplane.plugin.script.FreeplaneScriptBaseClass
 import javax.swing.JOptionPane
 
 SYSTEM_MESSAGE_STYLE = '-SystemMessage'
+GROUPING_STYLE = null
 PROMPT_STYLE = '-Prompt'
 RESPONSE_STYLE = '-Response'
 
@@ -54,13 +55,14 @@ static getText(Node n) {
 
 void printNodePathData(List<Node> nodePath) {
     nodePath.each {
-        println "${it.id}: ${it.style.name}\n${getText(it).indent(2)}"
+        print "${it.id}: ${it.style.name}\n${getText(it).indent(2)}"
     }
 }
 
 def messages = []
 def pathFromSysMsg = properPathToSysMsg.reverse()
-pathFromSysMsg.eachWithIndex { Node n, int i ->
+def chatNodePath = pathFromSysMsg.findAll { it.style.name in [SYSTEM_MESSAGE_STYLE, PROMPT_STYLE, RESPONSE_STYLE] || it.id == node.id }
+chatNodePath.eachWithIndex { Node n, int i ->
     if (i == 0) {
         messages << getText(n)
     } else if (i % 2 != 0) {
@@ -69,7 +71,7 @@ pathFromSysMsg.eachWithIndex { Node n, int i ->
         } else {
             def msg = "Unsupported style for ${n.id}: ${n.style.name}\nExpected ${PROMPT_STYLE}"
             println msg
-            printNodePathData(pathFromSysMsg)
+            printNodePathData(chatNodePath)
             throw new IllegalArgumentException(msg)
         }
     } else {
@@ -78,7 +80,7 @@ pathFromSysMsg.eachWithIndex { Node n, int i ->
         } else {
             def msg = "Unsupported style for ${n.id}: ${n.style.name}\nExpected ${RESPONSE_STYLE}"
             println msg
-            printNodePathData(pathFromSysMsg)
+            printNodePathData(chatNodePath)
             throw new IllegalArgumentException(msg)
         }
     }
@@ -101,7 +103,7 @@ def getIsoNow = {
 }
 
 def parentStyle = node.parent.style.name
-def expectedParentStyles = [SYSTEM_MESSAGE_STYLE, RESPONSE_STYLE]
+def expectedParentStyles = [SYSTEM_MESSAGE_STYLE, RESPONSE_STYLE, GROUPING_STYLE, null]
 if (parentStyle !in expectedParentStyles) {
     showError("Unsupported style of parent: ${parentStyle}\nExpected parent with style in ${expectedParentStyles}")
     return
