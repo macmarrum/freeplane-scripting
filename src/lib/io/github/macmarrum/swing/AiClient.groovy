@@ -81,7 +81,9 @@ class AiClient {
      * @param onError Closure with Exception as its argument
      * @return response text or null on error
      */
-    String chat(Iterable<String> messages, @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess = null, Closure onError = null) {
+    String chat(Iterable<String> messages,
+                @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess = null,
+                @ClosureParams(value = SimpleType.class, options = 'Exception') Closure onError = null) {
         def chatMessages = new ChatMessage[messages.size()]
         messages.eachWithIndex { String msg, int i ->
             def messageClass = i == 0 ? SystemMessage : (i % 2 != 0 ? UserMessage : AiMessage)
@@ -90,7 +92,9 @@ class AiClient {
         return chat(chatMessages, onSuccess, onError)
     }
 
-    String chat(ChatMessage[] chatMessages, @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess = null, Closure onError = null) {
+    String chat(ChatMessage[] chatMessages,
+                @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess = null,
+                @ClosureParams(value = SimpleType.class, options = 'Exception') Closure onError = null) {
         def chatModel = buildModel()
         try {
             ChatResponse response = chatModel.chat(chatMessages)
@@ -109,11 +113,15 @@ class AiClient {
         }
     }
 
-    void chatAsync(Iterable<String> messages, @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess, Closure onError) {
+    void chatAsync(Iterable<String> messages,
+                   @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess,
+                   @ClosureParams(value = SimpleType.class, options = 'Exception') Closure onError) {
         Thread.start { chat(messages, onSuccess, onError) }
     }
 
-    void chatAsync(ChatMessage[] chatMessages, @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess, Closure onError) {
+    void chatAsync(ChatMessage[] chatMessages,
+                   @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess,
+                   @ClosureParams(value = SimpleType.class, options = 'Exception') Closure onError) {
         Thread.start { chat(chatMessages, onSuccess, onError) }
     }
 }
