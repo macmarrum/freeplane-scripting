@@ -5,11 +5,14 @@
 
 package io.github.macmarrum.swing
 
+import dev.langchain4j.data.message.AiMessage
 import dev.langchain4j.data.message.ChatMessage
 import dev.langchain4j.data.message.SystemMessage
 import dev.langchain4j.data.message.UserMessage
 import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.chat.response.ChatResponse
+import dev.langchain4j.model.googleai.GeminiThinkingConfig
+import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel
 import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.model.openai.OpenAiChatModel
 import groovy.transform.stc.ClosureParams
@@ -20,27 +23,40 @@ import java.time.Duration
 
 /**
  * Example usage:
- * def client = new AiClient(model: 'ollama|phi4-mini')
+ * def client = new AiClient(provider: 'ollama', model: 'phi4-mini')
  * println client.chat(['You are a helpful assistant who answers in few words.', 'How far is the Moon?'])
  */
 class AiClient {
+    public static String geminiUrl = 'https://generativelanguage.googleapis.com/v1beta'
     public static String openRouterUrl = 'https://openrouter.ai/api/v1'
     public static String ollamaUrl = 'http://localhost:11434'
     public static Collection<String> thinkEfforts = ['medium', 'high', 'xhigh']
+    public String provider
     public String url
     public String key
     public String model
-    public long timeout
     public String effort
+    public long timeout
 
     ChatModel buildModel() {
-        if (!model?.contains('|')) {
-            throw new IllegalArgumentException("model must be in 'provider|modelName' format, got: '${model}'")
-        }
-        String provider
         String modelName
-        (provider, modelName) = model.split('\\|', 2)
+        if (model?.contains('|')) {
+            (provider, modelName) = model.split('\\|', 2)
+        } else {
+            modelName = model
+        }
         return switch (provider.toLowerCase()) {
+            case 'gemini' -> {
+                def tmout = Duration.ofSeconds(timeout ?: 300)
+                def thinkingLevel = switch (effort.toLowerCase()) {
+                    case 'none' -> null
+                    case ['minimal', 'low', 'medium', 'high'] -> effort.toLowerCase()
+                    case ['xhigh', 'max'] -> 'high'
+                    default -> throw new IllegalArgumentException("unsupported effort: ${effort}")
+                }
+                def thinkingConfig = GeminiThinkingConfig.builder().thinkingLevel(thinkingLevel).build()
+                GoogleAiGeminiChatModel.builder().timeout(tmout).baseUrl(url ?: geminiUrl).apiKey(key).modelName(modelName).thinkingConfig(thinkingConfig).build()
+            }
             case 'openrouter' -> {
                 def tmout = Duration.ofSeconds(timeout ?: 60)
                 OpenAiChatModel.builder().timeout(tmout).baseUrl(url ?: openRouterUrl).apiKey(key).modelName(modelName).reasoningEffort(effort).build()
@@ -60,15 +76,16 @@ class AiClient {
     }
 
     /**
-     * @param messages System Message followed by one or more User Messages
+     * @param messages System Message (index: 0) followed by User Messages (index: 1, 3, 5, ...) and AI Messages (index: 2, 4, 6, ...)
      * @param onSuccess Closure with ChatResponse as its argument
      * @param onError Closure with Exception as its argument
      * @return response text or null on error
      */
-    String chat(List<String> messages, @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess = null, Closure onError = null) {
+    String chat(Iterable<String> messages, @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess = null, Closure onError = null) {
         def chatMessages = new ChatMessage[messages.size()]
         messages.eachWithIndex { String msg, int i ->
-            chatMessages[i] = i == 0 ? SystemMessage.from(msg) : UserMessage.from(msg)
+            def messageClass = i == 0 ? SystemMessage : (i % 2 != 0 ? UserMessage : AiMessage)
+            chatMessages[i] = messageClass.from(msg)
         }
         return chat(chatMessages, onSuccess, onError)
     }
@@ -92,7 +109,7 @@ class AiClient {
         }
     }
 
-    void chatAsync(List<String> messages, @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess, Closure onError) {
+    void chatAsync(Iterable<String> messages, @ClosureParams(value = SimpleType.class, options = 'ChatResponse') Closure onSuccess, Closure onError) {
         Thread.start { chat(messages, onSuccess, onError) }
     }
 
