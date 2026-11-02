@@ -129,19 +129,19 @@ def responseNode = node.createChild("...running since ${getIsoNow()}")
 responseNode['modified_at'] = promptIsoDate
 responseNode['model'] = "${provider}/${model}"
 responseNode['effort'] = effort
+responseNode.style.name = RESPONSE_STYLE
 
 new AiClient(provider: provider, url: url, key: key, model: model, effort: effort).chatAsync(messages)
         {
             def (responseDate, responseIsoDate) = getNow()
             responseNode['modified_at'] = responseIsoDate
             responseNode.text = it.aiMessage().text()
-            responseNode.style.name = RESPONSE_STYLE
             responseNode['duration'] = TimeCategory.minus(responseDate, promptDate).toString()
         }
         {
             def (responseDate, responseIsoDate) = getNow()
             responseNode['modified_at'] = responseIsoDate
             responseNode.text = null
-            responseNode['error'] = it as String
+            responseNode['error'] = it.message
             responseNode['duration'] = TimeCategory.minus(responseDate, promptDate).toString()
         }
