@@ -143,6 +143,8 @@ new AiClient(provider: provider, url: url, key: key, model: model, effort: effor
             def (responseDate, responseIsoDate) = getNow()
             responseNode['modified_at'] = responseIsoDate
             responseNode.text = it.aiMessage().text()
+            responseNode['input_token_count'] = it.tokenUsage().inputTokenCount()
+            responseNode['output_token_count'] = it.tokenUsage().outputTokenCount()
             responseNode['duration'] = TimeCategory.minus(responseDate, promptDate).toString()
         }
         {
