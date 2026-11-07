@@ -10,7 +10,7 @@
  * </pre>
  * Keeps history and chat metadata in nodes.
  * Uses Provider+Model and Effort as selected in Freeplane AI Panel;
- * apiKey and URL from Freeplane AI Preferences.
+ * apiKey and baseUrl from Freeplane AI Preferences.
  */
 
 import groovy.time.TimeCategory
@@ -120,13 +120,13 @@ node[promptIsoDate] = messages.last()
 def (provider, model) = config.getProperty('ai_selected_model').split(/\|/, 2)
 def effort = config.getProperty('ai_thinking_effort')
 
-String url = switch (provider) {
+String baseUrl = switch (provider) {
     case 'gemini' -> config.getProperty('ai_gemini_service_address')
     case 'openrouter' -> config.getProperty('ai_openrouter_service_address')
     case 'ollama' -> config.getProperty('ai_ollama_service_address')
     default -> null
 }
-String key = switch (provider) {
+String apiKey = switch (provider) {
     case 'gemini' -> config.getProperty('ai_gemini_key')
     case 'openrouter' -> config.getProperty('ai_openrouter_key')
     default -> null
@@ -138,7 +138,7 @@ responseNode['model'] = "${provider}/${model}"
 responseNode['effort'] = effort
 responseNode.style.name = RESPONSE_STYLE
 
-new AiClient(provider: provider, url: url, key: key, model: model, effort: effort).chatAsync(messages)
+new AiClient(provider: provider, baseUrl: baseUrl, apiKey: apiKey, model: model, effort: effort).chatAsync(messages)
         {
             def (responseDate, responseIsoDate) = getNow()
             responseNode['modified_at'] = responseIsoDate

@@ -32,8 +32,8 @@ class AiClient {
     public static String ollamaUrl = 'http://localhost:11434'
     public static Collection<String> thinkEfforts = ['medium', 'high', 'xhigh']
     public String provider
-    public String url
-    public String key
+    public String baseUrl
+    public String apiKey
     public String model
     public String effort
     public long timeout
@@ -55,18 +55,18 @@ class AiClient {
                     default -> throw new IllegalArgumentException("unsupported effort: ${effort}")
                 }
                 def thinkingConfig = GeminiThinkingConfig.builder().thinkingLevel(thinkingLevel).build()
-                GoogleAiGeminiChatModel.builder().timeout(tmout).baseUrl(url ?: geminiUrl).apiKey(key).modelName(modelName).thinkingConfig(thinkingConfig).build()
+                GoogleAiGeminiChatModel.builder().timeout(tmout).baseUrl(baseUrl ?: geminiUrl).apiKey(apiKey).modelName(modelName).thinkingConfig(thinkingConfig).build()
             }
             case 'openrouter' -> {
                 def tmout = Duration.ofSeconds(timeout ?: 60)
-                OpenAiChatModel.builder().timeout(tmout).baseUrl(url ?: openRouterUrl).apiKey(key).modelName(modelName).reasoningEffort(effort).build()
+                OpenAiChatModel.builder().timeout(tmout).baseUrl(baseUrl ?: openRouterUrl).apiKey(apiKey).modelName(modelName).reasoningEffort(effort).build()
             }
             case 'ollama' -> {
                 def tmout = Duration.ofSeconds(timeout ?: 300)
                 def think = effort == null ? null : effort in thinkEfforts
-                def builder = OllamaChatModel.builder().timeout(tmout).baseUrl(url ?: ollamaUrl).modelName(modelName).think(think)
-                if (key)
-                    builder = builder.customHeaders(['Authorization': "Bearer ${key}"])
+                def builder = OllamaChatModel.builder().timeout(tmout).baseUrl(baseUrl ?: ollamaUrl).modelName(modelName).think(think)
+                if (apiKey)
+                    builder = builder.customHeaders(['Authorization': "Bearer ${apiKey}"])
                 builder.build()
             }
             default -> {
