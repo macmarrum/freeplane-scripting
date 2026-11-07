@@ -141,16 +141,16 @@ responseNode.style.name = RESPONSE_STYLE
 new AiClient(provider: provider, baseUrl: baseUrl, apiKey: apiKey, model: model, effort: effort).chatAsync(messages)
         {
             def (responseDate, responseIsoDate) = getNow()
-            responseNode['modified_at'] = responseIsoDate
             responseNode.text = it.aiMessage().text()
+            responseNode['modified_at'] = responseIsoDate
             responseNode['input_token_count'] = it.tokenUsage().inputTokenCount()
             responseNode['output_token_count'] = it.tokenUsage().outputTokenCount()
             responseNode['duration'] = TimeCategory.minus(responseDate, promptDate).toString()
         }
         {
             def (responseDate, responseIsoDate) = getNow()
-            responseNode['modified_at'] = responseIsoDate
             responseNode.text = null
+            responseNode['modified_at'] = responseIsoDate
             responseNode['error'] = it.message
             responseNode['duration'] = TimeCategory.minus(responseDate, promptDate).toString()
         }
