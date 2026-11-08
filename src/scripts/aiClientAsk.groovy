@@ -38,9 +38,9 @@ c = c as Controller
 node = node as Node
 FreeplaneScriptBaseClass.ConfigProperties config = config
 
-def showError = { String message ->
+def showError = { String message, int messageType = JOptionPane.ERROR_MESSAGE ->
     NodeModel nodeModel = node.delegate
-    UITools.showConfirmDialog(nodeModel, message, 'Ai Ask With Config', JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE)
+    UITools.showConfirmDialog(nodeModel, message, 'Ai Ask With Config', JOptionPane.CLOSED_OPTION, messageType)
 }
 
 if (node.style.name !in [null, PROMPT_STYLE]) {
