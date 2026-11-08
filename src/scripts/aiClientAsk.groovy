@@ -8,9 +8,9 @@
  * SystemMessage → Prompt → Response [→ P → R ...]
  *                       [→ Response [→ P → R ...]]
  * </pre>
- * Keeps history and chat metadata in nodes.
- * Uses Provider+Model and Effort as selected in Freeplane AI Panel;
- * apiKey and baseUrl from Freeplane AI Preferences.
+ * Keeps history and chat metadata in attributes.
+ * Uses Provider+Model and Effort as selected in Freeplane AI Panel,
+ * apiKey and baseUrl as specified in Freeplane AI Preferences.
  */
 
 import groovy.time.TimeCategory
