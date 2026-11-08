@@ -54,7 +54,8 @@ for (n in properPathToRoot) {
     }
 }
 if (!systemMessageNode) {
-    c.statusInfo = 'No system-message node found in pathToRoot'
+    showError("No system-message node found in pathToRoot\nExpected a node with the style ${SYSTEM_MESSAGE_STYLE}")
+    return
 }
 
 static getText(Node n) {
