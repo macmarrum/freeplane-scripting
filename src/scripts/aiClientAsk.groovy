@@ -58,11 +58,32 @@ if (!systemMessageNode) {
     return
 }
 
-static getText(Node n) {
-    return n.note?.text ?: n.text
+def getText = { Node n ->
+    def text = switch (n.style.name) {
+        case SYSTEM_MESSAGE_STYLE -> n.note?.text ?: n.text
+        case null -> n.note?.text ?: n.text
+        case PROMPT_STYLE -> {
+            def prompt = n.note?.text ?: n.text
+            if (prompt) {
+                prompt
+            } else {
+                def previousModifiedAt = n['modified_at'].text
+                previousModifiedAt ? n[previousModifiedAt].text : null
+            }
+        }
+        case RESPONSE_STYLE -> n.note?.text ?: n.text
+        default -> {
+            def msg = "Unexpected node style (${n.style.name})\nExpected one of ${[SYSTEM_MESSAGE_STYLE, null, PROMPT_STYLE, RESPONSE_STYLE]}"
+            throw new IllegalArgumentException(msg)
+        }
+    }
+    if (!text) {
+        throw new IllegalArgumentException("No message found in node ${n.id}")
+    }
+    return text
 }
 
-void printNodePathData(List<Node> nodePath) {
+def printNodePathData = { List<Node> nodePath ->
     nodePath.each {
         print "${it.id}: ${it.style.name}\n${getText(it).indent(2)}"
     }
