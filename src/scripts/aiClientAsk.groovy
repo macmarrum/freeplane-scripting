@@ -23,10 +23,16 @@ import org.freeplane.plugin.script.FreeplaneScriptBaseClass
 
 import javax.swing.JOptionPane
 
-SYSTEM_MESSAGE_STYLE = '-SystemMessage'
-GROUPING_STYLE = null
-PROMPT_STYLE = '-Prompt'
-RESPONSE_STYLE = '-Response'
+final SYSTEM_MESSAGE_STYLE = '-SystemMessage'
+final GROUPING_STYLE = null
+final PROMPT_STYLE = '-Prompt'
+final RESPONSE_STYLE = '-Response'
+
+// Note: Prompt is always recorded in node[latestModifiedAt]
+final REMOVE_PROMPT_FROM_NOTE_OR_CORE = false
+
+final MOVE_SUBSEQUENT_PROMPT_TO_NOTE_IF_CORE_IS_LONG = true
+final MINIMIZE_PROMPT_NODE_IF_CORE_IS_LONG = true
 
 c = c as Controller
 node = node as Node
@@ -145,6 +151,25 @@ if (previousModifiedAt) {
 }
 node['modified_at'] = promptIsoDate
 node[promptIsoDate] = messages.last()
+
+def isCoreLong = {
+    return node.text.size() > config.getIntProperty('max_shortened_text_length')
+}
+
+if (REMOVE_PROMPT_FROM_NOTE_OR_CORE) {
+    if (node.note) {
+        node.note = null
+    } else {
+        node.text = null
+    }
+}
+if (MOVE_SUBSEQUENT_PROMPT_TO_NOTE_IF_CORE_IS_LONG && messages.size() >= 4 && !node.note && isCoreLong()) {
+    node.note = node.text
+    node.text = null
+}
+if (MINIMIZE_PROMPT_NODE_IF_CORE_IS_LONG && isCoreLong()) {
+    node.minimized = true
+}
 
 def (provider, model) = config.getProperty('ai_selected_model').split(/\|/, 2)
 def effort = config.getProperty('ai_thinking_effort')
