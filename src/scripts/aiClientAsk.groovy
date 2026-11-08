@@ -138,6 +138,7 @@ responseNode['modified_at'] = promptIsoDate
 responseNode['model'] = "${provider}/${model}"
 responseNode['effort'] = effort
 responseNode.style.name = RESPONSE_STYLE
+c.select(responseNode)
 
 new AiClient(provider: provider, baseUrl: baseUrl, apiKey: apiKey, model: model, effort: effort).chatAsync(messages)
         {
