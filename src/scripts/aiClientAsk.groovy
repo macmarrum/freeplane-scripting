@@ -115,6 +115,13 @@ if (parentStyle !in expectedParentStyles) {
 }
 
 def (promptDate, promptIsoDate) = getNow()
+def previousModifiedAt = node['modified_at'].text
+if (previousModifiedAt) {
+    def previousMessage = node[previousModifiedAt].text
+    if (previousMessage == messages.last()) {
+        node[previousModifiedAt] = null
+    }
+}
 node['modified_at'] = promptIsoDate
 node[promptIsoDate] = messages.last()
 
