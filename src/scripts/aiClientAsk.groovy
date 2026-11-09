@@ -17,7 +17,9 @@ import groovy.time.TimeCategory
 import io.github.macmarrum.swing.AiClient
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
+import org.freeplane.core.resources.ResourceController
 import org.freeplane.core.ui.components.UITools
+import org.freeplane.core.ui.sounds.SoundClipPlayer
 import org.freeplane.features.map.NodeModel
 import org.freeplane.plugin.script.FreeplaneScriptBaseClass
 
@@ -34,6 +36,10 @@ final REMOVE_PROMPT_FROM_NOTE_OR_CORE = false
 
 final MOVE_SUBSEQUENT_PROMPT_TO_NOTE_IF_CORE_IS_LONG = true
 final MINIMIZE_PROMPT_NODE_IF_CORE_IS_LONG = true
+
+// Note: Put ai-response-success.wav and/or ai-response-error.wav in <user-dir>/resources/sounds/
+final SUCCESSFUL_RESPONSE_SOUND_WAV_STEM = 'ai-response-success'
+final ERROR_RESPONSE_SOUND_WAV_STEM = 'ai-response-error'
 
 c = c as Controller
 node = node as Node
@@ -194,10 +200,6 @@ responseNode['effort'] = effort
 responseNode.style.name = RESPONSE_STYLE
 c.select(responseNode)
 
-def onCompleted = {
-    flashSpotlight()
-}
-
 new AiClient(provider: provider, baseUrl: baseUrl, apiKey: apiKey, model: model, effort: effort).chatAsync(messages)
         {
             def (responseDate, responseIsoDate) = getNow()
@@ -207,7 +209,8 @@ new AiClient(provider: provider, baseUrl: baseUrl, apiKey: apiKey, model: model,
             responseNode['input_token_count'] = it.tokenUsage().inputTokenCount()
             responseNode['output_token_count'] = it.tokenUsage().outputTokenCount()
             responseNode['duration'] = TimeCategory.minus(responseDate, promptDate).toString()
-            onCompleted()
+            playSound(SUCCESSFUL_RESPONSE_SOUND_WAV_STEM)
+            flashSpotlight()
         }
         {
             def (responseDate, responseIsoDate) = getNow()
@@ -215,10 +218,21 @@ new AiClient(provider: provider, baseUrl: baseUrl, apiKey: apiKey, model: model,
             responseNode['modified_at'] = responseIsoDate
             responseNode['error'] = it.message
             responseNode['duration'] = TimeCategory.minus(responseDate, promptDate).toString()
-            onCompleted()
+            playSound(ERROR_RESPONSE_SOUND_WAV_STEM)
+            flashSpotlight()
         }
 
-static def toggleSpotlight() {
+static playSound(String soundWavStem) {
+    // org.freeplane.core.ui.sounds.SoundClipPlayer.loadSoundClip
+    ResourceController resourceController = ResourceController.getResourceController()
+    final propertyName = 'playsSound.' + soundWavStem
+    final oldValue = resourceController.getBooleanProperty(propertyName)
+    resourceController.setProperty(propertyName, true)
+    SoundClipPlayer.playSound(soundWavStem)
+    resourceController.setProperty(propertyName, oldValue)
+}
+
+static void toggleSpotlight() {
     // org.freeplane.features.styles.SetBooleanMapViewPropertyAction.actionPerformed
     def propertyName = 'spotlight'
     def mapViewComponent = org.freeplane.features.mode.Controller.getCurrentController().getMapViewManager().getMapViewComponent()
@@ -227,7 +241,7 @@ static def toggleSpotlight() {
     mapViewComponent.putClientProperty(propertyName, newValue)
 }
 
-static def flashSpotlight() {
+static void flashSpotlight() {
     toggleSpotlight()
     // Timer executes its listeners on the Event Dispatch Thread (EDT), which is crucial for Swing's thread safety
     new Timer(400, { evt -> toggleSpotlight(); evt.source.stop() }).start()
