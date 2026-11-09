@@ -22,6 +22,7 @@ import org.freeplane.features.map.NodeModel
 import org.freeplane.plugin.script.FreeplaneScriptBaseClass
 
 import javax.swing.JOptionPane
+import javax.swing.Timer
 
 final SYSTEM_MESSAGE_STYLE = '-SystemMessage'
 final GROUPING_STYLE = null
@@ -193,6 +194,10 @@ responseNode['effort'] = effort
 responseNode.style.name = RESPONSE_STYLE
 c.select(responseNode)
 
+def onCompleted = {
+    flashSpotlight()
+}
+
 new AiClient(provider: provider, baseUrl: baseUrl, apiKey: apiKey, model: model, effort: effort).chatAsync(messages)
         {
             def (responseDate, responseIsoDate) = getNow()
@@ -202,6 +207,7 @@ new AiClient(provider: provider, baseUrl: baseUrl, apiKey: apiKey, model: model,
             responseNode['input_token_count'] = it.tokenUsage().inputTokenCount()
             responseNode['output_token_count'] = it.tokenUsage().outputTokenCount()
             responseNode['duration'] = TimeCategory.minus(responseDate, promptDate).toString()
+            onCompleted()
         }
         {
             def (responseDate, responseIsoDate) = getNow()
@@ -209,4 +215,20 @@ new AiClient(provider: provider, baseUrl: baseUrl, apiKey: apiKey, model: model,
             responseNode['modified_at'] = responseIsoDate
             responseNode['error'] = it.message
             responseNode['duration'] = TimeCategory.minus(responseDate, promptDate).toString()
+            onCompleted()
         }
+
+static def toggleSpotlight() {
+    // org.freeplane.features.styles.SetBooleanMapViewPropertyAction.actionPerformed
+    def propertyName = 'spotlight'
+    def mapViewComponent = org.freeplane.features.mode.Controller.getCurrentController().getMapViewManager().getMapViewComponent()
+    final Boolean value = Boolean.TRUE.equals(mapViewComponent.getClientProperty(propertyName))
+    boolean newValue = !value.booleanValue()
+    mapViewComponent.putClientProperty(propertyName, newValue)
+}
+
+static def flashSpotlight() {
+    toggleSpotlight()
+    // Timer executes its listeners on the Event Dispatch Thread (EDT), which is crucial for Swing's thread safety
+    new Timer(400, { evt -> toggleSpotlight(); evt.source.stop() }).start()
+}
