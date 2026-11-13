@@ -181,15 +181,13 @@ if (MINIMIZE_PROMPT_NODE_IF_CORE_IS_LONG && isCoreLong()) {
 def (provider, model) = config.getProperty('ai_selected_model').split(/\|/, 2)
 def effort = config.getProperty('ai_thinking_effort')
 
+final PROVIDERS = ['openai', 'openrouter', 'requesty', 'custom', 'gemini', 'ollama']
 String baseUrl = switch (provider) {
-    case 'gemini' -> config.getProperty('ai_gemini_service_address')
-    case 'openrouter' -> config.getProperty('ai_openrouter_service_address')
-    case 'ollama' -> config.getProperty('ai_ollama_service_address')
+    case PROVIDERS -> config.getProperty("ai_${provider}_service_address")
     default -> null
 }
 String apiKey = switch (provider) {
-    case 'gemini' -> config.getProperty('ai_gemini_key')
-    case 'openrouter' -> config.getProperty('ai_openrouter_key')
+    case PROVIDERS -> config.getProperty("ai_${provider}_key")
     default -> null
 }
 
