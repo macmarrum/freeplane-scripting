@@ -27,8 +27,11 @@ import java.time.Duration
  * println client.chat(['You are a helpful assistant who answers in few words.', 'How far is the Moon?'])
  */
 class AiClient {
+    public static String openaiUrl = 'https://api.openai.com/v1'
+    public static String openrouterUrl = 'https://openrouter.ai/api/v1'
+    public static String requestyUrl = 'https://router.requesty.ai/v1'
+    public static String customUrl = null
     public static String geminiUrl = 'https://generativelanguage.googleapis.com/v1beta'
-    public static String openRouterUrl = 'https://openrouter.ai/api/v1'
     public static String ollamaUrl = 'http://localhost:11434'
     public static Collection<String> thinkEfforts = ['medium', 'high', 'xhigh']
     public String provider
@@ -46,6 +49,10 @@ class AiClient {
             modelName = model
         }
         return switch (provider.toLowerCase()) {
+            case ['openai', 'openrouter', 'requesty', 'custom'] -> {
+                def tmout = Duration.ofSeconds(timeout ?: 60)
+                OpenAiChatModel.builder().timeout(tmout).baseUrl(baseUrl ?: AiClient."${provider.toLowerCase()}Url").apiKey(apiKey).modelName(modelName).reasoningEffort(effort.toLowerCase()).build()
+            }
             case 'gemini' -> {
                 def tmout = Duration.ofSeconds(timeout ?: 300)
                 def thinkingLevel = switch (effort.toLowerCase()) {
@@ -57,10 +64,6 @@ class AiClient {
                 def thinkingConfig = GeminiThinkingConfig.builder().thinkingLevel(thinkingLevel).build()
                 GoogleAiGeminiChatModel.builder().timeout(tmout).baseUrl(baseUrl ?: geminiUrl).apiKey(apiKey).modelName(modelName).thinkingConfig(thinkingConfig).build()
             }
-            case 'openrouter' -> {
-                def tmout = Duration.ofSeconds(timeout ?: 60)
-                OpenAiChatModel.builder().timeout(tmout).baseUrl(baseUrl ?: openRouterUrl).apiKey(apiKey).modelName(modelName).reasoningEffort(effort).build()
-            }
             case 'ollama' -> {
                 def tmout = Duration.ofSeconds(timeout ?: 300)
                 def think = effort == null ? null : effort in thinkEfforts
@@ -70,7 +73,7 @@ class AiClient {
                 builder.build()
             }
             default -> {
-                throw new IllegalArgumentException("provider '${provider}' not supported")
+                throw new IllegalArgumentException("provider '${this.provider}' not supported")
             }
         }
     }
