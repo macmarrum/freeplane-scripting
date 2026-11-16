@@ -213,6 +213,7 @@ new AiClient(provider: provider, baseUrl: baseUrl, apiKey: apiKey, model: model,
         {
             def (responseDate, responseIsoDate) = getNow()
             responseNode.text = null
+            responseNode.note = '''=node['error']'''
             responseNode['modified_at'] = responseIsoDate
             responseNode['error'] = it.message
             responseNode['duration'] = TimeCategory.minus(responseDate, promptDate).toString()
