@@ -201,22 +201,22 @@ c.select(responseNode)
 new AiClient(provider: provider, baseUrl: baseUrl, apiKey: apiKey, model: model, effort: effort).chatAsync(messages)
         {
             def (responseDate, responseIsoDate) = getNow()
-            responseNode.text = null
-            responseNode.note = it.aiMessage().text()
             responseNode['modified_at'] = responseIsoDate
             responseNode['input_token_count'] = it.tokenUsage().inputTokenCount()
             responseNode['output_token_count'] = it.tokenUsage().outputTokenCount()
             responseNode['duration'] = TimeCategory.minus(responseDate, promptDate).toString()
+            responseNode.text = null
+            responseNode.note = it.aiMessage().text()
             playSound(SUCCESSFUL_RESPONSE_SOUND_WAV_STEM)
             flashSpotlight()
         }
         {
             def (responseDate, responseIsoDate) = getNow()
-            responseNode.text = null
-            responseNode.note = '''=node['error']'''
             responseNode['modified_at'] = responseIsoDate
             responseNode['error'] = it.message
             responseNode['duration'] = TimeCategory.minus(responseDate, promptDate).toString()
+            responseNode.text = null
+            responseNode.note = '''=node['error']'''
             playSound(ERROR_RESPONSE_SOUND_WAV_STEM)
             flashSpotlight()
         }
