@@ -26,7 +26,7 @@ enum NodePart {
 final MARKTEXT_COMMAND = 'marktext'
 
 // When set to true, Freeplane will wait for MarkText to exit.
-// When false, a dialog will appear to confirm the editing has finished.
+// When false, a dialog will appear for user to confirm the editing has finished.
 final ASSUME_SINGLE_PROCESS_MARKTEXT = false
 
 ////// Configuration end //////
