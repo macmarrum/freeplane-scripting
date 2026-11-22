@@ -13,13 +13,6 @@ import java.awt.*
 import java.awt.event.ActionListener
 import java.util.List
 
-node = node as Node
-c = c as Controller
-
-enum NodePart {
-    CORE, DETAILS, NOTE
-}
-
 ////// Configuration start //////
 
 // Set it to a full path if need be, e.g. 'C:\\Program Files\\MarkText\\marktext.exe'
@@ -31,6 +24,9 @@ final ASSUME_SINGLE_PROCESS_MARKTEXT = false
 
 ////// Configuration end //////
 
+
+node = node as Node
+c = c as Controller
 
 final TITLE = 'Edit Markdown in MarkText'
 def showConfirmDialog = { String message, int messageType = JOptionPane.ERROR_MESSAGE ->
@@ -62,6 +58,10 @@ static String chooseFromButtons(String title, List<String> options, Frame owner)
     dialog.visible = true  // blocks until disposed
 
     return result[0]
+}
+
+enum NodePart {
+    CORE, DETAILS, NOTE
 }
 
 Map<NodePart, String> nodePartToMarkdown = [:]
