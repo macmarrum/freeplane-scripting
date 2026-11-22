@@ -18,6 +18,9 @@ enum NodePart {
 
 // Configuration start
 
+// Set it to a full path if need be, e.g. 'C:\\Program Files\\MarkText\\marktext.exe'
+final MARKTEXT_COMMAND = 'marktext'
+
 // When set to true, Freeplane will wait for MarkText to exit.
 // When false, a dialog will appear to confirm the editing has finished.
 final ASSUME_SINGLE_PROCESS_MARKTEXT = false
@@ -64,7 +67,7 @@ if (!text) {
 }
 def tempFile = File.createTempFile(node.id + '-' + source.name() + '~', '.md')
 tempFile.setText(text, 'UTF-8')
-final cmdArgs = ['marktext', tempFile]
+final cmdArgs = [MARKTEXT_COMMAND, tempFile]
 def editorProcess = cmdArgs.execute()
 if (ASSUME_SINGLE_PROCESS_MARKTEXT) {
     editorProcess.waitFor()
