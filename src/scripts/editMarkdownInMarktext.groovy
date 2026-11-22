@@ -1,8 +1,6 @@
 // SPDX-FileCopyrightText: 2026 macmarrum (at) outlook (dot) ie
 // SPDX-License-Identifier: GPL-3.0-or-later
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Edit"})
-
-
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
@@ -20,7 +18,7 @@ final MARKTEXT_COMMAND = 'marktext'
 
 // When set to true, Freeplane will wait for MarkText to exit.
 // When false, a dialog will appear for the user to confirm the editing has finished.
-final ASSUME_SINGLE_PROCESS_MARKTEXT = false
+final WAIT_FOR_MARKTEXT_TO_EXIT = false
 
 ////// Configuration end //////
 
@@ -99,7 +97,7 @@ def tempFile = File.createTempFile(node.id + '-' + source.name() + '~', '.md')
 tempFile.setText(text, 'UTF-8')
 final cmdArgs = [MARKTEXT_COMMAND, tempFile]
 def editorProcess = cmdArgs.execute()
-if (ASSUME_SINGLE_PROCESS_MARKTEXT) {
+if (WAIT_FOR_MARKTEXT_TO_EXIT) {
     editorProcess.waitFor()
 } else {
     showConfirmDialog('Once you have finished in MarkText (saved and/or closed the temporary file), click OK.', JOptionPane.INFORMATION_MESSAGE)
