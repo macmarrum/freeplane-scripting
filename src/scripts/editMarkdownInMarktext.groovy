@@ -2,12 +2,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Edit"})
 
+
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
 import org.freeplane.features.map.NodeModel
 
-import javax.swing.JOptionPane
+import javax.swing.*
+import java.awt.*
+import java.awt.event.ActionListener
+import java.util.List
 
 node = node as Node
 c = c as Controller
@@ -16,7 +20,7 @@ enum NodePart {
     CORE, DETAILS, NOTE
 }
 
-// Configuration start
+////// Configuration start //////
 
 // Set it to a full path if need be, e.g. 'C:\\Program Files\\MarkText\\marktext.exe'
 final MARKTEXT_COMMAND = 'marktext'
@@ -25,17 +29,39 @@ final MARKTEXT_COMMAND = 'marktext'
 // When false, a dialog will appear to confirm the editing has finished.
 final ASSUME_SINGLE_PROCESS_MARKTEXT = false
 
-// Markdown can be located in core, note or details. This sets the priority for editing.
-final PRIORITY = [
-        NodePart.CORE,
-        NodePart.NOTE,
-        NodePart.DETAILS,
-]
-// Configuration end
+////// Configuration end //////
 
+
+final TITLE = 'Edit Markdown in MarkText'
 def showConfirmDialog = { String message, int messageType = JOptionPane.ERROR_MESSAGE ->
     NodeModel nodeModel = node.delegate
-    UITools.showConfirmDialog(nodeModel, message, 'Edit Markdown in MarkText', JOptionPane.CLOSED_OPTION, messageType)
+    UITools.showConfirmDialog(nodeModel, message, TITLE, JOptionPane.CLOSED_OPTION, messageType)
+}
+
+static String chooseFromButtons(String title, List<String> options, Frame owner) {
+    JDialog dialog = new JDialog(owner, title, true)
+    String[] result = [null]
+
+    JPanel panel = new JPanel(new GridLayout(options.size(), 1, 0, 6))
+    panel.border = BorderFactory.createEmptyBorder(12, 12, 12, 12)
+
+    options.each { String label ->
+        JButton button = new JButton(label)
+        button.addActionListener({
+            result[0] = label
+            dialog.dispose()
+        } as ActionListener)
+        panel.add(button)
+    }
+
+    dialog.contentPane.add(panel)
+    dialog.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+    dialog.pack()
+    dialog.minimumSize = new Dimension(600, dialog.height)
+    dialog.locationRelativeTo = owner
+    dialog.visible = true  // blocks until disposed
+
+    return result[0]
 }
 
 Map<NodePart, String> nodePartToMarkdown = [:]
@@ -54,14 +80,18 @@ if (node.detailsContentType == 'markdown') {
 
 String text = null
 NodePart source = null
-for (nodePart in PRIORITY) {
-    text = nodePartToMarkdown.get(nodePart)
-    if (text) {
-        source = nodePart
-        break
+if (nodePartToMarkdown.size() == 1) {
+    source = nodePartToMarkdown.find { it.value }.key
+    text = nodePartToMarkdown[source]
+} else if (nodePartToMarkdown.size() > 1) {
+    List<String> options = nodePartToMarkdown.findAll { it.value }.collect { it.key.name() }
+    def label = chooseFromButtons(TITLE, options, UITools.currentFrame)
+    if (label) {
+        source = label as NodePart
+        text = nodePartToMarkdown[source]
     }
 }
-if (!text) {
+if (!text || !source) {
     c.statusInfo = 'No Markdown content'
     return
 }
