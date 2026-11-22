@@ -1,4 +1,11 @@
-// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac2"})
+// SPDX-FileCopyrightText: 2022, 2026 macmarrum (at) outlook (dot) ie
+// SPDX-License-Identifier: GPL-3.0-or-later
+// @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Edit"})
+
+import org.freeplane.api.Node
+
+node = node as Node
+
 def tempFile = File.createTempFile(node.id + '~', '.tmp')
 String text = node.note ?: ''
 tempFile.setText(text, 'UTF-8')
