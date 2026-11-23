@@ -44,14 +44,14 @@ def showConfirmDialog = { String message, int messageType = JOptionPane.ERROR_ME
     UITools.showConfirmDialog(nodeModel, message, TITLE, JOptionPane.CLOSED_OPTION, messageType)
 }
 
-static String chooseFromButtons(String title, List<String> options, Frame owner, boolean mnemonicAlwaysVisible) {
+static String chooseFromButtons(String title, List<String> labels, Frame owner, boolean mnemonicAlwaysVisible) {
     JDialog dialog = new JDialog(owner, title, true)
     String[] result = [null]
 
-    JPanel panel = new JPanel(new GridLayout(options.size(), 1, 0, 6))
+    JPanel panel = new JPanel(new GridLayout(labels.size(), 1, 0, 6))
     panel.border = BorderFactory.createEmptyBorder(12, 12, 12, 12)
 
-    options.each { String raw ->
+    labels.each { String raw ->
         int amp = raw.indexOf('&')
         boolean hasKey = amp >= 0 && amp + 1 < raw.length()
 
@@ -119,11 +119,15 @@ if (nodePartToMarkdown.size() == 1) {
     source = nodePartToMarkdown.find { it.value != null }.key
     text = nodePartToMarkdown[source]
 } else if (nodePartToMarkdown.size() > 1) {
-    Map<NodePart, String> orderedNodePartToMarkdown = BUTTON_ORDER.collectEntries { def np = it as NodePart; [(np): nodePartToMarkdown[np]] }
-    List<String> options = orderedNodePartToMarkdown.collect { it.key.label }
-    def label = chooseFromButtons(TITLE, options, UITools.currentFrame, BUTTON_MNEMONIC_ALWAYS_VISIBLE)
-    if (label) {
-        source = label as NodePart
+    Map<NodePart, String> orderedNodePartToMarkdown = BUTTON_ORDER.collectEntries {
+        def nodePart = it as NodePart
+        def markdown = nodePartToMarkdown[nodePart]
+        markdown != null ? [(nodePart): markdown] : null
+    }
+    List<String> labels = orderedNodePartToMarkdown.collect { it.key.label }
+    def choice = chooseFromButtons(TITLE, labels, UITools.currentFrame, BUTTON_MNEMONIC_ALWAYS_VISIBLE)
+    if (choice) {
+        source = choice as NodePart
         text = nodePartToMarkdown[source]
     }
 }
