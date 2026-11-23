@@ -22,6 +22,16 @@ final MARKTEXT_COMMAND = 'marktext'
 // When false, a dialog will appear for the user to confirm the editing has finished.
 final WAIT_FOR_MARKTEXT_TO_EXIT = false
 
+// When more than one Markdown-typed node part is found, the selection buttons will be displayed in this order.
+final BUTTON_ORDER = [
+        'CORE',
+        'DETAILS',
+        'NOTE',
+]
+
+// When false, the button mnemonic letter is underlined only when Alt is pressed.
+final BUTTON_MNEMONIC_ALWAYS_VISIBLE = true
+
 ////// Configuration end //////
 
 
@@ -34,7 +44,7 @@ def showConfirmDialog = { String message, int messageType = JOptionPane.ERROR_ME
     UITools.showConfirmDialog(nodeModel, message, TITLE, JOptionPane.CLOSED_OPTION, messageType)
 }
 
-static String chooseFromButtons(String title, List<String> options, Frame owner) {
+static String chooseFromButtons(String title, List<String> options, Frame owner, boolean mnemonicAlwaysVisible) {
     JDialog dialog = new JDialog(owner, title, true)
     String[] result = [null]
 
@@ -45,16 +55,24 @@ static String chooseFromButtons(String title, List<String> options, Frame owner)
         int amp = raw.indexOf('&')
         boolean hasKey = amp >= 0 && amp + 1 < raw.length()
 
-        String text = hasKey ? raw.substring(0, amp) + raw.substring(amp + 1) : raw
+        String plain = hasKey ? raw.substring(0, amp) + raw.substring(amp + 1) : raw
         int keyPos = hasKey ? amp : 0
         char keyChar = hasKey ? raw.charAt(amp + 1) : raw.charAt(0)
-        String label = text
+        String html
+        if (mnemonicAlwaysVisible) {
+            String before = plain.substring(0, keyPos)
+            String key = plain.substring(keyPos, keyPos + 1)
+            String after = plain.substring(keyPos + 1)
+            html = "<html>${before}<u>${key}</u>${after}</html>"
+        } else {
+            html = plain
+        }
 
-        JButton button = new JButton(label)
+        JButton button = new JButton(html)
         button.mnemonic = KeyEvent.getExtendedKeyCodeForChar(Character.toUpperCase(keyChar) as int)
         button.displayedMnemonicIndex = keyPos
         button.addActionListener({
-            result[0] = label
+            result[0] = plain
             dialog.dispose()
         } as ActionListener)
         panel.add(button)
@@ -101,8 +119,9 @@ if (nodePartToMarkdown.size() == 1) {
     source = nodePartToMarkdown.find { it.value != null }.key
     text = nodePartToMarkdown[source]
 } else if (nodePartToMarkdown.size() > 1) {
-    List<String> options = nodePartToMarkdown.findAll { it.value != null }.collect { it.key.label }
-    def label = chooseFromButtons(TITLE, options, UITools.currentFrame)
+    Map<NodePart, String> orderedNodePartToMarkdown = BUTTON_ORDER.collectEntries { def np = it as NodePart; [(np): nodePartToMarkdown[np]] }
+    List<String> options = orderedNodePartToMarkdown.collect { it.key.label }
+    def label = chooseFromButtons(TITLE, options, UITools.currentFrame, BUTTON_MNEMONIC_ALWAYS_VISIBLE)
     if (label) {
         source = label as NodePart
         text = nodePartToMarkdown[source]
