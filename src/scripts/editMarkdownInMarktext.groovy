@@ -24,10 +24,11 @@ final MARKTEXT_COMMAND = 'marktext'
 final WAIT_FOR_MARKTEXT_TO_EXIT = false
 
 // When more than one Markdown-typed node part is found, the selection buttons will be displayed in this order.
-final BUTTON_ORDER = [
-        'CORE',
-        'DETAILS',
-        'NOTE',
+// Remove or comment the ones to be ignored.
+final NODE_PARTS_TO_BE_SEARCHED_FOR_MARKDOWN = [
+        NodePart.CORE,
+        NodePart.DETAILS,
+        NodePart.NOTE,
 ]
 
 // When false, the button mnemonic letter is underlined only when Alt is pressed.
@@ -112,33 +113,25 @@ enum NodePart {
     }
 }
 
-Map<NodePart, String> nodePartToMarkdown = [:]
-if (node.format == 'markdownPatternFormat') {
-    nodePartToMarkdown[NodePart.CORE] = node.text ?: ''
+Map<NodePart, String> orderedNodePartToMarkdown = [:]
+NODE_PARTS_TO_BE_SEARCHED_FOR_MARKDOWN.each { nodePart ->
+    switch (nodePart) {
+        case NodePart.CORE -> if (node.format == 'markdownPatternFormat') orderedNodePartToMarkdown[nodePart] = node.text ?: ''
+        case NodePart.DETAILS -> if (node.detailsContentType == 'markdown') orderedNodePartToMarkdown[nodePart] = node.details?.text ?: ''
+        case NodePart.NOTE -> if (node.noteContentType == 'markdown') orderedNodePartToMarkdown[nodePart] = node.note?.text ?: ''
+    }
 }
-if (node.noteContentType == 'markdown') {
-    nodePartToMarkdown[NodePart.NOTE] = node.note?.text ?: ''
-}
-if (node.detailsContentType == 'markdown') {
-    nodePartToMarkdown[NodePart.DETAILS] = node.details?.text ?: ''
-}
-
 String text = null
 NodePart source = null
-if (nodePartToMarkdown.size() == 1) {
-    source = nodePartToMarkdown.find { it.value != null }.key
-    text = nodePartToMarkdown[source]
-} else if (nodePartToMarkdown.size() > 1) {
-    Map<NodePart, String> orderedNodePartToMarkdown = BUTTON_ORDER.collectEntries {
-        def nodePart = it as NodePart
-        def markdown = nodePartToMarkdown[nodePart]
-        markdown != null ? [(nodePart): markdown] : null
-    }
+if (orderedNodePartToMarkdown.size() == 1) {
+    source = orderedNodePartToMarkdown.find { it.value != null }.key
+    text = orderedNodePartToMarkdown[source]
+} else if (orderedNodePartToMarkdown.size() > 1) {
     List<String> labels = orderedNodePartToMarkdown.collect { it.key.label }
     def choice = chooseFromButtons(TITLE, labels, UITools.currentFrame, BUTTON_MNEMONIC_ALWAYS_VISIBLE)
     if (choice) {
         source = choice as NodePart
-        text = nodePartToMarkdown[source]
+        text = orderedNodePartToMarkdown[source]
     }
 }
 if (!source) {
