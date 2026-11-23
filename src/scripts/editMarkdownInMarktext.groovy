@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 macmarrum (at) outlook (dot) ie
 // SPDX-License-Identifier: GPL-3.0-or-later
 // @ExecutionModes({ON_SINGLE_NODE="/menu_bar/Mac1/Edit"})
+
 import org.freeplane.api.Controller
 import org.freeplane.api.Node
 import org.freeplane.core.ui.components.UITools
@@ -64,32 +65,29 @@ enum NodePart {
 
 Map<NodePart, String> nodePartToMarkdown = [:]
 if (node.format == 'markdownPatternFormat') {
-    def core = node.text
-    if (core) nodePartToMarkdown[NodePart.CORE] = core
+    nodePartToMarkdown[NodePart.CORE] = node.text ?: ''
 }
 if (node.noteContentType == 'markdown') {
-    def note = node.note?.text
-    if (note) nodePartToMarkdown[NodePart.NOTE] = note
+    nodePartToMarkdown[NodePart.NOTE] = node.note?.text ?: ''
 }
 if (node.detailsContentType == 'markdown') {
-    def details = node.details?.text
-    if (details) nodePartToMarkdown[NodePart.DETAILS] = details
+    nodePartToMarkdown[NodePart.DETAILS] = node.details?.text ?: ''
 }
 
 String text = null
 NodePart source = null
 if (nodePartToMarkdown.size() == 1) {
-    source = nodePartToMarkdown.find { it.value }.key
+    source = nodePartToMarkdown.find { it.value != null }.key
     text = nodePartToMarkdown[source]
 } else if (nodePartToMarkdown.size() > 1) {
-    List<String> options = nodePartToMarkdown.findAll { it.value }.collect { it.key.name() }
+    List<String> options = nodePartToMarkdown.findAll { it.value != null }.collect { it.key.name() }
     def label = chooseFromButtons(TITLE, options, UITools.currentFrame)
     if (label) {
         source = label as NodePart
         text = nodePartToMarkdown[source]
     }
 }
-if (!text || !source) {
+if (!source) {
     c.statusInfo = 'No Markdown content'
     return
 }
