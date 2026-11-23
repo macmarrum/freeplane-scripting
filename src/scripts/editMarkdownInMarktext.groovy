@@ -10,6 +10,7 @@ import org.freeplane.features.map.NodeModel
 import javax.swing.*
 import java.awt.*
 import java.awt.event.ActionListener
+import java.awt.event.KeyEvent
 import java.util.List
 
 ////// Configuration start //////
@@ -40,8 +41,18 @@ static String chooseFromButtons(String title, List<String> options, Frame owner)
     JPanel panel = new JPanel(new GridLayout(options.size(), 1, 0, 6))
     panel.border = BorderFactory.createEmptyBorder(12, 12, 12, 12)
 
-    options.each { String label ->
+    options.each { String raw ->
+        int amp = raw.indexOf('&')
+        boolean hasKey = amp >= 0 && amp + 1 < raw.length()
+
+        String text = hasKey ? raw.substring(0, amp) + raw.substring(amp + 1) : raw
+        int keyPos = hasKey ? amp : 0
+        char keyChar = hasKey ? raw.charAt(amp + 1) : raw.charAt(0)
+        String label = text
+
         JButton button = new JButton(label)
+        button.mnemonic = KeyEvent.getExtendedKeyCodeForChar(Character.toUpperCase(keyChar) as int)
+        button.displayedMnemonicIndex = keyPos
         button.addActionListener({
             result[0] = label
             dialog.dispose()
@@ -60,7 +71,17 @@ static String chooseFromButtons(String title, List<String> options, Frame owner)
 }
 
 enum NodePart {
-    CORE, DETAILS, NOTE
+    CORE('&CORE'), DETAILS('&DETAILS'), NOTE('NOT&E')
+
+    final String label
+
+    NodePart(String label) {
+        this.label = label
+    }
+
+    String getLabel() {
+        label
+    }
 }
 
 Map<NodePart, String> nodePartToMarkdown = [:]
@@ -80,7 +101,7 @@ if (nodePartToMarkdown.size() == 1) {
     source = nodePartToMarkdown.find { it.value != null }.key
     text = nodePartToMarkdown[source]
 } else if (nodePartToMarkdown.size() > 1) {
-    List<String> options = nodePartToMarkdown.findAll { it.value != null }.collect { it.key.name() }
+    List<String> options = nodePartToMarkdown.findAll { it.value != null }.collect { it.key.label }
     def label = chooseFromButtons(TITLE, options, UITools.currentFrame)
     if (label) {
         source = label as NodePart
