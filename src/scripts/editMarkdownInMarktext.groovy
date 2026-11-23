@@ -9,6 +9,7 @@ import org.freeplane.features.map.NodeModel
 
 import javax.swing.*
 import java.awt.*
+import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.KeyEvent
 import java.util.List
@@ -77,6 +78,15 @@ static String chooseFromButtons(String title, List<String> labels, Frame owner, 
         } as ActionListener)
         panel.add(button)
     }
+
+    JRootPane root = dialog.rootPane
+    root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 'cancel')
+    root.actionMap.put('cancel', new AbstractAction() {
+        @Override
+        void actionPerformed(ActionEvent e) {
+            dialog.dispose()
+        }
+    })
 
     dialog.contentPane.add(panel)
     dialog.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
