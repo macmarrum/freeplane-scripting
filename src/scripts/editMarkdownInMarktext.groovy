@@ -142,7 +142,7 @@ if (nodePartToMarkdown.size() == 1) {
     }
 }
 if (!source) {
-    c.statusInfo = 'No Markdown content'
+    c.statusInfo = "No Markdown content — ${TITLE}"
     return
 }
 def tempFile = File.createTempFile(node.id + '-' + source.name() + '~', '.md')
